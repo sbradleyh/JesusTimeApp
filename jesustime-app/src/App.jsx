@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·111";
+const APP_VERSION = "v26.06.26·114";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4086,6 +4086,8 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const [addHour, setAddHour] = React.useState(()=>String(new Date().getHours()%12||12));
   const [addAmPm, setAddAmPm] = React.useState(()=>new Date().getHours()<12?"a":"p");
   const [addAmt, setAddAmt] = React.useState("");
+  // Use the day shown in the streaks title (the viewed day) as the target date for adds.
+  const addDay = chartTab==="day" ? viewDay : today;
   const [activeFilters, setActiveFilters] = React.useState(new Set());
   const [cols, setCols] = React.useState(2);
   const singleCol = cols===1;
@@ -4161,7 +4163,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const addTag = effectiveSearch.trim().replace(/^#+/,"");
   const addDisplay = (() => { const d=addAmt.replace(/\D/g,""); if(!d)return""; if(d.length<=2)return d; return d.slice(0,-2)+":"+d.slice(-2); })();
   const addDur = (() => { const d=addAmt.replace(/\D/g,""); if(!d)return 0; if(d.length<=2)return parseInt(d)||0; const h=parseInt(d.slice(0,-2))||0,m=parseInt(d.slice(-2))||0; return h*60+m; })();
-  const doAdd = () => { if(!addTag||addDur<=0||!onAddEntry)return; onAddEntry(addTag, addDur, `${addHour}${addAmPm}`, `#${addTag.replace(/ /g,"_")}`); setAddAmt(""); setSearch(""); };
+  const doAdd = () => { if(!addTag||addDur<=0||!onAddEntry)return; onAddEntry(addTag, addDur, `${addHour}${addAmPm}`, `#${addTag.replace(/ /g,"_")}`, addDay); setAddAmt(""); setSearch(""); };
 
   const [qaTime, setQaTime] = React.useState(nowTimeStr());
   const [qaAmt, setQaAmt] = React.useState("");
@@ -4420,7 +4422,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
                   <div onClick={e=>e.stopPropagation()} style={{display:"flex",gap:6}}>
                     {[["1m",1],["5m",5],["15m",15],["30m",30],["1h",60]].map(([lbl,m])=>(
                       <button key={lbl}
-                        onClick={()=>{onAddEntry(tag,m,(selectedSlot?SLOT_TIME[selectedSlot]:nowTimeStr()),`#${tag.replace(/ /g,"_")}`);setSelectedTag(null);}}
+                        onClick={()=>{onAddEntry(tag,m,(selectedSlot?SLOT_TIME[selectedSlot]:nowTimeStr()),`#${tag.replace(/ /g,"_")}`,addDay);setSelectedTag(null);}}
                         style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${C.borderHi}`,
                           background:C.buttonFill,color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer"}}>
                         {lbl}
@@ -13624,7 +13626,7 @@ export default function App() {
                             onFilterTag={tag=>setSelectedFilterTags(prev=>prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag])}
                             onAddToTag={tag=>{setInlineNotes(`#${tag.replace(/ /g,"_")}`);setSuggestionTrigger(t=>t+1);}}
                             onStarTag={tag=>setStarredTags(prev=>{const n=prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag];return n;})}
-                            onAddEntry={(tag,mins,time,notes)=>{const form={...emptyForm(),dur:fmtMRaw(mins),time:time||nowTimeStr(),notes:notes||(tag?`#${tag}`:"")};addEntry(mins,form,today);}}
+                            onAddEntry={(tag,mins,time,notes,date)=>{const form={...emptyForm(),dur:fmtMRaw(mins),time:time||nowTimeStr(),notes:notes||(tag?`#${tag}`:"")};addEntry(mins,form,date||today);}}
                             searchOverride={streakSearch}/>
                         </div>
                       )}
