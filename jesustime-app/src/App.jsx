@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.24·38";
+const APP_VERSION = "v26.06.26·2";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6357,7 +6357,7 @@ const GREEK_NT = {}; // Greek text removed from source
 const REF_ABBR = {"Matthew":"Matt","Mark":"Mark","Luke":"Luke","John":"John","Acts":"Acts","Romans":"Rom","1 Corinthians":"1 Cor","2 Corinthians":"2 Cor","Galatians":"Gal","Ephesians":"Eph","Philippians":"Phil","Colossians":"Col","1 Thessalonians":"1 Th","2 Thessalonians":"2 Th","1 Timothy":"1 Tim","2 Timothy":"2 Tim","Titus":"Titus","Philemon":"Phlm","Hebrews":"Heb","James":"Jas","1 Peter":"1 Pet","2 Peter":"2 Pet","1 John":"1 Jn","2 John":"2 Jn","3 John":"3 Jn","Jude":"Jude","Revelation":"Rev"};
 
 
-function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bibleView="read", onSwitchView=()=>{}, drillSignal=0, computeStreak=()=>0, starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{}, esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvChapter=()=>{}, loadEsvPassage=()=>{}}) {
+function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bibleView="read", onSwitchView=()=>{}, drillSignal=0, computeStreak=()=>0, starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{}, esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvChapter=()=>{}, loadEsvPassage=()=>{}, onOpenReader=()=>{}}) {
   const BL = '#378ADD', PU = '#7F77DD';
 
   // ── Deep links (Bible.com USFM codes + Accordance) ──
@@ -7413,14 +7413,6 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
           </div>
           );
         })()}
-        {cards.length > 0 && (
-          <button onClick={()=>startReview(true)}
-            style={{width:"100%",padding:"10px",borderRadius:12,marginBottom:6,
-              border:`1px solid ${PU}`,background:"rgba(127,119,221,0.10)",
-              color:PU,fontSize:14,fontWeight:800,cursor:"pointer"}}>
-            🖥 Full Screen
-          </button>
-        )}
 
         {showAddCard && (
           <div style={{padding:"10px",borderRadius:12,border:`1px solid rgba(127,119,221,0.4)`,
@@ -7488,7 +7480,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
               {group.map(c=>(
                 <div key={c.id} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",
                   marginBottom:4,borderRadius:10,border:`1px solid ${C.border}`,background:C.card}}>
-                  <div onClick={e=>setVerseMenu({card:c, x:e.clientX, y:e.clientY})} title="Verse options" style={{flex:1,minWidth:0,cursor:"pointer"}}>
+                  <div onClick={()=>reviewCard(c)} title="Review this verse" style={{flex:1,minWidth:0,cursor:"pointer"}}>
                     <div><span style={{fontSize:17,fontWeight:800,color:C.text}}>{c.label}</span><span style={{fontSize:12,color:C.textFaint,marginLeft:8}}>{slotLabel(c)}{c.n>0?` · ${c.n}×`:""}</span></div>
                     {c.text && <div style={{fontSize:14,color:C.textMid,fontStyle:"italic",marginTop:3,lineHeight:1.45,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{c.text}</div>}
                   </div>
@@ -7983,6 +7975,10 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                 </div>
                 {/* BOTTOM: input + hint + grade bar (hidden until tap) */}
                 {revBars && <div style={{flexShrink:0,borderTop:`1px solid rgba(${C.ink},0.10)`,background:C.modalBg,padding:"10px 16px 12px"}}>
+                  <button onClick={()=>{ onOpenReader(cur.bk, cur.ch); setRev(null); }}
+                    style={{width:"100%",padding:"9px",borderRadius:11,marginBottom:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>
+                    📖 Open in Reader
+                  </button>
                   <div style={{display:"flex",gap:6,alignItems:"stretch"}}>
                     {!complete && (<>
                       <button onClick={()=>setRevType(t=>({...t, reveal:true, hinted:true, hints:(t.hints||0)+1}))} title="Reveal the current word"
@@ -10218,6 +10214,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [nIdx, setNIdx] = React.useState(() => Math.floor(Math.random()*Math.max(1,JESUS_NAMES.length)));
   const [cIdx, setCIdx] = React.useState(() => Math.floor(Math.random()*Math.max(1,IN_CHRIST.length)));
   const [nameColor, setNameColor] = React.useState(() => { try { return localStorage.getItem("jtNameColor")||"#4ade80"; } catch(e){ return "#4ade80"; } });
+  const [titleFont, setTitleFont] = React.useState(() => { try { return localStorage.getItem("jtTitleFont")||""; } catch(e){ return ""; } });
+  const setTitleF = f => { setTitleFont(f); try{ localStorage.setItem("jtTitleFont", f); }catch(e){} };
   const [recentColors, setRecentColors] = React.useState(() => { try { const v=JSON.parse(localStorage.getItem("jtNameColorsRecent")||"null"); return (Array.isArray(v)&&v.length)?v:["#4ade80","#d4a017","#f5f5f5","#60a5fa","#f9a8d4","#fb923c"]; } catch(e){ return ["#4ade80","#d4a017","#f5f5f5","#60a5fa","#f9a8d4","#fb923c"]; } });
   const pickColor = c => { c=String(c).toLowerCase(); setNameColor(c); try{ localStorage.setItem("jtNameColor", c); }catch(e){} setRecentColors(prev => { const next=[c, ...prev.filter(x=>String(x).toLowerCase()!==c)].slice(0,6); try{ localStorage.setItem("jtNameColorsRecent", JSON.stringify(next)); }catch(e){} return next; }); };
   const [slideColor, setSlideColor] = React.useState(() => { try { return localStorage.getItem("jtSlideColor")||localStorage.getItem("jtNameColor")||"#4ade80"; } catch(e){ return "#4ade80"; } });
@@ -10362,7 +10360,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           style={{width:"100%",padding:"3px 5px",borderRadius:13,cursor:"pointer",boxSizing:"border-box",
             border:`1px solid rgba(212,160,23,0.4)`,background:bubbleBg,
             display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-          <span style={{fontSize:`calc(${inChrist?"clamp(14px,3.6vw,26px)":"clamp(16px,4.4vw,30px)"} * ${titleScale})`,fontWeight:800,color:nameColor,minWidth:0,textAlign:"center",lineHeight:1.2,display:"-webkit-box",WebkitLineClamp:inChrist?3:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{cur.n}</span>
+          <span style={{fontSize:`calc(${inChrist?"clamp(14px,3.6vw,26px)":"clamp(16px,4.4vw,30px)"} * ${titleScale})`,fontWeight:800,color:nameColor,fontFamily:titleFont||undefined,minWidth:0,textAlign:"center",lineHeight:1.2,display:"-webkit-box",WebkitLineClamp:inChrist?3:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{cur.n}</span>
           <span style={{fontSize:11,color:C.gold,flexShrink:0}}>▾</span>
         </div>
         {menuOpen && (<>
@@ -10372,7 +10370,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             boxShadow:"0 8px 24px rgba(0,0,0,0.7)"}}>
             <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <div style={{flex:1,fontSize:20,fontWeight:800,color:nameColor,lineHeight:1.3}}>{cur.n}</div>
+                <div style={{flex:1,fontSize:20,fontWeight:800,color:nameColor,fontFamily:titleFont||undefined,lineHeight:1.3}}>{cur.n}</div>
                 <button onClick={another} title="Another"
                   style={{flexShrink:0,padding:"4px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,cursor:"pointer",lineHeight:1}}>🔄</button>
               </div>
@@ -10416,6 +10414,12 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 ))}
                 <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer"}}/>
               </div>
+            </div>
+            <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Font</span>
+              <PDrop C={C} value={titleFont} onChange={setTitleF}
+                wrapStyle={{flex:1,minWidth:0}} btnStyle={{height:38,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
+                options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
             </div>
             <div style={{display:"flex",gap:6,padding:"8px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
               <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
@@ -12395,6 +12399,14 @@ export default function App() {
     } catch { return DEFAULT_BOTTOM_TABS; }
   });
   const saveBottomTabOrder = (o) => { setBottomTabOrder(o); try{localStorage.setItem("jtTabOrder",JSON.stringify(o));}catch(e){} };
+  // Per-device order for the visible bottom bar (drag-to-reorder); separate from
+  // the settings list so it never disturbs grouping/visibility. localStorage = per device.
+  const [bottomBarOrder, setBottomBarOrder] = useState(() => { try { return JSON.parse(localStorage.getItem("jtBarOrder")||"null") || []; } catch(e){ return []; } });
+  const saveBottomBarOrder = (o) => { setBottomBarOrder(o); try{localStorage.setItem("jtBarOrder",JSON.stringify(o));}catch(e){} };
+  const barDrag = useRef(null);
+  const suppressTabClick = useRef(false);
+  const [barDragId, setBarDragId] = useState(null);
+  const [barDropIdx, setBarDropIdx] = useState(null);
   // ── Shared ESV passage cache + downloader (used by the Bible reader and the Disciple reader) ──
   const [esvChapCache, setEsvChapCache] = useState(() => { try { return JSON.parse(localStorage.getItem("jtEsvChapters")||"{}"); } catch(e){ return {}; } });
   const [esvChapBusy, setEsvChapBusy] = useState("");
@@ -12703,6 +12715,24 @@ export default function App() {
       setSyncStatus("synced"); setLastSync(Date.now());
     } catch(e) { setSyncStatus("error"); }
   };
+
+  // Auto-pull: bring down entries + personal names on launch and when the app
+  // returns to the foreground (throttled), so devices sync without tapping Pull.
+  const autoPullTs = useRef(0);
+  useEffect(() => {
+    if (!syncCode || !workerUrl) return;
+    const t = setTimeout(() => { autoPullTs.current = Date.now(); pullSync(); }, 800);
+    const onVis = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!syncCodeRef.current || !workerUrlRef.current) return;
+      if (Date.now() - autoPullTs.current < 20000) return;
+      autoPullTs.current = Date.now();
+      pullSync();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearTimeout(t); document.removeEventListener("visibilitychange", onVis); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncCode, workerUrl]);
 
   const persist = useCallback(async data => {
     try { localStorage.setItem("jwDark2", JSON.stringify(data)); } catch(e){}
@@ -13622,7 +13652,8 @@ export default function App() {
                             bibleView={bibleView} onSwitchView={saveBibleView} drillSignal={drillSignal}
                             computeStreak={computeStreak} starredTags={starredTags}
                             onToggleStar={tag=>setStarredTags(prev=>prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag])}
-                            sharedTags={sharedTags} toggleSharedTag={toggleSharedTag}/>
+                            sharedTags={sharedTags} toggleSharedTag={toggleSharedTag}
+                            onOpenReader={(bid,ch)=>{ try{ if(bid) localStorage.setItem("jtReaderBook", bid); }catch(e){} saveBibleView("read"); saveMainTab("bible"); }}/>
                         </div>
                       )}
                       {activeMainTab === "catechism" && (
@@ -13797,14 +13828,17 @@ export default function App() {
           // Abide tab is "done" when every SHOWN grouped tab is done.
           const abideVisible = abideGroupIds.filter(tid => bottomTabVisible[tid]!==false);
           const abideDone = abideVisible.length>0 && abideVisible.every(tid => tid==="bible" ? bibleDone : isDoneId(tid));
-          return bottomTabOrder
+          const forcedBar = ["abide","bible","streaks"];
+          const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
+          const barIds = bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
             .filter(id => id==="today" || id==="abide" || id==="bible" || bottomTabVisible[id]!==false)
             .filter(id => !lockedTabIds.includes(id) || lockVerified)
             .filter(id => !groupedIds.includes(id))   // grouped tabs live in their container popup
             .filter(id => id!=="today")   // Day reached via the Today popup, not its own tab
-            .sort((a,b)=>{ const o=["abide","bible","streaks"]; const ia=o.indexOf(a),ib=o.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); })
-            .map(id => {
+            .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
+          return barIds
+            .map((id, tabIdx) => {
               const [icon,label] = TAB_META[id]||["?",id];
               const STAR_KEYS = {prayer:"prayer", names:"names", looking:"looking"};
               const starKey = STAR_KEYS[id]||null;
@@ -13812,7 +13846,14 @@ export default function App() {
               const showStar = starKey!==null || id==="abide" || id==="bible";
               const starOn = id==="abide" ? abideDone : id==="bible" ? bibleDone : (starKey?tabStarMap[starKey]===true:false);
               return (
-                <button key={id} onClick={()=>{
+                <button key={id}
+                  data-tabid={id} data-tabidx={tabIdx}
+                  onPointerDown={e=>{ barDrag.current={active:false,id,startX:e.clientX,from:tabIdx,to:tabIdx}; try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }}
+                  onPointerMove={e=>{ const d=barDrag.current; if(!d||d.id!==id) return; if(!d.active){ if(Math.abs(e.clientX-d.startX)<12) return; d.active=true; setBarDragId(id); } let t=null; try{ t=document.elementFromPoint(e.clientX,e.clientY); }catch(_){} const cell=t&&t.closest?t.closest("[data-tabidx]"):null; if(cell){ const di=Number(cell.dataset.tabidx); if(!Number.isNaN(di)){ d.to=di; setBarDropIdx(di); } } }}
+                  onPointerUp={()=>{ const d=barDrag.current; barDrag.current=null; setBarDragId(null); setBarDropIdx(null); if(d&&d.active){ suppressTabClick.current=true; setTimeout(()=>{suppressTabClick.current=false;},60); const from=d.from, to=(d.to==null?from:d.to); if(to!==from){ const arr=[...barIds]; const [m]=arr.splice(from,1); arr.splice(to,0,m); saveBottomBarOrder(arr); } } }}
+                  onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
+                  onClick={()=>{
+                  if(suppressTabClick.current) return;
                   if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
@@ -13821,9 +13862,10 @@ export default function App() {
                   setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); setShowTodayMenu(false);
                   saveMainTab(id);
                 }}
-                  style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",
+                  style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
                     background:(activeMainTab===id||(id==="abide"&&showAbideMenu))?`rgba(${C.ink},0.04)`:"transparent",
-                    border:"none",
+                    border:"none",opacity:barDragId===id?0.4:1,
+                    boxShadow:(barDragId&&barDropIdx===tabIdx&&barDragId!==id)?`inset 3px 0 0 ${C.gold}`:"none",
                     borderTop:(activeMainTab===id||(id==="abide"&&showAbideMenu))?`2px solid ${C.gold}`:"2px solid transparent",
                     position:"relative"}}>
                   {showStar && (
