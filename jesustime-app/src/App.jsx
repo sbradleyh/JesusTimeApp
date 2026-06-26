@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·109";
+const APP_VERSION = "v26.06.26·111";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -7978,11 +7978,9 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                 </div>
                 {/* BOTTOM: input + hint + grade bar (hidden until tap) */}
                 {revBars && <div style={{flexShrink:0,borderTop:`1px solid rgba(${C.ink},0.10)`,background:C.modalBg,padding:"10px 16px 12px"}}>
-                  <button onClick={()=>{ onOpenReader(cur.bk, cur.ch); setRev(null); }}
-                    style={{width:"100%",padding:"9px",borderRadius:11,marginBottom:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>
-                    📖 Open in Reader
-                  </button>
                   <div style={{display:"flex",gap:6,alignItems:"stretch"}}>
+                    <button onClick={()=>{ onOpenReader(cur.bk, cur.ch); setRev(null); }} title="Open in Reader"
+                      style={{flex:"0 0 auto",padding:"11px 12px",borderRadius:12,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer"}}>📕</button>
                     {!complete && (<>
                       <button onClick={()=>setRevType(t=>({...t, reveal:true, hinted:true, hints:(t.hints||0)+1}))} title="Reveal the current word"
                         style={{flex:"0 0 auto",padding:"11px 10px",borderRadius:11,border:`1px solid ${PU}`,background:`rgba(${C.ink},0.05)`,color:PU,fontSize:13,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>💡 Word</button>
@@ -12882,20 +12880,34 @@ export default function App() {
     const h = d.getHours(), m = d.getMinutes();
     const ap = h<12?"am":"pm", h12 = h%12||12;
     const timeStr = m>0 ? `${h12}:${String(m).padStart(2,"0")}${ap}` : `${h12}${ap}`;
+    const pad = n => String(n).padStart(2,"0");
+    const dateStr = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     setEditForm({dur:fmtMRaw(entry.minutes),teachings:entry.teachings||[],
-      topics:entry.topics||[],book:entry.book||"",chapter:entry.chapter||"",notes:entry.notes||"",time:timeStr});
+      topics:entry.topics||[],book:entry.book||"",chapter:entry.chapter||"",notes:entry.notes||"",time:timeStr,date:dateStr});
   };
   const saveEdit = async () => {
     if(!editEntry)return;
+    const orig = (entries[editEntry.day]||[]).find(e=>e.ts===editEntry.ts);
+    if(!orig){ setEditEntry(null); return; }
     const newMins=parseDuration(editForm.dur);
-    let newTs = editEntry.ts;
     const pt = parseTimeStr(editForm.time);
-    if (pt) { const d = new Date(editEntry.ts); d.setHours(pt.h,pt.m,0,0); newTs = d.getTime(); }
-    const updated={...entries,[editEntry.day]:(entries[editEntry.day]||[]).map(e=>
-      e.ts!==editEntry.ts?e:{...e,minutes:newMins>0?newMins:e.minutes,ts:newTs,
-        teachings:editForm.teachings,topics:editForm.topics,
-        book:editForm.book,chapter:editForm.chapter,notes:editForm.notes.trim()})};
-    setEntries(updated); await persist(updated); setEditEntry(null); showToast("Session updated");
+    // Target day comes from the date field; fall back to the original day.
+    const toDay = (editForm.date && /^\d{4}-\d{2}-\d{2}$/.test(editForm.date)) ? editForm.date : editEntry.day;
+    // Build the new timestamp at the chosen date + time (keep original time if none typed).
+    const base = new Date(toDay+"T00:00:00");
+    if (pt) base.setHours(pt.h, pt.m, 0, 0);
+    else { const o = new Date(editEntry.ts); base.setHours(o.getHours(), o.getMinutes(), 0, 0); }
+    const newTs = base.getTime();
+    const updatedEntry = {...orig, minutes:newMins>0?newMins:orig.minutes, ts:newTs,
+      teachings:editForm.teachings, topics:editForm.topics,
+      book:editForm.book, chapter:editForm.chapter, notes:editForm.notes.trim()};
+    const fromDay = editEntry.day;
+    const next = {...entries};
+    next[fromDay] = (next[fromDay]||[]).filter(e=>e.ts!==editEntry.ts);
+    const dest = (toDay===fromDay ? next[fromDay] : (next[toDay]||[])).filter(e=>e.ts!==editEntry.ts);
+    next[toDay] = [...dest, updatedEntry].sort((a,b)=>a.ts-b.ts);
+    if (fromDay!==toDay && next[fromDay] && next[fromDay].length===0) delete next[fromDay];
+    setEntries(next); await persist(next); setEditEntry(null); showToast("Session updated");
   };
   // Full backup: log + memory cards + settings (versioned envelope)
   const BACKUP_SETTINGS_KEYS = [
@@ -14219,6 +14231,9 @@ export default function App() {
       {editEntry && (
         <ModalShell title="Edit Session" canSave={true} onSave={saveEdit} onClose={()=>setEditEntry(null)}
           onDelete={()=>{ deleteEntry(editEntry.day, editEntry.ts); setEditEntry(null); }}>
+          <input type="date" value={editForm.date||""} onChange={e=>setEditForm(p=>({...p,date:e.target.value}))}
+            style={{width:"100%",padding:"9px 12px",borderRadius:12,marginBottom:8,border:`1.5px solid ${C.borderHi}`,
+              background:"rgba(212,160,23,0.07)",color:C.text,fontSize:16,fontWeight:700,outline:"none",boxSizing:"border-box"}}/>
           <div style={{display:"flex",gap:8,marginBottom:12,width:"auto"}}>
             <input type="text" value={editForm.time||""} onChange={e=>setEditForm(p=>({...p,time:e.target.value}))}
               onFocus={()=>setEditForm(p=>({...p,time:""}))}
