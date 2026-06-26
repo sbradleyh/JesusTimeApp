@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·106";
+const APP_VERSION = "v26.06.26·107";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12404,6 +12404,7 @@ export default function App() {
   const [bottomBarOrder, setBottomBarOrder] = useState(() => { try { return JSON.parse(localStorage.getItem("jtBarOrder")||"null") || []; } catch(e){ return []; } });
   const saveBottomBarOrder = (o) => { setBottomBarOrder(o); try{localStorage.setItem("jtBarOrder",JSON.stringify(o));}catch(e){} };
   const barDrag = useRef(null);
+  const barRef = useRef(null);
   const suppressTabClick = useRef(false);
   const [barDragId, setBarDragId] = useState(null);
   const [barDropIdx, setBarDropIdx] = useState(null);
@@ -13800,18 +13801,7 @@ export default function App() {
       {/* Bottom tab bar */}
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h", h+"px"); } }} style={{flexShrink:0,background:C.card,borderTop:`1px solid ${C.border}`,
         paddingBottom:"env(safe-area-inset-bottom)"}}>
-        <div style={{display:"flex",width:"100%"}}>
-        <button onClick={()=>{setAppMenuOpen(o=>!o);setShowTodayMenu(false);setShowBibleMenu(false);setShowAbideMenu(false);setShowFriendsMenu(false);}}
-          style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",
-            background:appMenuOpen?`rgba(${C.ink},0.04)`:"transparent",
-            border:"none",
-            borderTop:appMenuOpen?`2px solid ${C.gold}`:"2px solid transparent"}}>
-          <span style={{display:"block",fontSize:30,lineHeight:1,marginBottom:6,marginTop:2,
-            opacity:appMenuOpen?1:0.65,color:C.gold,
-            transform:appMenuOpen?"translateY(-2px) scale(1.08)":"scale(1)"}}>☰</span>
-          <span style={{display:"block",fontSize:16,fontWeight:700,
-            color:appMenuOpen?C.gold:C.textFaint,whiteSpace:"nowrap"}}>Menu</span>
-        </button>
+        <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
           const TAB_META = {today:["☀️","Day"],streaks:["🔥","Today"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
@@ -13831,16 +13821,37 @@ export default function App() {
           const abideVisible = abideGroupIds.filter(tid => bottomTabVisible[tid]!==false);
           const abideDone = abideVisible.length>0 && abideVisible.every(tid => tid==="bible" ? bibleDone : isDoneId(tid));
           const forcedBar = ["abide","bible","streaks"];
-          const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
-          const barIds = bottomTabOrder
+          const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; if (a==="MENU") return -1; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
+          const barIds = ["MENU"].concat(bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
             .filter(id => id==="today" || id==="abide" || id==="bible" || bottomTabVisible[id]!==false)
             .filter(id => !lockedTabIds.includes(id) || lockVerified)
             .filter(id => !groupedIds.includes(id))   // grouped tabs live in their container popup
-            .filter(id => id!=="today")   // Day reached via the Today popup, not its own tab
+            .filter(id => id!=="today"))   // Day reached via the Today popup, not its own tab
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
           return barIds
             .map((id, tabIdx) => {
+              if (id==="MENU") {
+                return (
+                <button key="MENU"
+                  data-tabid="MENU" data-tabidx={tabIdx}
+                  onPointerDown={e=>{ barDrag.current={active:false,id:"MENU",startX:e.clientX,from:tabIdx,to:tabIdx}; try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }}
+                  onPointerMove={e=>{ const d=barDrag.current; if(!d||d.id!=="MENU") return; if(!d.active){ if(Math.abs(e.clientX-d.startX)<12) return; d.active=true; setBarDragId("MENU"); } const r=barRef.current&&barRef.current.getBoundingClientRect(); if(r&&r.width){ const n=barIds.length; let di=Math.floor((e.clientX-r.left)/(r.width/n)); di=Math.max(0,Math.min(n-1,di)); d.to=di; setBarDropIdx(di); } }}
+                  onPointerUp={()=>{ const d=barDrag.current; barDrag.current=null; setBarDragId(null); setBarDropIdx(null); if(d&&d.active){ suppressTabClick.current=true; setTimeout(()=>{suppressTabClick.current=false;},60); const from=d.from, to=(d.to==null?from:d.to); if(to!==from){ const arr=[...barIds]; const [m]=arr.splice(from,1); arr.splice(to,0,m); saveBottomBarOrder(arr); } } }}
+                  onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
+                  onClick={()=>{ if(suppressTabClick.current) return; setAppMenuOpen(o=>!o);setShowTodayMenu(false);setShowBibleMenu(false);setShowAbideMenu(false);setShowFriendsMenu(false); }}
+                  style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
+                    background:appMenuOpen?`rgba(${C.ink},0.04)`:"transparent",border:"none",opacity:barDragId==="MENU"?0.4:1,
+                    boxShadow:(barDragId&&barDropIdx===tabIdx&&barDragId!=="MENU")?`inset 3px 0 0 ${C.gold}`:"none",
+                    borderTop:appMenuOpen?`2px solid ${C.gold}`:"2px solid transparent"}}>
+                  <span style={{display:"block",fontSize:30,lineHeight:1,marginBottom:6,marginTop:2,
+                    opacity:appMenuOpen?1:0.65,color:C.gold,
+                    transform:appMenuOpen?"translateY(-2px) scale(1.08)":"scale(1)"}}>☰</span>
+                  <span style={{display:"block",fontSize:16,fontWeight:700,
+                    color:appMenuOpen?C.gold:C.textFaint,whiteSpace:"nowrap"}}>Menu</span>
+                </button>
+                );
+              }
               const [icon,label] = TAB_META[id]||["?",id];
               const STAR_KEYS = {prayer:"prayer", names:"names", looking:"looking"};
               const starKey = STAR_KEYS[id]||null;
@@ -13851,7 +13862,7 @@ export default function App() {
                 <button key={id}
                   data-tabid={id} data-tabidx={tabIdx}
                   onPointerDown={e=>{ barDrag.current={active:false,id,startX:e.clientX,from:tabIdx,to:tabIdx}; try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} }}
-                  onPointerMove={e=>{ const d=barDrag.current; if(!d||d.id!==id) return; if(!d.active){ if(Math.abs(e.clientX-d.startX)<12) return; d.active=true; setBarDragId(id); } let t=null; try{ t=document.elementFromPoint(e.clientX,e.clientY); }catch(_){} const cell=t&&t.closest?t.closest("[data-tabidx]"):null; if(cell){ const di=Number(cell.dataset.tabidx); if(!Number.isNaN(di)){ d.to=di; setBarDropIdx(di); } } }}
+                  onPointerMove={e=>{ const d=barDrag.current; if(!d||d.id!==id) return; if(!d.active){ if(Math.abs(e.clientX-d.startX)<12) return; d.active=true; setBarDragId(id); } const r=barRef.current&&barRef.current.getBoundingClientRect(); if(r&&r.width){ const n=barIds.length; let di=Math.floor((e.clientX-r.left)/(r.width/n)); di=Math.max(0,Math.min(n-1,di)); d.to=di; setBarDropIdx(di); } }}
                   onPointerUp={()=>{ const d=barDrag.current; barDrag.current=null; setBarDragId(null); setBarDropIdx(null); if(d&&d.active){ suppressTabClick.current=true; setTimeout(()=>{suppressTabClick.current=false;},60); const from=d.from, to=(d.to==null?from:d.to); if(to!==from){ const arr=[...barIds]; const [m]=arr.splice(from,1); arr.splice(to,0,m); saveBottomBarOrder(arr); } } }}
                   onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
                   onClick={()=>{
