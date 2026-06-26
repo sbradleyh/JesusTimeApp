@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·108";
+const APP_VERSION = "v26.06.26·109";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3882,6 +3882,9 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
 
   // Helper: normalize a raw #tag token to a display tag, collapsing Bible specifics
   // For time/sessions: combine Bible_Read and Workout variants
+  // ciTag: case-fold a generic tag so e.g. "Prayer"/"prayer"/"PRAYER" group together,
+  // keeping a readable display (each word's first letter capitalized).
+  const ciTag = (s) => String(s||"").toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
   const normalizeTag = (raw) => {
     const t = raw.slice(1).replace(/Prayed_\d+/,"Prayed");
     if (/^Bible_Read/i.test(t))       return "Bible_Read";
@@ -3893,7 +3896,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
     if (/^Workout$/i.test(t))         return "Workout";
     if (/^Look4Jesus/i.test(t))        return "Look4Jesus";
     if (/_\d{8,}$/.test(t))           return null;
-    return t.replace(/_/g," ");
+    return ciTag(t.replace(/_/g," "));
   };
 
   // For streaks: combine Bible_Read, Workout variants, and truncate at first dash
@@ -3908,7 +3911,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
     if (/^Workout$/i.test(t))         return "Workout";
     if (/^Look4Jesus/i.test(t))        return "Look4Jesus";
     if (/_\d{8,}$/.test(t))           return null;
-    return t.split("-")[0].replace(/_/g," ");
+    return ciTag(t.split("-")[0].replace(/_/g," "));
   };
 
   days.forEach(iso => {
