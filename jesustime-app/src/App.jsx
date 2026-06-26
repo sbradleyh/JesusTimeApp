@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·107";
+const APP_VERSION = "v26.06.26·108";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -14218,6 +14218,7 @@ export default function App() {
           onDelete={()=>{ deleteEntry(editEntry.day, editEntry.ts); setEditEntry(null); }}>
           <div style={{display:"flex",gap:8,marginBottom:12,width:"auto"}}>
             <input type="text" value={editForm.time||""} onChange={e=>setEditForm(p=>({...p,time:e.target.value}))}
+              onFocus={()=>setEditForm(p=>({...p,time:""}))}
               placeholder="7:00am"
               style={{width:110,padding:"9px 8px",borderRadius:12,border:`1.5px solid ${C.borderHi}`,
                 background:"rgba(212,160,23,0.07)",color:C.text,fontSize:20,fontWeight:700,
