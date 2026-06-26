@@ -1,0 +1,7 @@
+name = "jesustime-friends"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "8b1700098d0347869710b88f15921632"
