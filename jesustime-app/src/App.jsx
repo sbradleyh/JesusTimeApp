@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·123";
+const APP_VERSION = "v26.06.26·124";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -2236,11 +2236,10 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
 
   // Total time prayed and count for this specific request
   const prayedToday = React.useMemo(() => {
-    const todayKey = new Date().toISOString().slice(0,10);
-    if (item.iso === todayKey) return true;
+    if (item.iso === today) return true;
     const prayedTag = `#prayed_${item.ts}`;
-    return (entries[todayKey]||[]).some(e=>(e.notes||"").toLowerCase().includes(prayedTag));
-  }, [entries, item.ts, item.iso]);
+    return (entries[today]||[]).some(e=>(e.notes||"").toLowerCase().includes(prayedTag));
+  }, [entries, item.ts, item.iso, today]);
 
   const {totalPrayed, prayedCount, lastPrayedIso} = React.useMemo(() => {
     let total = item.minutes||0;
