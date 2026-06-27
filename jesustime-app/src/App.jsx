@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v16";
+const APP_VERSION = "v20";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5918,8 +5918,10 @@ const BIBLE_TOTAL_VERSES = 31102;
 
 function normBook(s){ return s.replace(/_/g,' '); }
 
-function BibleReadCircle({entries, size}) {
-  const sz = size || Math.min((typeof window!=="undefined"?window.innerWidth:360)-48, 300);
+function BibleReadCircle({entries, addEntry, today, size}) {
+  const iw = typeof window!=="undefined"?window.innerWidth:380;
+  const ih = typeof window!=="undefined"?window.innerHeight:720;
+  const sz = size || Math.max(300, Math.min(iw-8, ih-205));
   const readInfo = React.useMemo(() => {
     const map = {};
     Object.keys(entries||{}).forEach(iso => {
@@ -5938,55 +5940,87 @@ function BibleReadCircle({entries, size}) {
   const OT_SET = React.useMemo(()=>new Set(BIBLE_OT),[]);
   const chCount = b => BIBLE_CHAPTERS[b]||1;
   const OT_CH = React.useMemo(()=>BIBLE_OT.reduce((s,b)=>s+chCount(b),0),[]);
+  const NT_BOOKS = React.useMemo(()=>Object.keys(BIBLE_CHAPTERS).filter(b=>!OT_SET.has(b)),[OT_SET]);
   const NT_CH = BIBLE_TOTAL_CHAPTERS - OT_CH;
   const keys = Object.keys(readInfo);
   const total = keys.length;
   const otRead = keys.filter(k=>OT_SET.has(k.split(":")[0])).length;
   const ntRead = total - otRead;
   const pct = Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10;
-  const stroke = Math.round(sz*0.12);
-  const r = (sz - stroke)/2 - 2;
-  const cx = sz/2, cy = sz/2;
-  const circ = 2*Math.PI*r;
-  const gapFrac = 0.014;
-  const otFrac = OT_CH/BIBLE_TOTAL_CHAPTERS;
-  const ntFrac = NT_CH/BIBLE_TOTAL_CHAPTERS;
-  const BLUE="#4a90d9", GOLD="#d4a017";
-  const arc = (rotFrac, lenFrac, color, key, op) => (
-    <circle key={key} cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeOpacity={op}
-      strokeWidth={stroke} strokeLinecap="butt"
-      strokeDasharray={`${Math.max(0,lenFrac)*circ} ${circ}`}
-      transform={`rotate(${-90 + rotFrac*360} ${cx} ${cy})`} />
-  );
-  const otSpan = Math.max(0, otFrac - gapFrac);
-  const ntSpan = Math.max(0, ntFrac - gapFrac);
+  const bookRead = {}; keys.forEach(k=>{ const b=k.split(":")[0]; bookRead[b]=(bookRead[b]||0)+1; });
+  const [selBook, setSelBook] = React.useState(null);
+  const [selChs, setSelChs] = React.useState(()=>new Set());
+  const [hover, setHover] = React.useState(null);
+  const svgRef = React.useRef(null);
+  const pressing = React.useRef(false);
+  const hoverRef = React.useRef(null);
+  const BL="#4a90d9", BLUE="#4a90d9", GOLD="#d4a017";
+  const cx=sz/2, cy=sz/2, TAU=Math.PI*2;
+  const rO2=sz/2-4, rO1=sz*0.36, rN2=sz*0.345, rN1=sz*0.20;
+  const pt=(r,a)=>[cx+r*Math.sin(a), cy-r*Math.cos(a)];
+  const sector=(r1,r2,a0,a1)=>{ const A=pt(r2,a0),B=pt(r2,a1),Cc=pt(r1,a1),D=pt(r1,a0); const lg=(a1-a0)>Math.PI?1:0; return `M ${A[0].toFixed(2)} ${A[1].toFixed(2)} A ${r2} ${r2} 0 ${lg} 1 ${B[0].toFixed(2)} ${B[1].toFixed(2)} L ${Cc[0].toFixed(2)} ${Cc[1].toFixed(2)} A ${r1} ${r1} 0 ${lg} 0 ${D[0].toFixed(2)} ${D[1].toFixed(2)} Z`; };
+  const buildRing=(books,r1,r2,base)=>{ const n=books.length; const out=[]; books.forEach((b,i)=>{ const a0=i/n*TAU,a1=(i+1)/n*TAU; const f=Math.min(1,(bookRead[b]||0)/chCount(b)); out.push({b,a0,a1,r1,r2,base,f,op:0.13+0.87*f,ring:base===BLUE?"ot":"nt",idx:i}); }); return out; };
+  const slices=buildRing(BIBLE_OT,rO1,rO2,BLUE).concat(buildRing(NT_BOOKS,rN1,rN2,GOLD));
+  const labelFor=b=>SHELF_ABBR[b]||b.slice(0,3);
+  const fsO=Math.max(9,Math.min(15,sz*0.032)), fsN=Math.max(8,Math.min(14,sz*0.03));
+  const setHov=(h)=>{ hoverRef.current=h; setHover(h); };
+  const bookAt=(clientX,clientY)=>{ const el=svgRef.current; if(!el) return null; const rect=el.getBoundingClientRect(); const scale=sz/(rect.width||sz); const px=(clientX-rect.left)*scale, py=(clientY-rect.top)*scale; const dx=px-cx, dy=py-cy; const r=Math.hypot(dx,dy); let a=Math.atan2(dx,-dy); if(a<0)a+=TAU;
+    if(r>=rO1-6 && r<=rO2+18){ const n=BIBLE_OT.length; let idx=Math.floor(a/TAU*n); idx=Math.max(0,Math.min(n-1,idx)); return {book:BIBLE_OT[idx],ring:"ot"}; }
+    if(r>=rN1-6 && r<=rN2+6){ const n=NT_BOOKS.length; let idx=Math.floor(a/TAU*n); idx=Math.max(0,Math.min(n-1,idx)); return {book:NT_BOOKS[idx],ring:"nt"}; }
+    return null; };
+  const onDown=(e)=>{ pressing.current=true; setHov(bookAt(e.clientX,e.clientY)); try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){ } };
+  const onMove=(e)=>{ if(!pressing.current) return; setHov(bookAt(e.clientX,e.clientY)); };
+  const onUp=(e)=>{ if(!pressing.current) return; pressing.current=false; const h=hoverRef.current; setHov(null); if(h&&h.book) openBookSel(h.book); };
+  const onCancel=()=>{ pressing.current=false; setHov(null); };
+  const openBookSel=(b)=>{ setSelBook(b); setSelChs(new Set()); };
+  const logSel=async()=>{ const b=selBook; const sorted=[...selChs].sort((x,y)=>x-y); if(!b||!sorted.length) return; const runs=[]; let s=sorted[0],p=sorted[0]; for(let i=1;i<sorted.length;i++){ if(sorted[i]===p+1)p=sorted[i]; else {runs.push([s,p]);s=p=sorted[i];} } runs.push([s,p]); const tags=runs.map(([a,b2])=>`#Bible_Read_${tagBook(b)}-${a}${b2>a?`-${b2}`:""}`).join(" "); const mins=sorted.length*5; await addEntry(mins,{dur:`${mins}m`,notes:tags,time:nowTimeStr()},today); setSelChs(new Set()); };
+  const hb = hover && hover.book;
+  const hRd = hb ? Object.keys(readInfo).filter(k=>k.split(":")[0]===hover.book).length : 0;
+  const hCh = hb ? chCount(hover.book) : 0;
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,padding:"10px 0"}}>
-      <div style={{position:"relative",width:sz,height:sz}}>
-        <svg width={sz} height={sz} style={{display:"block"}}>
-          {arc(0, otSpan, BLUE, "ot-t", 0.16)}
-          {arc(0, otSpan*(OT_CH?otRead/OT_CH:0), BLUE, "ot-f", 1)}
-          {arc(otFrac, ntSpan, GOLD, "nt-t", 0.16)}
-          {arc(otFrac, ntSpan*(NT_CH?ntRead/NT_CH:0), GOLD, "nt-f", 1)}
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,padding:"4px 0"}}>
+      <div style={{position:"relative",width:sz,height:sz,touchAction:"none"}}
+        onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onCancel}>
+        <svg ref={svgRef} width={sz} height={sz} style={{display:"block"}}>
+          {slices.map((s,i)=>(<path key={"p"+i} d={sector(s.r1,s.r2,s.a0,s.a1)} fill={s.base} fillOpacity={s.op} stroke="#140d05" strokeWidth={0.6} style={{pointerEvents:"none"}}/>))}
+          {slices.map((s,i)=>{ const am=(s.a0+s.a1)/2,rm=(s.r1+s.r2)/2,P=pt(rm,am); let deg=am*180/Math.PI-90; while(deg>90)deg-=180; while(deg<-90)deg+=180; return (<text key={"t"+i} x={P[0].toFixed(2)} y={P[1].toFixed(2)} fill="#fff" fillOpacity={0.95} fontSize={s.ring==="ot"?fsO:fsN} fontWeight={700} textAnchor="middle" dominantBaseline="central" transform={`rotate(${deg.toFixed(1)} ${P[0].toFixed(2)} ${P[1].toFixed(2)})`} style={{pointerEvents:"none"}}>{labelFor(s.b)}</text>); })}
+          {hb && (()=>{ const list=hover.ring==="ot"?BIBLE_OT:NT_BOOKS; const idx=list.indexOf(hover.book); if(idx<0) return null; const n=list.length; const a0=idx/n*TAU,a1=(idx+1)/n*TAU; const r1=hover.ring==="ot"?rO1:rN1; const r2=(hover.ring==="ot"?rO2:rN2)+16; const base=hover.ring==="ot"?BLUE:GOLD; const am=(a0+a1)/2,rm=(r1+r2)/2,P=pt(rm,am); let deg=am*180/Math.PI-90; while(deg>90)deg-=180; while(deg<-90)deg+=180; return (<g style={{pointerEvents:"none"}}><path d={sector(r1,r2,a0,a1)} fill={base} fillOpacity={1} stroke="#fff" strokeWidth={2.5}/><text x={P[0].toFixed(2)} y={P[1].toFixed(2)} fill="#fff" fontSize={Math.max(13,sz*0.045)} fontWeight={800} textAnchor="middle" dominantBaseline="central" transform={`rotate(${deg.toFixed(1)} ${P[0].toFixed(2)} ${P[1].toFixed(2)})`}>{labelFor(hover.book)}</text></g>); })()}
         </svg>
-        <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-          <div style={{fontSize:sz*0.22,fontWeight:800,color:C.gold,lineHeight:1}}>{pct}%</div>
-          <div style={{fontSize:sz*0.065,fontWeight:700,color:C.text,marginTop:6}}>{total.toLocaleString()} / {BIBLE_TOTAL_CHAPTERS.toLocaleString()}</div>
-          <div style={{fontSize:sz*0.05,fontWeight:600,color:C.textFaint,opacity:0.8}}>chapters read</div>
+        <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}>
+          {hb ? (<>
+            <div style={{fontSize:sz*0.075,fontWeight:800,color:C.gold,lineHeight:1.05,textAlign:"center",padding:"0 8px"}}>{hover.book}</div>
+            <div style={{fontSize:sz*0.04,fontWeight:700,color:C.text,marginTop:4}}>{hRd} / {hCh} read</div>
+            <div style={{fontSize:sz*0.032,fontWeight:600,color:C.textFaint,marginTop:2}}>release to open</div>
+          </>) : (<>
+            <div style={{fontSize:sz*0.11,fontWeight:800,color:C.gold,lineHeight:1}}>{pct}%</div>
+            <div style={{fontSize:sz*0.04,fontWeight:700,color:C.text,marginTop:3}}>{total} / {BIBLE_TOTAL_CHAPTERS}</div>
+          </>)}
         </div>
       </div>
       <div style={{display:"flex",gap:22}}>
         <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-          <div style={{fontSize:13,fontWeight:800,color:BLUE,letterSpacing:"0.05em"}}>OLD TEST.</div>
-          <div style={{fontSize:17,fontWeight:800,color:C.text}}>{otRead.toLocaleString()}<span style={{fontSize:12,color:C.textFaint,fontWeight:600}}> / {OT_CH.toLocaleString()}</span></div>
-          <div style={{fontSize:12,fontWeight:700,color:BLUE}}>{Math.round(otRead/OT_CH*1000)/10}%</div>
+          <div style={{fontSize:12,fontWeight:800,color:BLUE,letterSpacing:"0.05em"}}>OLD TEST.</div>
+          <div style={{fontSize:16,fontWeight:800,color:C.text}}>{otRead.toLocaleString()}<span style={{fontSize:11,color:C.textFaint,fontWeight:600}}> / {OT_CH.toLocaleString()}</span></div>
         </div>
         <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-          <div style={{fontSize:13,fontWeight:800,color:GOLD,letterSpacing:"0.05em"}}>NEW TEST.</div>
-          <div style={{fontSize:17,fontWeight:800,color:C.text}}>{ntRead.toLocaleString()}<span style={{fontSize:12,color:C.textFaint,fontWeight:600}}> / {NT_CH.toLocaleString()}</span></div>
-          <div style={{fontSize:12,fontWeight:700,color:GOLD}}>{Math.round(ntRead/NT_CH*1000)/10}%</div>
+          <div style={{fontSize:12,fontWeight:800,color:GOLD,letterSpacing:"0.05em"}}>NEW TEST.</div>
+          <div style={{fontSize:16,fontWeight:800,color:C.text}}>{ntRead.toLocaleString()}<span style={{fontSize:11,color:C.textFaint,fontWeight:600}}> / {NT_CH.toLocaleString()}</span></div>
         </div>
       </div>
+      {selBook && (()=>{ const b=selBook, chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`]) rd++; return (<>
+        <div onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)"}}/>
+        <div style={{position:"fixed",zIndex:200001,top:"50%",left:"50%",transform:"translate(-50%,-50%)",background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:"14px",width:"min(380px,calc(100vw - 28px))",maxHeight:"80vh",overflowY:"auto",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,marginBottom:10}}>
+            <span style={{fontSize:22,fontWeight:800,color:C.text}}>{b}</span>
+            <span style={{fontSize:12,color:BL,fontWeight:700,marginLeft:"auto"}}>{rd}/{chs} read</span>
+            <button onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,borderRadius:8,padding:"4px 10px",fontSize:15,fontWeight:700,cursor:"pointer"}}>✕</button>
+          </div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
+            {Array.from({length:chs},(_,i)=>{ const ch=i+1, isRead=!!readInfo[`${b}:${ch}`], sel=selChs.has(ch); return (<div key={ch} onClick={()=>setSelChs(prev=>{const n=new Set(prev); n.has(ch)?n.delete(ch):n.add(ch); return n;})} style={{width:40,height:40,borderRadius:9,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",background:sel?BL:isRead?"rgba(74,144,217,0.28)":C.inputBg,color:sel?"#fff":isRead?"#fff":C.textFaint,border:sel?`2px solid ${BL}`:`0.5px solid ${C.border}`,fontSize:15,fontWeight:sel||isRead?700:500}}>{ch}</div>); })}
+          </div>
+          <button onClick={logSel} disabled={!selChs.size} style={{width:"100%",padding:"11px 0",borderRadius:10,border:"none",background:selChs.size?BL:C.inputBg,color:selChs.size?"#fff":C.textFaint,fontSize:15,fontWeight:800,cursor:selChs.size?"pointer":"default"}}>✓ Log read{selChs.size?` · +${selChs.size*5}m`:""}</button>
+        </div>
+      </>); })()}
     </div>
   );
 }
@@ -13859,10 +13893,9 @@ export default function App() {
                         </div>
                       )}
                       {activeMainTab === "readcircle" && (
-                        <div style={{padding:"16px 12px 24px",overflowY:"auto"}}>
-                          <div style={{textAlign:"center",fontSize:18,fontWeight:800,color:C.gold,marginBottom:6}}>📖 Bible Reading</div>
-                          <div style={{textAlign:"center",fontSize:12,color:C.textFaint,marginBottom:10}}>Chapters read through the Bible</div>
-                          <BibleReadCircle entries={entries}/>
+                        <div style={{padding:"6px 4px 14px",overflowY:"auto"}}>
+                          <div style={{textAlign:"center",fontSize:15,fontWeight:800,color:C.gold,marginBottom:4}}>📖 Bible Reading — tap a book to log chapters</div>
+                          <BibleReadCircle entries={entries} addEntry={addEntry} today={today}/>
                         </div>
                       )}
                       {activeMainTab === "streaks" && (
