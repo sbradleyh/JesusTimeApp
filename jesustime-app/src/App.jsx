@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v9";
+const APP_VERSION = "v12";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4253,7 +4253,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const SLOT_START={morning:0,midday:11,evening:16};
   const nowPct=Math.max(0,Math.min(100,((nowHour-SLOT_START[nowSlot])/SLOT_HRS[nowSlot])*100));
   const timeBubbles = [["evening","🌙","Night"],["midday","🕑","Noon"],["morning","☀️","Morn"]].map(([slot,icon,lbl])=>{
-    const mins=slotMins[slot]; const narrow=cols>=2; const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
+    const mins=slotMins[slot]; const narrow=true; const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
     return (
       <div key={slot} onClick={()=>setSelectedSlot(s=>s===slot?null:slot)} style={{cursor:"pointer",position:"relative",overflow:"hidden",borderRadius:14,border:`1px solid ${selectedSlot===slot?C.gold:mins>0?C.borderHi:C.border}`,boxShadow:selectedSlot===slot?`0 0 0 2px ${C.gold}`:"none",boxSizing:"border-box",flex:1,minHeight:0,background:`rgba(${C.ink},0.05)`}}>
         <div style={{position:"absolute",left:0,right:0,bottom:0,height:`${fillPct}%`,background:`rgba(${C.ink},0.20)`,zIndex:0}}/>
@@ -4382,8 +4382,8 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
             <span>Restore {deletedTags.length} hidden tag{deletedTags.length>1?"s":""}</span>
           </button> : null}
         </div>}
-      <div style={{display:"flex",gap:8,alignItems:"stretch",height: showList ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px)` : undefined}}>
-      {showList && (<div style={{flex: cols>=2 ? "0 0 30%" : "0 0 56%",display:"flex",flexDirection:"column",gap:8,minWidth:0}}>{timeBubbles}</div>)}
+      {showList && (<div style={{display:"flex",gap:8,marginBottom:8,height:128}}>{timeBubbles}</div>)}
+      <div style={{display:"flex",gap:8,alignItems:"stretch",height: showList ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px - 136px)` : undefined}}>
       <div style={{flex:1,minWidth:0,minHeight:0,alignContent:"start",overflowY: showList ? "auto" : "visible",display:"grid",gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,gap:8}}>
         {!hasHeaders && (
           <div key="filt0" style={{gridColumn:"1 / -1",display:"flex",justifyContent:"flex-end",padding:"0 2px 2px"}}>{filterToggleBtn}</div>
@@ -14078,8 +14078,8 @@ export default function App() {
       {/* Abide tab popup menu — the tabs grouped under Abide */}
       {showTodayMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"rgba(0,0,0,0.35)",animation:"jtFadeIn .15s ease both"}} onClick={()=>setShowTodayMenu(false)}/>
-          <div style={{position:"fixed",bottom:74,zIndex:200,left:"50%",transform:"translateX(-50%)",
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowTodayMenu(false)}/>
+          <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"column",gap:4,minWidth:190}}>
@@ -14120,8 +14120,8 @@ export default function App() {
 
       {showAbideMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"rgba(0,0,0,0.35)",animation:"jtFadeIn .15s ease both"}} onClick={()=>setShowAbideMenu(false)}/>
-          <div style={{position:"fixed",bottom:74,zIndex:200,
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowAbideMenu(false)}/>
+          <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
             borderRadius:14,padding:"8px",
@@ -14162,8 +14162,8 @@ export default function App() {
       {/* Friends tab popup menu */}
       {showFriendsMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"rgba(0,0,0,0.35)",animation:"jtFadeIn .15s ease both"}} onClick={()=>setShowFriendsMenu(false)}/>
-          <div style={{position:"fixed",bottom:74,zIndex:200,
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowFriendsMenu(false)}/>
+          <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
             borderRadius:14,padding:"8px",
@@ -14188,8 +14188,8 @@ export default function App() {
       {/* Bible tab popup menu */}
       {showBibleMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"rgba(0,0,0,0.35)",animation:"jtFadeIn .15s ease both"}} onClick={()=>setShowBibleMenu(false)}/>
-          <div style={{position:"fixed",bottom:74,zIndex:200,
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowBibleMenu(false)}/>
+          <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
             borderRadius:14,padding:"8px",
