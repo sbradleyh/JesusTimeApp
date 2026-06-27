@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·127";
+const APP_VERSION = "v26.06.26·130";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1858,7 +1858,15 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false}) {
   const fmtIso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const t = new Date(today+"T00:00:00");
   const endSat = new Date(t); endSat.setDate(t.getDate() + (6 - t.getDay()));
-  const WEEKS = 52;
+  const WEEKS = (() => {
+    // Zoom in: only show weeks since the first logged day (capped at one year).
+    const firstIso = Object.keys(minsBy).filter(iso => (minsBy[iso]||0) > 0 && iso <= today).sort()[0];
+    if (!firstIso) return 52;
+    const fd = new Date(firstIso+"T00:00:00");
+    const startSun = new Date(fd); startSun.setDate(fd.getDate() - fd.getDay());
+    const span = Math.round((endSat - startSun) / (7*86400000)) + 1;
+    return Math.min(52, Math.max(4, span));
+  })();
   const cols = []; let daysWith = 0;
   for (let w = WEEKS-1; w >= 0; w--) {
     const col = [];
@@ -11820,14 +11828,18 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const myNames = readArr("jtPersonalNames") || [];
   const myNamesItems = myNames.length ? myNames : [{n:"No personal names yet — tap ✏️ Edit above to add your own names for Jesus.", a:""}];
   const myNamesBook = buildVerseListBook(myNamesItems, "Personal Names of Jesus", "mynames", true);
+  const l4jList = readArr("jtLook4JesusList") || [];
+  const l4jItems = l4jList.length ? l4jList : [{n:"Nothing here yet — tap ✏️ Edit above to add ways and places you look for Jesus.", a:""}];
+  const l4jBook = buildVerseListBook(l4jItems, "Looking 4 Jesus", "look4jesus", true);
   const [editKey, setEditKey] = React.useState(null);
   const [, setRdVer] = React.useState(0);
   React.useEffect(() => {
     const bump = () => setRdVer(v=>v+1);
     window.addEventListener("jtPersonalNamesChanged", bump);
-    return () => window.removeEventListener("jtPersonalNamesChanged", bump);
+    window.addEventListener("jtLook4JesusChanged", bump);
+    return () => { window.removeEventListener("jtPersonalNamesChanged", bump); window.removeEventListener("jtLook4JesusChanged", bump); };
   }, []);
-  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, ...(CHECKBOOK_DAYS.length ? [buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE)] : []), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myNamesBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false)];
+  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, ...(CHECKBOOK_DAYS.length ? [buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE)] : []), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myNamesBook, l4jBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false)];
   const BOOK_ICONS = ["📕","📗","📘","📙","📒","📔","📓"];
   const bookIcon = (id) => { const i = BOOKS.findIndex(b=>b.id===id); return BOOK_ICONS[(i<0?0:i) % BOOK_ICONS.length]; };
   const PREF = (()=>{ try { return JSON.parse(localStorage.getItem("jtReaderPanes")||"{}"); } catch(e){ return {}; } })();
@@ -12074,7 +12086,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               </div>
             </>)}
           </div>
-          {book.id==="mynames" && <button onClick={()=>setEditKey("mynames")}
+          {(book.id==="mynames"||book.id==="look4jesus") && <button onClick={()=>setEditKey(book.id)}
             style={{flexShrink:0,padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:11,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✏️ Edit</button>}
           <div style={{position:"relative",flexShrink:0}}>
             <button onClick={()=>setBookLogPop(s=>!s)}
@@ -12196,6 +12208,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   return (
     <div style={shell}>
       {editKey==="mynames" && <NamesEditor C={C} title="Personal Names of Jesus" storageKey="jtPersonalNames" baseItems={[]} changeEvent="jtPersonalNamesChanged" onClose={()=>setEditKey(null)} />}
+      {editKey==="look4jesus" && <NamesEditor C={C} title="Looking 4 Jesus" storageKey="jtLook4JesusList" baseItems={[]} changeEvent="jtLook4JesusChanged" onClose={()=>setEditKey(null)} />}
       {refSelOpen && (
         <div onClick={()=>setRefSelOpen(false)} style={{position:"absolute",inset:0,zIndex:60,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",padding:12}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"min(460px,100%)",maxHeight:"100%",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,boxShadow:"0 14px 40px rgba(0,0,0,0.55)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
@@ -13149,7 +13162,7 @@ export default function App() {
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
         style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",padding:"4px 0px",paddingTop:"calc(env(safe-area-inset-top) - 22px)",marginTop:"0px",gap:0,borderBottom:`1px solid ${C.border}`,background:C.bg,position:"relative",zIndex:30}}>
         <div onClick={()=>{ try{ location.reload(); }catch(e){ location.href = location.href; } }}
-          title="Tap to reload" style={{position:"absolute",left:6,top:"calc(env(safe-area-inset-top) + (100% - env(safe-area-inset-top)) / 2)",transform:"translateY(-50%)",zIndex:40,
+          title="Tap to reload" style={{position:"absolute",left:6,top:"calc(env(safe-area-inset-top) + 2px)",zIndex:40,
           fontSize:10,fontWeight:700,letterSpacing:"0.04em",color:C.gold,opacity:0.7,lineHeight:1.15,textAlign:"left",
           cursor:"pointer",padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
@@ -14040,7 +14053,7 @@ export default function App() {
             borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
-            display:"flex",flexDirection:"column",gap:4,minWidth:180}}>
+            display:"flex",flexDirection:"row",flexWrap:"wrap",gap:6,maxWidth:"min(94vw,440px)",justifyContent:"center"}}>
             {(() => {
               const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
               const lockIdx = bottomTabOrder.indexOf("LOCK");
@@ -14055,15 +14068,15 @@ export default function App() {
                 const done = id==="bible" ? bibleDone : (DONE_KEY[id]?tabStarMap[DONE_KEY[id]]===true:false);
                 return (
                   <button key={id} onClick={()=>{ setShowAbideMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab(id); }}
-                    style={{padding:"11px 18px",borderRadius:10,
+                    style={{padding:"8px 10px",borderRadius:12,position:"relative",
                       border:`1px solid ${activeMainTab===id?C.gold:C.border}`,
                       background:activeMainTab===id?C.buttonActive:"transparent",
                       color:activeMainTab===id?C.gold:C.text,
-                      fontSize:16,fontWeight:700,cursor:"pointer",
-                      textAlign:"left",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:10}}>
-                    <span style={{fontSize:28}}>{icon}</span>
-                    <span style={{flex:1}}>{label}</span>
-                    <span style={{fontSize:22,color:done?"#d4a017":`rgba(${C.ink},0.25)`}}>{done?"★":"☆"}</span>
+                      fontSize:12,fontWeight:700,cursor:"pointer",
+                      whiteSpace:"nowrap",display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:62}}>
+                    <span style={{fontSize:26}}>{icon}</span>
+                    <span>{label}</span>
+                    <span style={{position:"absolute",top:2,right:5,fontSize:12,color:done?"#d4a017":`rgba(${C.ink},0.25)`}}>{done?"★":"☆"}</span>
                   </button>
                 );
               });
@@ -14108,45 +14121,45 @@ export default function App() {
             borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
-            display:"flex",flexDirection:"column",gap:4,minWidth:180}}>
+            display:"flex",flexDirection:"row",flexWrap:"wrap",gap:6,maxWidth:"min(94vw,440px)",justifyContent:"center"}}>
             {[["read","📖","Bible Reading","reading"],["mem","💜","Bible Memory","memory"]].filter(([v])=>!bibleViewHidden[v]).map(([v,icon,label,dk])=>{
               const done = tabStarMap[dk]===true;
               return (
               <button key={v} onClick={()=>{saveBibleView(v);setBibleChosen(true);setShowBibleMenu(false);saveMainTab("bible");}}
-                style={{padding:"10px 16px",borderRadius:10,
+                style={{padding:"8px 10px",borderRadius:12,position:"relative",
                   border:`1px solid ${bibleView===v?C.gold:C.border}`,
                   background:bibleView===v?C.buttonActive:"transparent",
                   color:bibleView===v?C.gold:C.text,
-                  fontSize:14,fontWeight:700,cursor:"pointer",
-                  textAlign:"left",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8}}>
+                  fontSize:12,fontWeight:700,cursor:"pointer",
+                  whiteSpace:"nowrap",display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:62}}>
                 <span style={{fontSize:24}}>{icon}</span>
-                <span style={{flex:1}}>{label}</span>
-                <span style={{fontSize:22,color:done?"#d4a017":`rgba(${C.ink},0.25)`}}>{done?"★":"☆"}</span>
+                <span>{label.replace("Bible ","")}</span>
+                <span style={{position:"absolute",top:2,right:5,fontSize:12,color:done?"#d4a017":`rgba(${C.ink},0.25)`}}>{done?"★":"☆"}</span>
               </button>
               );
             })}
             {!bibleViewHidden["drill"] && (
             <button onClick={()=>{setBibleChosen(true);setShowBibleMenu(false);saveMainTab("bible");setDrillSignal(x=>x+1);}}
-              style={{padding:"10px 16px",borderRadius:10,
+              style={{padding:"8px 10px",borderRadius:12,position:"relative",
                 border:`1px solid ${C.border}`,background:"transparent",
-                color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",
-                textAlign:"left",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:24}}>📚</span><span style={{flex:1}}>Books Drill</span>
-              <span style={{fontSize:22,color:tabStarMap.drill?"#d4a017":`rgba(${C.ink},0.25)`}}>{tabStarMap.drill?"★":"☆"}</span>
+                color:C.text,fontSize:12,fontWeight:700,cursor:"pointer",
+                whiteSpace:"nowrap",display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:62}}>
+              <span style={{fontSize:24}}>📚</span><span>Drill</span>
+              <span style={{position:"absolute",top:2,right:5,fontSize:12,color:tabStarMap.drill?"#d4a017":`rgba(${C.ink},0.25)`}}>{tabStarMap.drill?"★":"☆"}</span>
             </button>)}
             {groupRange(bottomTabOrder,"BIBLE").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
               const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Today"],today:["☀️","Day"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowBibleMenu(false); setShowFriendsMenu(false); setShowTodayMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
-                  style={{padding:"11px 18px",borderRadius:10,
+                  style={{padding:"8px 10px",borderRadius:12,
                     border:`1px solid ${activeMainTab===gid?C.gold:C.border}`,
                     background:activeMainTab===gid?C.buttonActive:"transparent",
                     color:activeMainTab===gid?C.gold:C.text,
-                    fontSize:16,fontWeight:700,cursor:"pointer",
-                    textAlign:"left",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:28}}>{gicon}</span>
-                  <span style={{flex:1}}>{glabel}</span>
+                    fontSize:12,fontWeight:700,cursor:"pointer",
+                    whiteSpace:"nowrap",display:"flex",flexDirection:"column",alignItems:"center",gap:2,minWidth:62}}>
+                  <span style={{fontSize:26}}>{gicon}</span>
+                  <span>{glabel}</span>
                 </button>
               );
             })}
