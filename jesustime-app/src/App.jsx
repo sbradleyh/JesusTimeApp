@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·114";
+const APP_VERSION = "v26.06.26·117";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6500,13 +6500,23 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       c.slot === dom);
   const dueCards = cards.filter(isDueToday);
 
-  const gradeCard = (cardId, ok) => {
+  const gradeCard = (cardId, ok, sd) => {
     saveBox({...box, cards: box.cards.map(c => {
       if (c.id !== cardId) return c;
       const level = Math.max(0, Math.min(3, c.level + (ok ? 1 : -1)));
-      return {...c, level, slot: slotFor(level, c.id), n: c.n+1, last: today};
+      const out = {...c, level, slot: slotFor(level, c.id), n: c.n+1, last: today};
+      if (sd && sd.score != null) {
+        if (out.bestScore == null || sd.score > out.bestScore) out.bestScore = sd.score;
+        if (sd.timeMs != null && (out.bestTime == null || sd.timeMs < out.bestTime)) out.bestTime = sd.timeMs;
+        if (sd.miss != null && (out.fewestMiss == null || sd.miss < out.fewestMiss)) out.fewestMiss = sd.miss;
+        if (sd.hints != null && (out.fewestHints == null || sd.hints < out.fewestHints)) out.fewestHints = sd.hints;
+      }
+      return out;
     })});
   };
+  // Count retry attempts per verse for the current day; resets automatically on a new day.
+  const bumpRetry = (id) => saveBox({...box, cards: box.cards.map(c => c.id!==id ? c : {...c, retryDay: today, retries: (c.retryDay===today ? (c.retries||0) : 0) + 1})});
+  const retriesToday = (id) => { const c=(box.cards||[]).find(x=>x.id===id); return (c && c.retryDay===today) ? (c.retries||0) : 0; };
 
   // Add-card form
   const [showAddCard, setShowAddCard] = React.useState(false);
@@ -6697,7 +6707,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     if (!rev) return;
     const cur = rev.seq[rev.idx];
     (()=>{ const c0 = cur; if (!c0) return; const ws = c0.text ? c0.text.split(/\s+/) : []; const completed = !!c0.text && revType.n >= ws.length; const perfect = completed && ok && (revType.errors||0)===0 && (revType.hints||0)===0; bumpStats({reviews:1, memorized:ok?1:0, perfect:perfect?1:0, errors:revType.errors||0, hints:revType.hints||0}); })();
-    gradeCard(cur.id, ok);
+    const _ws = cur.text ? cur.text.split(/\s+/) : [];
+    const _completed = !!cur.text && revType.n >= _ws.length;
+    let _sd = null;
+    if (_completed) { const _miss=revType.errors||0, _hints=revType.hints||0, _t=verseTimeMs(); _sd={score:verseScore(_t,_miss,_hints), timeMs:_t, miss:_miss, hints:_hints}; }
+    gradeCard(cur.id, ok, _sd);
     const tag = (cur.bk && cur.ch && cur.v1)
       ? `#Bible_Memory_${tagBook(cur.bk)}-${cur.ch}:${cur.v1}${cur.v2>cur.v1?`-${cur.v2}`:""}` : null;
     const gradedTags = tag ? [...rev.gradedTags, tag] : rev.gradedTags;
@@ -6725,6 +6739,10 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
 
   // ── Type-the-verse practice (replaces the old "show first letters" reveal) ──
   const [revType, setRevType] = React.useState({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); // n=words done, draft=partial, reveal=show current word, hinted=any hint used (blocks Memorized)
+  const verseStartRef = React.useRef(Date.now()); // when the current verse's typing began
+  const verseDoneRef = React.useRef(null);        // when the verse was first fully recalled (freezes the timer)
+  const verseScore = (timeMs, miss, hints) => Math.max(0, Math.round(1000 - (miss||0)*12 - (hints||0)*30 - (timeMs/1000)/3));
+  const verseTimeMs = () => Math.max(0, (verseDoneRef.current||Date.now()) - (verseStartRef.current||Date.now()));
   const [revBars, setRevBars] = React.useState(false); // full-screen: title + button rows hidden until tap
   const [revFont, setRevFont] = React.useState(()=>{ try{ const v=parseInt(localStorage.getItem("jtRevFont")); return v>=14&&v<=64?v:20; }catch(e){ return 20; } });
   const bumpRevFont = d => setRevFont(v=>{ const n=Math.max(14,Math.min(64,v+d)); try{localStorage.setItem("jtRevFont",String(n));}catch(e){} return n; });
@@ -6803,7 +6821,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       setRevVv({h:0,top:0}); setKbOverlay(false);
     };
   }, [rev ? (rev.done?2:1) : 0]);
-  React.useEffect(() => { setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); setRevBars(false); }, [rev && rev.idx, rev && rev.done]);
+  React.useEffect(() => { setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); setRevBars(false); verseStartRef.current = Date.now(); verseDoneRef.current = null; }, [rev && rev.idx, rev && rev.done]);
   React.useEffect(() => { if (revWordRef.current) { try { revWordRef.current.scrollIntoView({block:"nearest", behavior:"smooth"}); } catch(e){} } }, [revType.n]);
   const revLetters = w => (w||"").toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]/g,"");
   const revOnType = (val) => {
@@ -6821,6 +6839,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         if (typed.length >= need) { n++; draft=""; lvl=0; miss=0; }
         else break;
       }
+      if (n >= words.length && verseDoneRef.current == null) verseDoneRef.current = Date.now();
       const tgt = n < words.length ? revLetters(words[n]) : "";
       const mm = !!draft && !!tgt && !tgt.startsWith(revLetters(draft));
       if (grew && mm) {                                       // wrong word → show verse with the missed word
@@ -7101,11 +7120,14 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         const score = scoreDrill(drill, elapsed);
         setDrillRecords(prev => {
           const cur = prev[drill.label] || {};
+          const entry = {score, miss: drill.miss||0, hints: drill.hints||0, timeMs: elapsed, date: today};
+          const top = [...(cur.top||[]), entry].sort((a,b)=> (b.score-a.score) || (a.timeMs-b.timeMs)).slice(0,3);
           const next = {
             bestTime: (cur.bestTime==null || elapsed < cur.bestTime) ? elapsed : cur.bestTime,
             fewestMiss: (cur.fewestMiss==null || drill.miss < cur.fewestMiss) ? drill.miss : cur.fewestMiss,
             fewestHints: (cur.fewestHints==null || (drill.hints||0) < cur.fewestHints) ? (drill.hints||0) : cur.fewestHints,
             bestScore: (cur.bestScore==null || score > cur.bestScore) ? score : cur.bestScore,
+            top,
           };
           const all = {...prev, [drill.label]: next};
           try { localStorage.setItem("jtDrillRecords", JSON.stringify(all)); } catch(e){}
@@ -7488,6 +7510,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                   <div onClick={()=>reviewCard(c)} title="Review this verse" style={{flex:1,minWidth:0,cursor:"pointer"}}>
                     <div><span style={{fontSize:17,fontWeight:800,color:C.text}}>{c.label}</span><span style={{fontSize:12,color:C.textFaint,marginLeft:8}}>{slotLabel(c)}{c.n>0?` · ${c.n}×`:""}</span></div>
                     {c.text && <div style={{fontSize:14,color:C.textMid,fontStyle:"italic",marginTop:3,lineHeight:1.45,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{c.text}</div>}
+                    {c.bestScore!=null && <div style={{fontSize:11,fontWeight:700,color:C.gold,marginTop:3}}>🏆 {c.bestScore}{c.fewestMiss!=null?` · ${c.fewestMiss} miss`:""}{c.fewestHints!=null?` · ${c.fewestHints} hint${c.fewestHints===1?"":"s"}`:""}{c.bestTime!=null?` · ${Math.round(c.bestTime/1000)}s`:""}</div>}
                   </div>
                   <button onClick={()=>{ if(confirmDel===c.id){ deleteCard(c.id); setConfirmDel(null);} else setConfirmDel(c.id); }}
                     style={{flexShrink:0,padding:"3px 8px",borderRadius:8,
@@ -7705,15 +7728,31 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
               alignItems:"center",padding:"0 24px",gap:18}}>
               <div style={{fontSize:54}}>📚</div>
               <div style={{fontSize:23,fontWeight:800,color:C.text,textAlign:"center",lineHeight:1.4,marginBottom:6}}>Type the first 2 letters of each book</div>
-              {[["Old Testament",BIBLE_OT],["New Testament",BIBLE_NT],["Whole Bible",[...BIBLE_OT,...BIBLE_NT]]].map(([lbl,list])=>(
-                <button key={lbl} onClick={()=>startDrill(lbl, list)}
-                  style={{width:"100%",maxWidth:340,padding:"18px 16px",borderRadius:14,
-                    border:`1px solid #d4a017`,background:"rgba(212,160,23,0.10)",
-                    color:"#d4a017",fontSize:22,fontWeight:800,cursor:"pointer",
-                    display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-                  {lbl} <span style={{fontSize:17,fontWeight:700,opacity:0.75}}>({list.length})</span>
-                </button>
-              ))}
+              {[["Old Testament",BIBLE_OT],["New Testament",BIBLE_NT],["Whole Bible",[...BIBLE_OT,...BIBLE_NT]]].map(([lbl,list])=>{
+                const rec = drillRecords[lbl] || {};
+                const top = (rec.top||[]).slice(0,3);
+                return (
+                <div key={lbl} style={{width:"100%",maxWidth:340}}>
+                  <button onClick={()=>startDrill(lbl, list)}
+                    style={{width:"100%",padding:"18px 16px",borderRadius:14,
+                      border:`1px solid #d4a017`,background:"rgba(212,160,23,0.10)",
+                      color:"#d4a017",fontSize:22,fontWeight:800,cursor:"pointer",
+                      display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+                    {lbl} <span style={{fontSize:17,fontWeight:700,opacity:0.75}}>({list.length})</span>
+                  </button>
+                  <div style={{marginTop:5,padding:"0 4px"}}>
+                    {top.length===0
+                      ? <div style={{fontSize:12,color:C.textFaint,textAlign:"center"}}>No scores yet</div>
+                      : top.map((t,i)=>(
+                          <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,fontWeight:700,color:i===0?C.gold:C.textFaint,padding:"1px 2px"}}>
+                            <span>{i===0?"🏆":`#${i+1}`} {t.score}</span>
+                            <span style={{fontWeight:600}}>{t.miss||0} miss · {t.hints||0} hint{(t.hints||0)===1?"":"s"} · {Math.round((t.timeMs||0)/1000)}s</span>
+                          </div>
+                        ))}
+                  </div>
+                </div>
+                );
+              })}
             </div>
             <div style={{flexShrink:0,display:"flex",justifyContent:"center",padding:"10px 16px calc(10px + env(safe-area-inset-bottom))"}}>
               <button onClick={()=>setDrill(null)} title="Close"
@@ -7900,11 +7939,24 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
             return (
               <>
                 {/* TOP: completion status (only once recalled) */}
-                {cur.text && complete && (
+                {cur.text && complete && (()=>{
+                  const sMiss = revType.errors||0, sHints = revType.hints||0, sTime = verseTimeMs();
+                  const sScore = verseScore(sTime, sMiss, sHints);
+                  const sBest = cur.bestScore;
+                  const sIsBest = (sBest==null || sScore > sBest);
+                  const sSec = Math.round(sTime/1000);
+                  return (
                   <div style={{flexShrink:0,borderBottom:`1px solid rgba(${C.ink},0.10)`,background:C.modalBg,padding:"10px 16px 8px",textAlign:"center"}}>
                     <span style={{fontSize:14,fontWeight:800,color:PU}}>{revType.hinted ? "Completed (with help)" : "✓ Recalled perfectly"}</span>
+                    <div style={{fontSize:13,fontWeight:800,color:sIsBest?C.gold:C.text,marginTop:3}}>
+                      {sIsBest ? `🏆 New best · ${sScore}` : `Score ${sScore} · best ${sBest}`}
+                    </div>
+                    <div style={{fontSize:11,fontWeight:600,color:C.textFaint,marginTop:1}}>
+                      {sMiss} miss · {sHints} hint{sHints===1?"":"s"} · {sSec}s · {retriesToday(cur.id)} retr{retriesToday(cur.id)===1?"y":"ies"} today
+                    </div>
                   </div>
-                )}
+                  );
+                })()}
                 {/* TOP: verse scrolls here */}
                 <div onClick={()=>setRevBars(v=>!v)} style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"flex-start",
                   paddingTop:revBars?12:"calc(12px + env(safe-area-inset-top))",paddingLeft:24,paddingRight:24,paddingBottom:16,overflowY:"auto",minHeight:0}}>
@@ -7920,7 +7972,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                         ))}
                       </div>
                       <div style={{display:"flex",gap:10,justifyContent:"center",marginTop:6}}>
-                        <button onClick={e=>{e.stopPropagation(); setRevType(t=>({n:0,draft:"",reveal:false,hinted:false,errors:t.errors||0,hints:t.hints||0,revealLvl:0,wordMiss:0,missedAt:null}));}}
+                        <button onClick={e=>{e.stopPropagation(); bumpRetry(cur.id); verseDoneRef.current=null; setRevType(t=>({n:0,draft:"",reveal:false,hinted:false,errors:t.errors||0,hints:t.hints||0,revealLvl:0,wordMiss:0,missedAt:null}));}}
                           style={{padding:"12px 24px",borderRadius:12,border:"none",background:PU,color:"#fff",fontSize:15,fontWeight:800,cursor:"pointer"}}>↻ Retry</button>
                         <button onClick={e=>{e.stopPropagation(); setRev(null);}}
                           style={{padding:"12px 24px",borderRadius:12,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:15,fontWeight:800,cursor:"pointer"}}>Exit</button>
@@ -7994,7 +8046,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                       style={{flex:1,minWidth:0,padding:"11px 8px",borderRadius:12,border:"none",background: complete ? (clean?PU:"#3a7ca5") : `rgba(${C.ink},0.10)`,color: complete ? "#fff" : C.textFaint,fontSize:15,fontWeight:800,cursor: complete ? "pointer" : "default",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                       {(complete && !clean) ? "Finished" : "✓ Memorized"}
                     </button>
-                    <button onClick={()=>setRevType({n:0,draft:"",reveal:false,hinted:false,errors:0,hints:0})} title="Retry from the start"
+                    <button onClick={()=>{ bumpRetry(cur.id); verseStartRef.current=Date.now(); verseDoneRef.current=null; setRevType({n:0,draft:"",reveal:false,hinted:false,errors:0,hints:0}); }} title="Retry from the start"
                       style={{flex:"0 0 auto",padding:"11px 12px",borderRadius:12,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.textMid,fontSize:16,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>↻</button>
                     <button onClick={()=>setRev(null)} title="Close"
                       style={{flex:"0 0 auto",padding:"11px 12px",borderRadius:12,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:16,fontWeight:800,cursor:"pointer"}}>✕</button>
