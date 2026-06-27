@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v45";
+const APP_VERSION = "v48";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4252,7 +4252,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const _now=new Date(); const nowHour=_now.getHours()+_now.getMinutes()/60; const nowSlot=getTimeSlot(_now.getTime());
   const SLOT_START={morning:0,midday:11,evening:16};
   const nowPct=Math.max(0,Math.min(100,((nowHour-SLOT_START[nowSlot])/SLOT_HRS[nowSlot])*100));
-  const timeBubbles = [["evening","🌙","Night"],["midday","🕑","Noon"],["morning","☀️","Morn"]].map(([slot,icon,lbl])=>{
+  const timeBubbles = [["morning","☀️","Morn"],["midday","🕑","Noon"],["evening","🌙","Night"]].map(([slot,icon,lbl])=>{
     const mins=slotMins[slot]; const narrow=(slotPos==="top"||slotPos==="bottom")?true:(cols>=2); const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
     return (
       <div key={slot} onClick={()=>setSelectedSlot(s=>s===slot?null:slot)} style={{cursor:"pointer",position:"relative",overflow:"hidden",borderRadius:14,border:`1px solid ${selectedSlot===slot?C.gold:mins>0?C.borderHi:C.border}`,boxShadow:selectedSlot===slot?`0 0 0 2px ${C.gold}`:"none",boxSizing:"border-box",flex:1,minHeight:0,background:`rgba(${C.ink},0.05)`}}>
@@ -10401,7 +10401,6 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
       if(next==="christ") setCIdx(i=>_rand(christItems.length,i)); else setNIdx(i=>_rand(nameItems.length,i)); }
     else if (effCat==="christ") setCIdx(i=>_rand(christItems.length,i));
     else setNIdx(i=>_rand(nameItems.length,i));
-    setMenuOpen(false);
   };
   React.useEffect(() => {
     const onVis = () => {
@@ -12659,6 +12658,13 @@ export default function App() {
   const circleBoxWRef = useRef(0);
   const circleRORef = useRef(null);
   const [showFriendsMenu, setShowFriendsMenu] = useState(false);
+  React.useEffect(() => {
+    const anyMenu = showBibleMenu || showAbideMenu || showTodayMenu || showFriendsMenu;
+    if (!anyMenu) return;
+    const block = (e) => { e.preventDefault(); };
+    document.addEventListener("touchmove", block, {passive:false});
+    return () => document.removeEventListener("touchmove", block, {passive:false});
+  }, [showBibleMenu, showAbideMenu, showTodayMenu, showFriendsMenu]);
   const [friendsView, setFriendsView] = useState("board");
   const [setupIni, setSetupIni] = useState("");
   const [showPeriodPicker, setShowPeriodPicker] = useState(false);
