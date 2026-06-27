@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v6";
+const APP_VERSION = "v8";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1892,18 +1892,15 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
   const activeVals = [];
   { let d=new Date(startIso+"T00:00:00"); for(; d<=t; d.setDate(d.getDate()+1)){ const m=minsBy[fmtIso(d)]||0; if(m>0) activeVals.push(m); } }
   activeVals.sort((a,b)=>a-b);
-  const cap = activeVals.length ? Math.max(1, activeVals[Math.floor(0.85*(activeVals.length-1))]) : 1;
-  const rgbFor = (mins) => {
-    if (mins<=0) return [14,14,20];
-    const tt = Math.max(0, Math.min(1, mins/cap));
-    const stops = [[0.0,[30,30,40]],[0.34,[45,95,205]],[0.70,[240,205,50]],[1.0,[255,255,255]]];
-    let lo=stops[0], hi=stops[stops.length-1];
-    for(let i=0;i<stops.length-1;i++){ if(tt>=stops[i][0]&&tt<=stops[i+1][0]){lo=stops[i];hi=stops[i+1];break;} }
-    const f=(tt-lo[0])/((hi[0]-lo[0])||1);
-    return [0,1,2].map(k=>Math.round(lo[1][k]+(hi[1][k]-lo[1][k])*f));
-  };
-  const rgbStr = rgb => `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
-  const txtFor = rgb => { const lum=(0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2])/255; return lum>0.62?"#1a1408":"#f3ecdd"; };
+  const valsDesc = activeVals.slice().sort((a,b)=>b-a);
+  const nAct = valsDesc.length;
+  const qd = p => nAct ? valsDesc[Math.min(Math.floor(p*nAct), nAct-1)] : Infinity;
+  const tA=qd(0.20), tB=qd(0.40), tC=qd(0.60), tD=qd(0.80);
+  const BANDS=[[50,185,90,1.0],[210,185,30,0.6],[220,120,40,0.4],[200,60,60,0.2]];
+  const bandOf = m => { if(m<=0||!nAct) return -1; if(m>=tA)return 0; if(m>=tB)return 1; if(m>=tC)return 2; if(m>=tD)return 3; return -1; };
+  const BG=[24,16,8];
+  const sqBg = m => { const b=bandOf(m); return b>=0 ? `rgba(${BANDS[b][0]},${BANDS[b][1]},${BANDS[b][2]},${BANDS[b][3]})` : `rgba(${C.ink},0.07)`; };
+  const txtFor = m => { const b=bandOf(m); let rgb; if(b<0) rgb=BG; else { const a=BANDS[b][3]; rgb=[0,1,2].map(i=>Math.round(BANDS[b][i]*a+BG[i]*(1-a))); } const lum=(0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2])/255; return lum>0.6?"#1a1408":"#f3ecdd"; };
   const fmtMin = m => m>=60 ? `${Math.floor(m/60)}h${m%60?(m%60)+"m":""}` : `${m}m`;
 
   const dayList = [];
@@ -1942,12 +1939,12 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
     gridEl = (
       <div style={{display:"flex",gap:gap,flexWrap:"wrap",justifyContent:"center",alignContent:"center",height:gh,maxWidth:best.cols*(cell+gap),marginLeft:"auto",marginRight:"auto"}}>
         {dayList.map(iso=>{
-          const m=minsBy[iso]||0; const rgb=rgbFor(m); const isToday=iso===today; const tc=txtFor(rgb);
+          const m=minsBy[iso]||0; const isToday=iso===today; const tc=txtFor(m);
           const d=new Date(iso+"T00:00:00");
           return (
             <div key={iso} onClick={()=>onPick(iso)} title={iso}
               style={{width:cell,height:cell,borderRadius:Math.max(3,cell*0.1),cursor:"pointer",position:"relative",
-                outline:isToday?`2px solid ${C.gold}`:"none",outlineOffset:-1,background:rgbStr(rgb),
+                outline:isToday?`2px solid ${C.gold}`:"none",outlineOffset:-1,background:sqBg(m),
                 display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
               <span style={{fontSize:Math.max(11,Math.round(cell*0.14)),fontWeight:700,color:tc,opacity:0.85}}>{WD[d.getDay()]} {d.getDate()}</span>
               {m>0 && <span style={{fontSize:Math.max(13,Math.round(cell*0.19)),fontWeight:800,color:tc}}>{fmtMin(m)}</span>}
@@ -1995,11 +1992,11 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
                 <div key={ci} style={{display:"flex",flexDirection:"column",gap:gap}}>
                   {col.map(({iso,m,future,before})=>{
                     if (future||before) return <div key={iso} style={{width:cell,height:cell,borderRadius:radius,background:"transparent"}}/>;
-                    const rgb=rgbFor(m); const isToday=iso===today; const tc=txtFor(rgb);
+                    const isToday=iso===today; const tc=txtFor(m);
                     return (
                       <div key={iso} title={`${iso}${m?" · "+fmtMin(m):""}`} onClick={()=>onPick(iso)}
                         style={{width:cell,height:cell,borderRadius:radius,cursor:"pointer",position:"relative",
-                          outline:isToday?`2px solid ${C.gold}`:"none",outlineOffset:-1,background:rgbStr(rgb),
+                          outline:isToday?`2px solid ${C.gold}`:"none",outlineOffset:-1,background:sqBg(m),
                           display:showNum?"flex":"block",alignItems:"center",justifyContent:"center"}}>
                         {showNum && <span style={{fontSize:Math.max(8,Math.round(cell*0.34)),fontWeight:700,color:tc,lineHeight:1}}>{+iso.slice(8,10)}</span>}
                       </div>
@@ -13235,11 +13232,6 @@ export default function App() {
           cursor:"pointer",padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
         </div>
-        <div style={{position:"absolute",right:6,top:"calc(env(safe-area-inset-top) + 2px)",zIndex:40,
-          fontSize:11,fontWeight:700,letterSpacing:"0.03em",color:C.gold,opacity:0.75,lineHeight:1.15,textAlign:"right",
-          pointerEvents:"none",whiteSpace:"nowrap"}}>
-          {new Date().toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}
-        </div>
         {/* Name of Jesus bubble (with title) at top */}
         <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
         {/* Stats — flex:1, shifts right as date expands */}
@@ -14044,8 +14036,8 @@ export default function App() {
                   onClick={()=>{
                   if(suppressTabClick.current) return;
                   if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("year"); setChartTab("year"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
                   if(id==="bible"){ setShowBibleMenu(m=>!m); setShowFriendsMenu(false); setShowAbideMenu(false); saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); return; }
