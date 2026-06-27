@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·130";
+const APP_VERSION = "v26.06.26·131";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5014,7 +5014,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                 // main tabs in bottom-bar order; the one closest to the + Add tab lands at the bottom
                 const mainTabs = bottomTabOrder.filter(id => !TAB_SENTINELS.includes(id) && !groupedIds.includes(id) && !lockedTabIds.includes(id));
                 const SUBVIEWS = {
-                  streaks: {hidden: todayViewHidden, save: saveTodayViewHidden, items: [["today","☀️","Day Circle"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]]},
+                  streaks: {hidden: todayViewHidden, save: saveTodayViewHidden, items: []},
                   bible: {hidden: bibleViewHidden, save: saveBibleViewHidden, items: [["read","📖","Reading"],["mem","💜","Memory"],["drill","📚","BookDrill"]]},
                 };
                 const GROUP_OF = {streaks: todayGroupIds, bible: bibleGroupIds, abide: abideGroupIds};
@@ -5103,6 +5103,15 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                       {mainTabs.includes("abide") && bubble("abide")}
                       {mainTabs.includes("bible") && bubble("bible")}
                       {mainTabs.includes("log") && bubble("log", {marginTop:"auto"})}
+                    </div>
+                  </div>
+                );
+                out.push(
+                  <div key="chartgrp" style={{marginTop:8,border:`1px solid ${C.border}`,borderRadius:10,padding:"3px 7px",background:`rgba(${C.ink},0.04)`}}>
+                    {[["today","☀️","Day Circle"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]].map(([v,ic,lb])=>subviewRow("streaks",v,ic,lb))}
+                    <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4,marginTop:3,borderTop:`1px solid ${C.border}`}}>
+                      <span style={{fontSize:22}}>📊</span>
+                      <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Chart</span>
                     </div>
                   </div>
                 );
