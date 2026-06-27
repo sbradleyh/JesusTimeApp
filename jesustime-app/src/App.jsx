@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v12";
+const APP_VERSION = "v15";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4154,7 +4154,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const [activeFilters, setActiveFilters] = React.useState(new Set());
   const [cols, setCols] = React.useState(2);
   const singleCol = cols===1;
-  const [showList, setShowList] = React.useState(true);
+  const [slotPos, setSlotPos] = React.useState(()=>{ try{ return localStorage.getItem("jtSlotPos")||"top"; }catch(e){ return "top"; } });
   const [selectedSlot, setSelectedSlot] = React.useState(()=>{ try { return getTimeSlot(Date.now()); } catch(e){ return null; } });
   const SLOT_TIME = {morning:"8a", midday:"1p", evening:"7p"};
   const toggleFilter = (f) => setActiveFilters(prev => { const n=new Set(prev); n.has(f)?n.delete(f):n.add(f); return n; });
@@ -4253,7 +4253,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const SLOT_START={morning:0,midday:11,evening:16};
   const nowPct=Math.max(0,Math.min(100,((nowHour-SLOT_START[nowSlot])/SLOT_HRS[nowSlot])*100));
   const timeBubbles = [["evening","🌙","Night"],["midday","🕑","Noon"],["morning","☀️","Morn"]].map(([slot,icon,lbl])=>{
-    const mins=slotMins[slot]; const narrow=true; const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
+    const mins=slotMins[slot]; const narrow=(slotPos==="top"||slotPos==="bottom")?true:(cols>=2); const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
     return (
       <div key={slot} onClick={()=>setSelectedSlot(s=>s===slot?null:slot)} style={{cursor:"pointer",position:"relative",overflow:"hidden",borderRadius:14,border:`1px solid ${selectedSlot===slot?C.gold:mins>0?C.borderHi:C.border}`,boxShadow:selectedSlot===slot?`0 0 0 2px ${C.gold}`:"none",boxSizing:"border-box",flex:1,minHeight:0,background:`rgba(${C.ink},0.05)`}}>
         <div style={{position:"absolute",left:0,right:0,bottom:0,height:`${fillPct}%`,background:`rgba(${C.ink},0.20)`,zIndex:0}}/>
@@ -4304,7 +4304,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
             {fBtn(activeFilters.has("Done"), "#4ade80", `${doneCount} Done`, ()=>toggleFilter("Done"), true)}
             {fBtn(atRiskOnly, "#f0a030", `${riskCount} Risk`, ()=>{ const v=!atRiskOnly; setAtRiskOnly(v); try{localStorage.setItem("streakAtRisk",JSON.stringify(v));}catch(err){} }, true)}
             {tBtn(cols===1?"l":cols===2?"ll":"lll", ()=>setCols(c=>c>=3?1:c+1), false)}
-            {tBtn("☀️", ()=>setShowList(s=>!s), showList)}
+            {tBtn(slotPos==="top"?"☀️⬆":slotPos==="left"?"☀️⬅":slotPos==="bottom"?"☀️⬇":"☀️", ()=>setSlotPos(p=>{const next=p==="top"?"left":p==="left"?"bottom":p==="bottom"?"off":"top"; try{localStorage.setItem("jtSlotPos",next);}catch(e){} return next;}), slotPos!=="off")}
             {tBtn(metric==="time"?"\u23F1":metric==="pct"?"%":"\u2717", ()=>{const o=["time","pct","sessions"];setMetric(prev=>o[(o.indexOf(prev)+1)%o.length]);}, true)}
           </div>
         );
@@ -4382,9 +4382,10 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
             <span>Restore {deletedTags.length} hidden tag{deletedTags.length>1?"s":""}</span>
           </button> : null}
         </div>}
-      {showList && (<div style={{display:"flex",gap:8,marginBottom:8,height:128}}>{timeBubbles}</div>)}
-      <div style={{display:"flex",gap:8,alignItems:"stretch",height: showList ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px - 136px)` : undefined}}>
-      <div style={{flex:1,minWidth:0,minHeight:0,alignContent:"start",overflowY: showList ? "auto" : "visible",display:"grid",gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,gap:8}}>
+      {slotPos==="top" && (<div style={{display:"flex",gap:8,marginBottom:8,height:128}}>{timeBubbles}</div>)}
+      <div style={{display:"flex",gap:8,alignItems:"stretch",height: slotPos!=="off" ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px${(slotPos==="top"||slotPos==="bottom") ? " - 136px" : ""})` : undefined}}>
+      {slotPos==="left" && (<div style={{flex: cols>=2 ? "0 0 30%" : "0 0 56%",display:"flex",flexDirection:"column",gap:8,minWidth:0}}>{timeBubbles}</div>)}
+      <div style={{flex:1,minWidth:0,minHeight:0,alignContent:"start",overflowY: slotPos!=="off" ? "auto" : "visible",display:"grid",gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,gap:8}}>
         {!hasHeaders && (
           <div key="filt0" style={{gridColumn:"1 / -1",display:"flex",justifyContent:"flex-end",padding:"0 2px 2px"}}>{filterToggleBtn}</div>
         )}
@@ -4501,6 +4502,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
         })}
       </div>
       </div>
+      {slotPos==="bottom" && (<div style={{display:"flex",gap:8,marginTop:8,height:128}}>{timeBubbles}</div>)}
       {visibleTags.length===0 && (
         <div style={{textAlign:"center",padding:"12px 8px"}}>
           <div style={{color:C.textFaint,fontSize:13,fontStyle:"italic",marginBottom:8}}>
@@ -5060,7 +5062,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Today"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["📊","Chart"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5159,8 +5161,8 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                           <input type="checkbox" checked={bottomTabVisible["chart"]===true}
                             onChange={e=>{const next={...bottomTabVisible,chart:e.target.checked};saveBottomTabVisible(next);}}
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>📊</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Chart</span>
+                          <span style={{fontSize:22}}>☀️</span>
+                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Today</span>
                         </div>
                       </div>
                       {mainTabs.includes("streaks") && bubble("streaks")}
@@ -12909,6 +12911,15 @@ export default function App() {
   const [celebrate, setCelebrate] = useState(false);
   const [todayView, setTodayView] = useState(()=>localStorage.getItem("jtTodayView")||"today");
   const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
+  React.useEffect(() => {
+    // On each app open, land on the Today chart, rotating between the day circle and the year heatmap.
+    let rot = "today";
+    try { rot = localStorage.getItem("jtOpenRot")==="year" ? "year" : "today"; } catch(e){}
+    setTodayView(rot); try{ localStorage.setItem("jtTodayView", rot); }catch(e){}
+    setChartTab(rot==="year" ? "year" : "day");
+    setActiveMainTab("today"); try{ localStorage.setItem("jtMainTab","today"); }catch(e){}
+    try { localStorage.setItem("jtOpenRot", rot==="year" ? "today" : "year"); } catch(e){}
+  }, []);
   // Shared top selector used on both the Today screen and the Streaks screen.
   const renderTodayNav = (activeKey) => {
     const go = v => { pickTodayView(v); saveMainTab("today"); };
@@ -13970,7 +13981,7 @@ export default function App() {
         paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Today"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["📊","Chart"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -14038,7 +14049,7 @@ export default function App() {
                   if(suppressTabClick.current) return;
                   if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("year"); setChartTab("year"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
                   if(id==="bible"){ setShowBibleMenu(m=>!m); setShowFriendsMenu(false); setShowAbideMenu(false); saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); return; }
@@ -14099,7 +14110,7 @@ export default function App() {
               );
             })}
             {groupRange(bottomTabOrder,"TODAY").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
-              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Today"],bible:["📖","Bible"],friends:["👥","Friends"]};
+              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],bible:["📖","Bible"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
@@ -14222,7 +14233,7 @@ export default function App() {
               <span style={{position:"absolute",top:2,right:5,fontSize:12,color:tabStarMap.drill?"#d4a017":`rgba(${C.ink},0.25)`}}>{tabStarMap.drill?"★":"☆"}</span>
             </button>)}
             {groupRange(bottomTabOrder,"BIBLE").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
-              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Today"],today:["☀️","Day"],friends:["👥","Friends"]};
+              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],today:["☀️","Day"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowBibleMenu(false); setShowFriendsMenu(false); setShowTodayMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
