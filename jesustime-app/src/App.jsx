@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v15";
+const APP_VERSION = "v16";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5062,7 +5062,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5163,6 +5163,13 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
                           <span style={{fontSize:22}}>☀️</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Today</span>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
+                          <input type="checkbox" checked={bottomTabVisible["readcircle"]===true}
+                            onChange={e=>{const next={...bottomTabVisible,readcircle:e.target.checked};saveBottomTabVisible(next);}}
+                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
+                          <span style={{fontSize:22}}>📖</span>
+                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Bible Read ⊙</span>
                         </div>
                       </div>
                       {mainTabs.includes("streaks") && bubble("streaks")}
@@ -5910,6 +5917,79 @@ const BIBLE_TOTAL_CHAPTERS = 1189;
 const BIBLE_TOTAL_VERSES = 31102;
 
 function normBook(s){ return s.replace(/_/g,' '); }
+
+function BibleReadCircle({entries, size}) {
+  const sz = size || Math.min((typeof window!=="undefined"?window.innerWidth:360)-48, 300);
+  const readInfo = React.useMemo(() => {
+    const map = {};
+    Object.keys(entries||{}).forEach(iso => {
+      (entries[iso]||[]).forEach(e => {
+        const tags = (e.notes||"").match(/#Bible_Read_\S+/gi)||[];
+        tags.forEach(tag => {
+          const p = tag.match(/#Bible_Read_(.+?)-(\d+)(?:-(\d+))?$/i);
+          if (!p) return;
+          const bk = normBook(p[1]), c1=parseInt(p[2]), c2=p[3]?parseInt(p[3]):c1;
+          for (let c=c1;c<=c2;c++) map[`${bk}:${c}`]=true;
+        });
+      });
+    });
+    return map;
+  }, [entries]);
+  const OT_SET = React.useMemo(()=>new Set(BIBLE_OT),[]);
+  const chCount = b => BIBLE_CHAPTERS[b]||1;
+  const OT_CH = React.useMemo(()=>BIBLE_OT.reduce((s,b)=>s+chCount(b),0),[]);
+  const NT_CH = BIBLE_TOTAL_CHAPTERS - OT_CH;
+  const keys = Object.keys(readInfo);
+  const total = keys.length;
+  const otRead = keys.filter(k=>OT_SET.has(k.split(":")[0])).length;
+  const ntRead = total - otRead;
+  const pct = Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10;
+  const stroke = Math.round(sz*0.12);
+  const r = (sz - stroke)/2 - 2;
+  const cx = sz/2, cy = sz/2;
+  const circ = 2*Math.PI*r;
+  const gapFrac = 0.014;
+  const otFrac = OT_CH/BIBLE_TOTAL_CHAPTERS;
+  const ntFrac = NT_CH/BIBLE_TOTAL_CHAPTERS;
+  const BLUE="#4a90d9", GOLD="#d4a017";
+  const arc = (rotFrac, lenFrac, color, key, op) => (
+    <circle key={key} cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeOpacity={op}
+      strokeWidth={stroke} strokeLinecap="butt"
+      strokeDasharray={`${Math.max(0,lenFrac)*circ} ${circ}`}
+      transform={`rotate(${-90 + rotFrac*360} ${cx} ${cy})`} />
+  );
+  const otSpan = Math.max(0, otFrac - gapFrac);
+  const ntSpan = Math.max(0, ntFrac - gapFrac);
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,padding:"10px 0"}}>
+      <div style={{position:"relative",width:sz,height:sz}}>
+        <svg width={sz} height={sz} style={{display:"block"}}>
+          {arc(0, otSpan, BLUE, "ot-t", 0.16)}
+          {arc(0, otSpan*(OT_CH?otRead/OT_CH:0), BLUE, "ot-f", 1)}
+          {arc(otFrac, ntSpan, GOLD, "nt-t", 0.16)}
+          {arc(otFrac, ntSpan*(NT_CH?ntRead/NT_CH:0), GOLD, "nt-f", 1)}
+        </svg>
+        <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+          <div style={{fontSize:sz*0.22,fontWeight:800,color:C.gold,lineHeight:1}}>{pct}%</div>
+          <div style={{fontSize:sz*0.065,fontWeight:700,color:C.text,marginTop:6}}>{total.toLocaleString()} / {BIBLE_TOTAL_CHAPTERS.toLocaleString()}</div>
+          <div style={{fontSize:sz*0.05,fontWeight:600,color:C.textFaint,opacity:0.8}}>chapters read</div>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:22}}>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+          <div style={{fontSize:13,fontWeight:800,color:BLUE,letterSpacing:"0.05em"}}>OLD TEST.</div>
+          <div style={{fontSize:17,fontWeight:800,color:C.text}}>{otRead.toLocaleString()}<span style={{fontSize:12,color:C.textFaint,fontWeight:600}}> / {OT_CH.toLocaleString()}</span></div>
+          <div style={{fontSize:12,fontWeight:700,color:BLUE}}>{Math.round(otRead/OT_CH*1000)/10}%</div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+          <div style={{fontSize:13,fontWeight:800,color:GOLD,letterSpacing:"0.05em"}}>NEW TEST.</div>
+          <div style={{fontSize:17,fontWeight:800,color:C.text}}>{ntRead.toLocaleString()}<span style={{fontSize:12,color:C.textFaint,fontWeight:600}}> / {NT_CH.toLocaleString()}</span></div>
+          <div style={{fontSize:12,fontWeight:700,color:GOLD}}>{Math.round(ntRead/NT_CH*1000)/10}%</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function tagBook(s){ return s.replace(/ /g,'_'); }
 
 function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", computeStreak=()=>0, starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{}, onChipTap=null}) {
@@ -13778,6 +13858,13 @@ export default function App() {
                           )}
                         </div>
                       )}
+                      {activeMainTab === "readcircle" && (
+                        <div style={{padding:"16px 12px 24px",overflowY:"auto"}}>
+                          <div style={{textAlign:"center",fontSize:18,fontWeight:800,color:C.gold,marginBottom:6}}>📖 Bible Reading</div>
+                          <div style={{textAlign:"center",fontSize:12,color:C.textFaint,marginBottom:10}}>Chapters read through the Bible</div>
+                          <BibleReadCircle entries={entries}/>
+                        </div>
+                      )}
                       {activeMainTab === "streaks" && (
                         <div>
                           
@@ -13981,7 +14068,7 @@ export default function App() {
         paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -13998,7 +14085,7 @@ export default function App() {
           // Abide tab is "done" when every SHOWN grouped tab is done.
           const abideVisible = abideGroupIds.filter(tid => bottomTabVisible[tid]!==false);
           const abideDone = abideVisible.length>0 && abideVisible.every(tid => tid==="bible" ? bibleDone : isDoneId(tid));
-          const forcedBar = ["chart","abide","bible","streaks"];
+          const forcedBar = ["chart","readcircle","abide","bible","streaks"];
           const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; if (a==="MENU") return -1; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
           const _barCore = bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
@@ -14007,6 +14094,7 @@ export default function App() {
             .filter(id => !groupedIds.includes(id))   // grouped tabs live in their container popup
             .filter(id => id!=="today");   // Day reached via the Today popup, not its own tab
           if (bottomTabVisible["chart"]===true && !_barCore.includes("chart")) _barCore.push("chart");
+          if (bottomTabVisible["readcircle"]===true && !_barCore.includes("readcircle")) _barCore.push("readcircle");
           const barIds = ["MENU"].concat(_barCore)
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
           return barIds
@@ -14050,6 +14138,7 @@ export default function App() {
                   if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="readcircle"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("readcircle"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
                   if(id==="bible"){ setShowBibleMenu(m=>!m); setShowFriendsMenu(false); setShowAbideMenu(false); saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); return; }
