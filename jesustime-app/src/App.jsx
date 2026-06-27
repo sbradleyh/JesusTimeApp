@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v8";
+const APP_VERSION = "v9";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1976,6 +1976,7 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
     const showNum = cell>=24;
     const monthStart=new Set(); { let pm=null; cols.forEach(col=>{ const mk=(col[0].iso||"").slice(0,7); if(mk!==pm){monthStart.add(col[0].iso);pm=mk;} }); }
     const rows=[]; { const rem=cols.length%weeksPerRow; let i=0; if(rem>0){rows.push(cols.slice(0,rem));i=rem;} for(;i<cols.length;i+=weeksPerRow) rows.push(cols.slice(i,i+weeksPerRow)); }
+    rows.reverse(); // newest weeks on top
     gridEl = (
       <div style={{display:"flex",flexDirection:"column",gap:ROWGAP,alignItems:"flex-start",justifyContent:"space-between",minHeight:gh}}>
         {rows.map((rowCols,ri)=>(
