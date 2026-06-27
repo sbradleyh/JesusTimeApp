@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26";
+const APP_VERSION = "v33";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5062,7 +5062,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"],names:["🎞️","Names"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5177,6 +5177,13 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
                           <span style={{fontSize:22}}>📚</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>All Books</span>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
+                          <input type="checkbox" checked={bottomTabVisible["names"]!==false}
+                            onChange={e=>{const next={...bottomTabVisible,names:e.target.checked};saveBottomTabVisible(next);}}
+                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
+                          <span style={{fontSize:22}}>🎞️</span>
+                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Names Slideshow</span>
                         </div>
                       </div>
                       {mainTabs.includes("streaks") && bubble("streaks")}
@@ -6039,7 +6046,7 @@ function BibleReadCircle({entries, addEntry, today, size}) {
     </div>
   );
 }
-function BibleBooksPage({entries, addEntry, today}) {
+function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
   const readInfo = React.useMemo(() => {
     const map = {};
     Object.keys(entries||{}).forEach(iso => {
@@ -6076,10 +6083,10 @@ function BibleBooksPage({entries, addEntry, today}) {
   const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:56,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
   return (
     <div style={{padding:"4px 2px 10px"}}>
-      <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
+      {!hideSummary && (<div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
         <span style={{fontSize:20,fontWeight:800,color:C.gold,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span>
         <span style={{fontSize:11,color:C.textFaint,fontWeight:700}}>{total}/{BIBLE_TOTAL_CHAPTERS} · OT {otRead}/{OT_CH} · NT {ntRead}/{NT_CH}</span>
-      </div>
+      </div>)}
       <div style={grid}>
         {labelTile("OT",BL)}
         {BIBLE_OT.map(tile)}
@@ -7796,160 +7803,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       </div>}
 
       {/* ── Atlas: reading view ── */}
-      {bibleView==="read" && <div style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:12,padding:"10px 8px 6px"}}>
-        
-
-        {/* Quick add: log chapters by reference */}
-        {showRSearch && <div style={{display:"flex",gap:6,marginBottom:8}}>
-          <input type="text" value={quickRef} onChange={e=>{setQuickRef(e.target.value); setQuickErr("");}}
-            onKeyDown={e=>{ if(e.key==="Enter") quickLog(); }}
-            placeholder={'Quick log — e.g. "John 3" or "Ps 1-5"'}
-            style={{flex:1,padding:"8px 10px",borderRadius:10,border:`1px solid ${C.border}`,
-              background:C.inputBg,color:C.text,fontSize:16,fontWeight:700,outline:"none",
-              boxSizing:"border-box",minWidth:0}}/>
-          <button onClick={quickLog} disabled={!quickRef.trim()}
-            style={{flexShrink:0,padding:"8px 14px",borderRadius:10,border:"none",
-              background:quickRef.trim()?BL:C.buttonActive,color:quickRef.trim()?"#fff":C.textFaint,
-              fontSize:16,fontWeight:800,cursor:quickRef.trim()?"pointer":"default"}}>
-            ✓
-          </button>
-        </div>}
-        {quickErr && <div style={{fontSize:11,color:C.red,marginBottom:8}}>{quickErr}</div>}
-
-        {true && (
-          <div>
-            {/* Legend — fills the card width */}
-            <div style={{display:"flex",gap:5,marginBottom:10,width:"100%"}}>
-              {[["Week","week",0],["Month","month",1],["Quarter","quarter",2],["Year","year",3]].map(([lbl,key,i])=>{
-                const on = readFilter===key;
-                return (
-                <button key={lbl} onClick={()=>setReadFilter(f=>f===key?null:key)}
-                  style={{flex:1,textAlign:"center",padding:"5px 2px",borderRadius:8,cursor:"pointer",
-                    fontSize:12,fontWeight:800,color:"#fff",letterSpacing:"0.02em",
-                    textShadow:"0 1px 2px rgba(0,0,0,0.55)",
-                    background:`rgba(${FRESH[i].r},${FRESH[i].g},${FRESH[i].b},${on?Math.min(1,FRESH[i].a+0.3):FRESH[i].a})`,
-                    border:`${on?2:1}px solid rgba(${FRESH[i].r},${FRESH[i].g},${FRESH[i].b},1)`,
-                    boxShadow:on?`0 0 0 2px rgba(${FRESH[i].r},${FRESH[i].g},${FRESH[i].b},0.35)`:"none"}}>
-                  {lbl}
-                </button>
-                );
-              })}
-              {(()=>{ const on=readFilter==="older"; return (
-                <button onClick={()=>setReadFilter(f=>f==="older"?null:"older")}
-                  style={{flex:1,textAlign:"center",padding:"5px 2px",borderRadius:8,cursor:"pointer",
-                    fontSize:12,fontWeight:800,letterSpacing:"0.02em",
-                    color:on?"#fff":C.textFaint,
-                    background:on?"rgba(120,120,130,0.55)":"transparent",
-                    border:`${on?2:1}px solid ${on?"rgba(160,160,170,0.95)":`rgba(${C.ink},0.25)`}`}}>
-                  &gt;Year
-                </button>
-              ); })()}
-              <button onClick={()=>setShowRSearch(s=>!s)} title="Search / quick log"
-                style={{flex:"0 0 auto",padding:"5px 9px",borderRadius:8,cursor:"pointer",fontSize:14,fontWeight:800,
-                  color:showRSearch?"#fff":C.textFaint,
-                  background:showRSearch?BL:"transparent",
-                  border:`${showRSearch?2:1}px solid ${showRSearch?BL:`rgba(${C.ink},0.25)`}`,
-                  display:"inline-flex",alignItems:"center",gap:3,lineHeight:1}}>
-                🔍<span style={{fontSize:10}}>{showRSearch?"▴":"▾"}</span>
-              </button>
-            </div>
-
-            <div ref={atlasMeasureRef}>
-            {(() => {
-              const TESTS = [["OT","Old Testament",BIBLE_OT],["NT","New Testament",BIBLE_NT]].map(([short,label,books])=>{
-                const fbooks = books.filter(bookMatches);
-                const shelfRows = packRows(fbooks, atlasW || 340);
-                const tRead = books.reduce((s,b)=>{let n=0;for(let c=1;c<=chCount(b);c++)if(readInfo[`${b}:${c}`])n++;return s+n;},0);
-                const tAll = books.reduce((s,b)=>s+chCount(b),0);
-                const expanded = quickRef.trim() ? true : (label==="Old Testament"?otOpen:ntOpen);
-                return {short,label,books,fbooks,shelfRows,tRead,tAll,expanded};
-              });
-              return (
-                <>
-                  <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:8}}>
-                    {TESTS.map(t=>(
-                      <div key={t.label} onClick={()=>toggleTestament(t.label)}
-                        style={{flex:1,position:"relative",borderRadius:8,overflow:"hidden",cursor:"pointer",
-                          border:`1px solid rgba(${C.ink},0.12)`,background:`rgba(${C.ink},0.04)`}}>
-                        <div style={{position:"absolute",inset:0,display:"flex",alignItems:"stretch"}}>
-                          {t.books.flatMap(b=>Array.from({length:chCount(b)},(_,i)=>{
-                            const fc = fcFiltered(readInfo[`${b}:${i+1}`]);
-                            return <span key={`${b}:${i+1}`} style={{flex:1,minWidth:0,background:fc?`rgba(${fc.r},${fc.g},${fc.b},${fc.a})`:C.inputBg}}/>;
-                          }))}
-                        </div>
-                        <div style={{position:"relative",display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"7px 12px"}}>
-                          <span style={{fontSize:18,letterSpacing:"0.06em",color:C.text,fontWeight:800,background:C.ink==="0,0,0"?"rgba(255,255,255,0.72)":"rgba(0,0,0,0.6)",padding:"1px 8px",borderRadius:6}}>{t.expanded?"▾":"▸"} {t.short}</span>
-                          <span style={{fontSize:17,color:BL,fontWeight:800,whiteSpace:"nowrap",background:C.ink==="0,0,0"?"rgba(255,255,255,0.72)":"rgba(0,0,0,0.6)",padding:"1px 8px",borderRadius:6}}>{t.tRead}/{t.tAll} · {t.tAll?((t.tRead/t.tAll)*100).toFixed(t.tRead&&t.tRead/t.tAll<0.1?1:0):0}%</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {TESTS.map(t=>{
-                    if (!t.expanded) return null;
-                    if (quickRef.trim() && t.fbooks.length===0) return null;
-                    const shelfRows = t.shelfRows;
-                    return (
-                      <div key={t.label} style={{marginBottom:10}}>
-                        {shelfRows.map((shelfRow, ri)=>(
-                          <React.Fragment key={ri}>
-                      <div style={{display:"flex",gap:3,alignItems:"flex-end"}}>
-                        {shelfRow.map(({b, chs, basis, w, g})=>{
-                          const mem = bookMemCount(b);
-                          const readYr = (()=>{ let n=0; for(let c=1;c<=chCount(b);c++){ const fi=readInfo[`${b}:${c}`]; if(fi && daysSince(fi.last)<=365) n++; } return n; })();
-                          const sel = openBook===b;
-                          const fs = Math.round((17 + (g-1)*8)*10)/10;
-                          const spineH = Math.round(46*g);
-                          const lbl = SHELF_ABBR[b] || b;
-                          return (
-                            <div key={b}
-                              onClick={()=>{setOpenBook(o=>o===b?null:b);setSelChs(new Set());}}
-                              title={b}
-                              style={{position:"relative",height:spineH,borderRadius:5,overflow:"hidden",cursor:"pointer",
-                                display:"flex",flexGrow:g,flexBasis:basis,minWidth:56,
-                                outline:sel?`2px solid ${BL}`:"none",outlineOffset:-1,
-                                border:`0.5px solid ${C.border}`,boxSizing:"border-box"}}>
-                              {Array.from({length:chs},(_,i)=>{
-                                const fc = fcFiltered(readInfo[`${b}:${i+1}`]);
-                                const pulsing = pulseChs && pulseChs.has(`${b}:${i+1}`);
-                                return <span key={i} style={{flex:1,minWidth:0,
-                                  animation:pulsing?"jtSliverPulse 1.5s ease-out both":"none",
-                                  background:fc?`rgba(${fc.r},${fc.g},${fc.b},${fc.a})`:C.inputBg}}/>;
-                              })}
-                              {lastReadBook===b && (
-                                <span title="Last read" style={{position:"absolute",top:0,right:5,zIndex:2,width:8,height:14,
-                                  background:"#d4a017",pointerEvents:"none",
-                                  clipPath:"polygon(0 0, 100% 0, 100% 100%, 50% 70%, 0 100%)",
-                                  filter:"drop-shadow(0 0 3px rgba(212,160,23,0.7))"}}/>
-                              )}
-                              <span style={{position:"absolute",inset:0,display:"flex",alignItems:"center",
-                                justifyContent:"center",pointerEvents:"none"}}>
-                                <span style={{display:"flex",flexDirection:"column",alignItems:"center",lineHeight:1.05,padding:"3px 6px",borderRadius:6,
-                                  maxWidth:"calc(100% - 4px)",overflow:"hidden",
-                                  background:C.ink==="0,0,0"?"rgba(255,255,255,0.65)":"rgba(0,0,0,0.55)"}}>
-                                  <span style={{fontSize:fs,fontWeight:800,color:C.text,whiteSpace:"nowrap"}}>{lbl}{mem>0 && <span style={{color:PU}}> ✦</span>}</span>
-                                  <span style={{fontSize:Math.max(9,Math.round(fs*0.62)),fontWeight:800,color:readYr>0?BL:C.textFaint,marginTop:1,whiteSpace:"nowrap"}}>{readYr} of {chCount(b)}</span>
-                                </span>
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div style={{height:2.5,borderRadius:1.5,background:"rgba(212,160,23,0.22)",
-                        margin:"0 1px 4px"}}/>
-                      {shelfRow.some(i=>i.b===openBook) && renderBookPanel(openBook)}
-                    </React.Fragment>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </>
-              );
-            })()}
-
-            </div>
-          </div>
-        )}
-      </div>}
+      {bibleView==="read" && <BibleBooksPage entries={entries} addEntry={addEntry} today={today} hideSummary={true}/>}
 
       {/* ── Books drill overlay ── */}
       {drill && (
@@ -10527,6 +10381,11 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     window.addEventListener("jtSlideshowName", show);
     return () => window.removeEventListener("jtSlideshowName", show);
   }, []);
+  React.useEffect(() => {
+    const start = () => { setForced(null); setPresentIdx(0); setPaused(false); setMenuOpen(false); setPresent(true); };
+    window.addEventListener("jtStartSlideshow", start);
+    return () => window.removeEventListener("jtStartSlideshow", start);
+  }, []);
   const [entryVal, setEntryVal] = React.useState("");
   const orig = JESUS_NAMES.filter(x => !removed.has(x.n));
   const nameItems = (srcH?orig:[]).concat(srcP?personal:[]);
@@ -10687,8 +10546,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           <span style={{fontSize:11,color:C.gold,flexShrink:0}}>▾</span>
         </div>
         {menuOpen && (<>
-          <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:199}}/>
-          <div style={{position:"absolute",top:"100%",left:"50%",transform:"translateX(-50%)",marginTop:4,zIndex:200,
+          <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000}}/>
+          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:"50%",transform:"translateX(-50%)",zIndex:200001,
             background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:12,overflow:"hidden",minWidth:0,width:"96vw",maxWidth:"min(96vw, 460px)",
             boxShadow:"0 8px 24px rgba(0,0,0,0.7)"}}>
             <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
@@ -13437,14 +13296,21 @@ export default function App() {
           cursor:"pointer",padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
         </div>
-        {/* Name of Jesus bubble (with title) at top */}
-        <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
+        {/* Times with Jesus header (tap to open the names menu) */}
+        <div onClick={()=>{ try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} }}
+          style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
+            border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
+            alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
+          <span style={{fontSize:"clamp(24px,7vw,34px)",fontWeight:800,color:"#d4a017"}}>{titleStats.count}</span>
+          <span style={{fontSize:"clamp(15px,4vw,24px)",fontWeight:800,color:C.text}}>{titleStats.count===1?"time":"times"} with</span>
+          <span style={{fontSize:"clamp(24px,7.5vw,40px)",fontWeight:800,color:"#d4a017"}}>Jesus</span>
+        </div>
         {/* Stats — flex:1, shifts right as date expands */}
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1}}>
-          <div style={{display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:3,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
+          <div style={{display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
-                style={{fontSize:20,fontWeight:800,color:C.gold,background:C.buttonActive,
+                style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
                   border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px",cursor:"pointer",whiteSpace:"nowrap",lineHeight:1.1}}>
                 {(()=>{const s=(chartTab==="day"?viewDay:today)||today;const p=String(s).split("-");return p.length===3?`${+p[1]}/${+p[2]}`:dateLabel;})()} ▾
               </button>
@@ -13473,14 +13339,18 @@ export default function App() {
                 </>
               )}
             </div>
-            <span style={{fontSize:20,fontWeight:800,color:C.gold,background:C.buttonActive,
+            <span style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
               border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px"}}>{(()=>{const m=titleStats.mins||0;const h=Math.floor(m/60),r=m%60;return h?`${h}h ${r}m`:`${r}m`;})()}</span>
-            <span style={{fontSize:20,fontWeight:800,color:C.gold,background:C.buttonActive,
+            <span style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
               border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px",
               display:"flex",alignItems:"baseline",gap:2}}>
               {titleStats.pctVal}%<span style={{fontSize:12,fontWeight:600,color:C.textFaint}}>of awake</span>
             </span>
           </div>
+        </div>
+        {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the 🎞️ tab) */}
+        <div style={{position:"fixed",left:-9999,top:0,width:1,height:1,overflow:"hidden",zIndex:0}}>
+          <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
         </div>
         {/* Right: hamburger */}
         <div style={{marginLeft:"auto",flexShrink:0}}>
@@ -14185,7 +14055,7 @@ export default function App() {
         paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"],names:["🎞️","Names"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -14202,7 +14072,7 @@ export default function App() {
           // Abide tab is "done" when every SHOWN grouped tab is done.
           const abideVisible = abideGroupIds.filter(tid => bottomTabVisible[tid]!==false);
           const abideDone = abideVisible.length>0 && abideVisible.every(tid => tid==="bible" ? bibleDone : isDoneId(tid));
-          const forcedBar = ["chart","readcircle","books","abide","bible","streaks"];
+          const forcedBar = ["chart","readcircle","books","names","abide","bible","streaks"];
           const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; if (a==="MENU") return -1; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
           const _barCore = bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
@@ -14213,6 +14083,7 @@ export default function App() {
           if (bottomTabVisible["chart"]===true && !_barCore.includes("chart")) _barCore.push("chart");
           if (bottomTabVisible["readcircle"]===true && !_barCore.includes("readcircle")) _barCore.push("readcircle");
           if (bottomTabVisible["books"]===true && !_barCore.includes("books")) _barCore.push("books");
+          if (bottomTabVisible["names"]!==false && !_barCore.includes("names")) _barCore.push("names");
           const barIds = ["MENU"].concat(_barCore)
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
           return barIds
@@ -14258,6 +14129,7 @@ export default function App() {
                   if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="readcircle"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("readcircle"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="books"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("books"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="names"){ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
                   if(id==="bible"){ setShowBibleMenu(m=>!m); setShowFriendsMenu(false); setShowAbideMenu(false); saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); return; }
