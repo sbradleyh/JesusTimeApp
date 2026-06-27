@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v48";
+const APP_VERSION = "v49";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10499,7 +10499,6 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
       try { localStorage.setItem("jtRemovedNames", JSON.stringify([...next])); } catch(e){}
     }
     setNIdx(i => Math.max(0, i-1));
-    setMenuOpen(false);
   };
   const addPersonal = () => {
     const t = entryVal.trim().slice(0,80);
