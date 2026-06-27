@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v38";
+const APP_VERSION = "v39";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10535,9 +10535,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           <span style={{fontSize:11,color:C.gold,flexShrink:0}}>▾</span>
         </div>
         {menuOpen && (<>
-          <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000}}/>
-          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:0,right:0,bottom:0,zIndex:200001,
-            background:C.bg,borderTop:`1px solid ${C.borderHi}`,overflowY:"auto",WebkitOverflowScrolling:"touch",
+          <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000,touchAction:"none",overscrollBehavior:"none"}}/>
+          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",zIndex:200001,
+            background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderBottom:`1px solid ${C.borderHi}`,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
             <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
