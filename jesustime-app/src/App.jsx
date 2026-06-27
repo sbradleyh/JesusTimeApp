@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v41";
+const APP_VERSION = "v42";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6091,7 +6091,7 @@ function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
             <button onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,borderRadius:8,padding:"4px 10px",fontSize:15,fontWeight:700,cursor:"pointer"}}>✕</button>
           </div>
           <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
-            {Array.from({length:chs},(_,i)=>{ const ch=i+1, isRead=!!readInfo[`${b}:${ch}`], sel=selChs.has(ch); return (<div key={ch} onClick={()=>setSelChs(prev=>{const n=new Set(prev); n.has(ch)?n.delete(ch):n.add(ch); return n;})} style={{width:40,height:40,borderRadius:9,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",background:sel?BL:isRead?"rgba(74,144,217,0.28)":C.inputBg,color:sel?"#fff":isRead?"#fff":C.textFaint,border:sel?`2px solid ${BL}`:`0.5px solid ${C.border}`,fontSize:15,fontWeight:sel||isRead?700:500}}>{ch}</div>); })}
+            {Array.from({length:chs},(_,i)=>{ const ch=i+1, isRead=!!readInfo[`${b}:${ch}`], sel=selChs.has(ch); return (<div key={ch} onClick={()=>setSelChs(prev=>{const n=new Set(prev); n.has(ch)?n.delete(ch):n.add(ch); return n;})} style={{width:32,height:32,borderRadius:7,cursor:"pointer",display:"inline-flex",alignItems:"center",justifyContent:"center",background:sel?BL:isRead?"rgba(74,144,217,0.28)":C.inputBg,color:sel?"#fff":isRead?"#fff":C.textFaint,border:sel?`2px solid ${BL}`:`0.5px solid ${C.border}`,fontSize:13,fontWeight:sel||isRead?700:500}}>{ch}</div>); })}
           </div>
           <button onClick={logSel} disabled={!selChs.size} style={{width:"100%",padding:"11px 0",borderRadius:10,border:"none",background:selChs.size?BL:C.inputBg,color:selChs.size?"#fff":C.textFaint,fontSize:15,fontWeight:800,cursor:selChs.size?"pointer":"default"}}>✓ Log read{selChs.size?` · +${selChs.size*5}m`:""}</button>
         </div>
@@ -7564,11 +7564,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
 
   const renderChip = (kind, info, icon, label, trailing) => (
     <div key={kind} onClick={()=>setChipMenu(m=>m===kind?null:kind)}
-      style={{display:"flex",alignItems:"center",gap:6,padding:"8px 14px",borderRadius:16,
+      style={{display:"flex",alignItems:"center",gap:6,padding:"3px 14px",borderRadius:16,
         width:"100%",boxSizing:"border-box",cursor:"pointer",
         border:`1px solid ${chipMenu===kind?(kind==="read"?BL:PU):info.done?C.chipHi:`rgba(${C.ink},0.15)`}`,
         background:C.chipShell}}>
-      <span style={{fontSize:19}}>{icon}</span>
+      <span style={{fontSize:17}}>{icon}</span>
       {label ? <span style={{fontSize:12,fontWeight:700,color:info.done?C.chipHi:`rgba(${C.ink},0.4)`,letterSpacing:"0.04em"}}>{label}</span> : null}
       {false&&info.inCircle&&<span style={{fontSize:10,fontWeight:800,padding:"1px 4px",borderRadius:5,color:"#d4a017",border:"1px solid #d4a017",background:"rgba(212,160,23,0.15)"}}>C</span>}
       {false&&info.inFriends&&<span style={{fontSize:10,fontWeight:800,padding:"1px 4px",borderRadius:5,color:"#a855f7",border:"1px solid #a855f7",background:"rgba(168,85,247,0.15)"}}>F</span>}
