@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v44";
+const APP_VERSION = "v45";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -14154,7 +14154,7 @@ export default function App() {
       {/* Abide tab popup menu — the tabs grouped under Abide */}
       {showTodayMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowTodayMenu(false)}/>
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent",touchAction:"none",overscrollBehavior:"none"}} onClick={()=>setShowTodayMenu(false)}/>
           <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
@@ -14196,7 +14196,7 @@ export default function App() {
 
       {showAbideMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowAbideMenu(false)}/>
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent",touchAction:"none",overscrollBehavior:"none"}} onClick={()=>setShowAbideMenu(false)}/>
           <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
@@ -14238,7 +14238,7 @@ export default function App() {
       {/* Friends tab popup menu */}
       {showFriendsMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowFriendsMenu(false)}/>
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent",touchAction:"none",overscrollBehavior:"none"}} onClick={()=>setShowFriendsMenu(false)}/>
           <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
@@ -14264,7 +14264,7 @@ export default function App() {
       {/* Bible tab popup menu */}
       {showBibleMenu && (
         <>
-          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent"}} onClick={()=>setShowBibleMenu(false)}/>
+          <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent",touchAction:"none",overscrollBehavior:"none"}} onClick={()=>setShowBibleMenu(false)}/>
           <div style={{position:"fixed",bottom:"calc(var(--jt-tab-h, 70px) + 8px)",zIndex:200,
             left:"50%",transform:"translateX(-50%)",
             background:C.bg,border:`1px solid ${C.borderHi}`,
