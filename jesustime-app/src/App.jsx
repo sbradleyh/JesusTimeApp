@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v39";
+const APP_VERSION = "v40";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6070,7 +6070,7 @@ function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
   const statTile=(t,rd,tot,col)=>(<div key={"S"+t} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"2px 1px",background:col,color:"#fff",overflow:"hidden"}}><span style={{fontSize:13,fontWeight:900,lineHeight:1}}>{t}</span><span style={{fontSize:11,fontWeight:700,marginTop:2}}>{rd}/{tot}</span><span style={{fontSize:10,fontWeight:700,opacity:0.9}}>{tot?Math.round(rd/tot*100):0}%</span></div>);
   const wholeTile=()=>(<div key="whole" style={{gridColumn:"span 2",borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"3px",background:C.gold,color:"#1a1107",overflow:"hidden"}}><span style={{fontSize:18,fontWeight:900,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span><span style={{fontSize:10,fontWeight:800,marginTop:2}}>{total}/{BIBLE_TOTAL_CHAPTERS}</span><span style={{fontSize:9,fontWeight:700,opacity:0.85}}>whole Bible</span></div>);
   return (
-    <div style={{padding:"4px 0px 10px"}}>
+    <div style={{padding:"0px 0px 10px"}}>
       {!hideSummary && (<div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
         <span style={{fontSize:20,fontWeight:800,color:C.gold,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span>
         <span style={{fontSize:11,color:C.textFaint,fontWeight:700}}>{total}/{BIBLE_TOTAL_CHAPTERS} · OT {otRead}/{OT_CH} · NT {ntRead}/{NT_CH}</span>
@@ -7582,7 +7582,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   return (
     <div style={{overflowX:"hidden"}}>
       {/* ── Active view's tag chip (full width) with whole-bible info + popup menu ── */}
-      <div style={{position:"relative",marginBottom:10}}>
+      <div style={{position:"relative",marginBottom:5}}>
         {bibleView==="read"
           ? renderChip("read", chipRead, "📖", "Bible Read",
               <span onClick={e=>{e&&e.stopPropagation&&e.stopPropagation();toggleReadStat();}}
@@ -14084,7 +14084,7 @@ export default function App() {
                   onPointerUp={()=>{ const d=barDrag.current; barDrag.current=null; setBarDragId(null); setBarDropIdx(null); if(d&&d.active){ suppressTabClick.current=true; setTimeout(()=>{suppressTabClick.current=false;},60); const from=d.from, to=(d.to==null?from:d.to); if(to!==from){ const arr=[...barIds]; const [m]=arr.splice(from,1); arr.splice(to,0,m); saveBottomBarOrder(arr); } } }}
                   onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
                   onClick={()=>{ if(suppressTabClick.current) return; setAppMenuOpen(o=>!o);setShowTodayMenu(false);setShowBibleMenu(false);setShowAbideMenu(false);setShowFriendsMenu(false); }}
-                  style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
+                  style={{flex:1,padding:"5px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
                     background:appMenuOpen?`rgba(${C.ink},0.04)`:"transparent",border:"none",opacity:barDragId==="MENU"?0.4:1,
                     boxShadow:(barDragId&&barDropIdx===tabIdx&&barDragId!=="MENU")?`inset 3px 0 0 ${C.gold}`:"none",
                     borderTop:appMenuOpen?`2px solid ${C.gold}`:"2px solid transparent"}}>
@@ -14121,7 +14121,7 @@ export default function App() {
                   setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); setShowTodayMenu(false);
                   saveMainTab(id);
                 }}
-                  style={{flex:1,padding:"10px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
+                  style={{flex:1,padding:"5px 4px 0px",textAlign:"center",cursor:"pointer",touchAction:"none",
                     background:(activeMainTab===id||(id==="abide"&&showAbideMenu))?`rgba(${C.ink},0.04)`:"transparent",
                     border:"none",opacity:barDragId===id?0.4:1,
                     boxShadow:(barDragId&&barDropIdx===tabIdx&&barDragId!==id)?`inset 3px 0 0 ${C.gold}`:"none",
@@ -14133,7 +14133,7 @@ export default function App() {
                       {starOn?"★":"☆"}
                     </span>
                   )}
-                  <span style={{display:"block",fontSize:36,lineHeight:1,marginBottom:3,
+                  <span style={{display:"block",fontSize:36,lineHeight:1,marginBottom:1,
                     transition:"transform .18s ease, opacity .18s ease",
                     opacity:activeMainTab===id?1:0.65,
                     color:(activeMainTab===id||(id==="abide"&&showAbideMenu))?C.gold:C.text,
