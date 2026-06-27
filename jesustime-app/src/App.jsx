@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·126";
+const APP_VERSION = "v26.06.26·127";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3862,7 +3862,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
       const y=now.getFullYear()+viewOffset;
       const all = Array.from({length:365},(_,i)=>{const d=new Date(y,0,1);d.setDate(d.getDate()+i);return d.toISOString().slice(0,10);}).filter(d=>d.startsWith(String(y))&&d<=today);
       // Zoom in: begin on the first day this year that has logged time
-      const first = all.find(d => (entries[d]||[]).some(e=>(e.minutes||0)>0));
+      const first = all.find(d => (entries[d]||[]).length>0);
       return first ? all.slice(all.indexOf(first)) : all;
     }
     if (chartTab==="week") {
@@ -13149,7 +13149,7 @@ export default function App() {
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
         style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",padding:"4px 0px",paddingTop:"calc(env(safe-area-inset-top) - 22px)",marginTop:"0px",gap:0,borderBottom:`1px solid ${C.border}`,background:C.bg,position:"relative",zIndex:30}}>
         <div onClick={()=>{ try{ location.reload(); }catch(e){ location.href = location.href; } }}
-          title="Tap to reload" style={{position:"absolute",left:6,top:"calc(env(safe-area-inset-top) + 2px)",zIndex:40,
+          title="Tap to reload" style={{position:"absolute",left:6,top:"calc(env(safe-area-inset-top) + (100% - env(safe-area-inset-top)) / 2)",transform:"translateY(-50%)",zIndex:40,
           fontSize:10,fontWeight:700,letterSpacing:"0.04em",color:C.gold,opacity:0.7,lineHeight:1.15,textAlign:"left",
           cursor:"pointer",padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
@@ -13226,7 +13226,10 @@ export default function App() {
                 const y = ref.getFullYear() + viewOffset;
                 const days=[];
                 for(let i=364;i>=0;i--){const d=new Date(y+"-01-01");d.setDate(d.getDate()+(364-i));if(d.getFullYear()===y)days.push(d.toISOString().slice(0,10));}
-                return days.filter(d=>d<=today);
+                const yd = days.filter(d=>d<=today);
+                // Zoom in: start at the first logged day of the year
+                const first = yd.find(d => (entries[d]||[]).length>0);
+                return first ? yd.slice(yd.indexOf(first)) : yd;
               }
               if (chartTab==="l365") {
                 const days=[];
