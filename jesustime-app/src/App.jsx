@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v42";
+const APP_VERSION = "v43";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6061,14 +6061,14 @@ function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
   const OT_CH=BIBLE_OT.reduce((s,b)=>s+chCount(b),0); const NT_CH=BIBLE_TOTAL_CHAPTERS-OT_CH;
   const logSel=async()=>{ const b=selBook; const sorted=[...selChs].sort((x,y)=>x-y); if(!b||!sorted.length) return; const runs=[]; let s=sorted[0],p=sorted[0]; for(let i=1;i<sorted.length;i++){ if(sorted[i]===p+1)p=sorted[i]; else {runs.push([s,p]);s=p=sorted[i];} } runs.push([s,p]); const tags=runs.map(([a,b2])=>`#Bible_Read_${tagBook(b)}-${a}${b2>a?`-${b2}`:""}`).join(" "); const mins=sorted.length*5; await addEntry(mins,{dur:`${mins}m`,notes:tags,time:nowTimeStr()},today); setSelChs(new Set()); };
   const tile=(b)=>{ const chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`])rd++; const f=rd/chs; const rgb=OT_SET.has(b)?"74,144,217":"212,160,23"; const done=f>=1; return (
-    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:64,padding:"5px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
+    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:46,padding:"2px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
       <span style={{fontSize:17,fontWeight:800,color:f>0.45?"#fff":C.text,lineHeight:1,whiteSpace:"nowrap"}}>{labelFor(b)}</span>
       <span style={{fontSize:12,fontWeight:700,color:f>0.45?"rgba(255,255,255,0.85)":C.textFaint,marginTop:2}}>{rd}/{chs}</span>
     </div>); };
   const grid={display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:3};
-  const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:64,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
-  const statTile=(t,rd,tot,col)=>(<div key={"S"+t} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"2px 1px",background:col,color:"#fff",overflow:"hidden"}}><span style={{fontSize:13,fontWeight:900,lineHeight:1}}>{t}</span><span style={{fontSize:11,fontWeight:700,marginTop:2}}>{rd}/{tot}</span><span style={{fontSize:10,fontWeight:700,opacity:0.9}}>{tot?Math.round(rd/tot*100):0}%</span></div>);
-  const wholeTile=()=>(<div key="whole" style={{gridColumn:"span 2",borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"3px",background:C.gold,color:"#1a1107",overflow:"hidden"}}><span style={{fontSize:18,fontWeight:900,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span><span style={{fontSize:10,fontWeight:800,marginTop:2}}>{total}/{BIBLE_TOTAL_CHAPTERS}</span><span style={{fontSize:9,fontWeight:700,opacity:0.85}}>whole Bible</span></div>);
+  const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:46,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
+  const statTile=(t,rd,tot,col)=>(<div key={"S"+t} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:46,padding:"2px 1px",background:col,color:"#fff",overflow:"hidden"}}><span style={{fontSize:13,fontWeight:900,lineHeight:1}}>{t}</span><span style={{fontSize:11,fontWeight:700,marginTop:2}}>{rd}/{tot}</span><span style={{fontSize:10,fontWeight:700,opacity:0.9}}>{tot?Math.round(rd/tot*100):0}%</span></div>);
+  const wholeTile=()=>(<div key="whole" style={{gridColumn:"span 2",borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:46,padding:"3px",background:C.gold,color:"#1a1107",overflow:"hidden"}}><span style={{fontSize:18,fontWeight:900,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span><span style={{fontSize:10,fontWeight:800,marginTop:2}}>{total}/{BIBLE_TOTAL_CHAPTERS}</span><span style={{fontSize:9,fontWeight:700,opacity:0.85}}>whole Bible</span></div>);
   return (
     <div style={{padding:"0px 0px 10px"}}>
       {!hideSummary && (<div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
