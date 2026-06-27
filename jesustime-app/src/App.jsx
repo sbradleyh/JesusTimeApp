@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·117";
+const APP_VERSION = "v26.06.26·118";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12396,6 +12396,23 @@ export default function App() {
   const [showAddToCircle, setShowAddToCircle] = useState(false);
   const [circlePopupTag, setCirclePopupTag] = useState(null);
   const [chipPopup, setChipPopup] = useState(null); // {tag,label,icon,iconFilter} for the activity-chip popup card
+  // Pull-to-refresh (iOS standalone PWAs have no native one): drag down from the top to reload.
+  const ptrRef = React.useRef(null);
+  const ptrState = React.useRef({active:false,startY:0,pulling:false,dist:0});
+  const [pullY, setPullY] = React.useState(0);
+  React.useEffect(() => {
+    const el = ptrRef.current; if (!el) return;
+    const THRESH = 70, MAX = 110;
+    const atTop = (target) => { let n = target; while (n && n !== el) { if (n.scrollHeight > n.clientHeight + 1) { const oy = (getComputedStyle(n).overflowY||""); if (oy==="auto"||oy==="scroll") return n.scrollTop <= 0; } n = n.parentElement; } return true; };
+    const onStart = (e) => { if (!e.touches || e.touches.length !== 1) { ptrState.current.active=false; return; } ptrState.current = {active: atTop(e.target), startY: e.touches[0].clientY, pulling:false, dist:0}; };
+    const onMove = (e) => { const s = ptrState.current; if (!s.active) return; const dy = e.touches[0].clientY - s.startY; if (dy <= 0) { if (s.pulling){ s.pulling=false; s.dist=0; setPullY(0); } return; } if (!s.pulling && dy < 8) return; s.pulling = true; if (e.cancelable) e.preventDefault(); const dist = Math.min(MAX, dy * 0.5); s.dist = dist; setPullY(dist); };
+    const onEnd = () => { const s = ptrState.current; if (s.pulling && s.dist >= THRESH) { setPullY(MAX); setTimeout(()=>{ try { location.reload(); } catch(e){ location.href = location.href; } }, 60); } else { setPullY(0); } s.active=false; s.pulling=false; s.dist=0; };
+    el.addEventListener("touchstart", onStart, {passive:true});
+    el.addEventListener("touchmove", onMove, {passive:false});
+    el.addEventListener("touchend", onEnd, {passive:true});
+    el.addEventListener("touchcancel", onEnd, {passive:true});
+    return () => { el.removeEventListener("touchstart",onStart); el.removeEventListener("touchmove",onMove); el.removeEventListener("touchend",onEnd); el.removeEventListener("touchcancel",onEnd); };
+  }, []);
   const [circlePopupMins, setCirclePopupMins] = useState("");
   const [backupOpen,setBackup]   = useState(false);
   const [viewDay,setViewDay]     = useState(todayKey());
@@ -13134,8 +13151,18 @@ export default function App() {
   };
 
   return (
-    <div className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
+    <div ref={ptrRef} className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
       overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,padding:0}}>
+      {pullY > 0 && (
+        <div style={{position:"fixed",top:0,left:0,right:0,zIndex:100001,height:pullY,display:"flex",alignItems:"flex-end",justifyContent:"center",
+          pointerEvents:"none",transition:ptrState.current.pulling?"none":"height 0.25s ease"}}>
+          <div style={{marginBottom:10,fontSize:13,fontWeight:800,color:C.gold,display:"flex",alignItems:"center",gap:6,
+            paddingTop:"env(safe-area-inset-top)"}}>
+            <span style={{display:"inline-block",transition:"transform 0.12s",transform:`rotate(${Math.min(180,(pullY/70)*180)}deg)`}}>↓</span>
+            {pullY>=70?"Release to refresh":"Pull to refresh"}
+          </div>
+        </div>
+      )}
       <div onClick={()=>{ try{ location.reload(); }catch(e){ location.href = location.href; } }}
         title="Tap to reload" style={{position:"fixed",left:"calc(env(safe-area-inset-left) + 33px)",top:1,zIndex:9999,
         fontSize:9,fontWeight:700,letterSpacing:"0.04em",color:C.gold,opacity:0.65,cursor:"pointer",
