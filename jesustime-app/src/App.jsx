@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v22";
+const APP_VERSION = "v26";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5925,6 +5925,14 @@ const BIBLE_TOTAL_VERSES = 31102;
 
 function normBook(s){ return s.replace(/_/g,' '); }
 
+const BOOK_ABBR3_OVERRIDE = { "Philemon":"Phe", "Philippians":"Phi", "Judges":"Jdg", "Jude":"Jde", "Song of Solomon":"Son" };
+function bookAbbr3(b){
+  if (BOOK_ABBR3_OVERRIDE[b]) return BOOK_ABBR3_OVERRIDE[b];
+  const m = b.match(/^([123])\s+(.*)$/);
+  if (m) return m[1] + " " + m[2].slice(0,2);
+  return b.slice(0,3);
+}
+
 function BibleReadCircle({entries, addEntry, today, size}) {
   const iw = typeof window!=="undefined"?window.innerWidth:380;
   const ih = typeof window!=="undefined"?window.innerHeight:720;
@@ -6053,28 +6061,31 @@ function BibleBooksPage({entries, addEntry, today}) {
   const [selBook, setSelBook] = React.useState(null);
   const [selChs, setSelChs] = React.useState(()=>new Set());
   const BL="#4a90d9", GOLD="#d4a017";
-  const labelFor = b => SHELF_ABBR[b]||b.slice(0,3);
+  const labelFor = b => bookAbbr3(b);
   const total=Object.keys(readInfo).length;
   const otRead=Object.keys(readInfo).filter(k=>OT_SET.has(k.split(":")[0])).length;
   const ntRead=total-otRead;
   const OT_CH=BIBLE_OT.reduce((s,b)=>s+chCount(b),0); const NT_CH=BIBLE_TOTAL_CHAPTERS-OT_CH;
   const logSel=async()=>{ const b=selBook; const sorted=[...selChs].sort((x,y)=>x-y); if(!b||!sorted.length) return; const runs=[]; let s=sorted[0],p=sorted[0]; for(let i=1;i<sorted.length;i++){ if(sorted[i]===p+1)p=sorted[i]; else {runs.push([s,p]);s=p=sorted[i];} } runs.push([s,p]); const tags=runs.map(([a,b2])=>`#Bible_Read_${tagBook(b)}-${a}${b2>a?`-${b2}`:""}`).join(" "); const mins=sorted.length*5; await addEntry(mins,{dur:`${mins}m`,notes:tags,time:nowTimeStr()},today); setSelChs(new Set()); };
   const tile=(b)=>{ const chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`])rd++; const f=rd/chs; const rgb=OT_SET.has(b)?"74,144,217":"212,160,23"; const done=f>=1; return (
-    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:40,padding:"3px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
-      <span style={{fontSize:12.5,fontWeight:800,color:f>0.45?"#fff":C.text,lineHeight:1,whiteSpace:"nowrap"}}>{labelFor(b)}</span>
-      <span style={{fontSize:8.5,fontWeight:700,color:f>0.45?"rgba(255,255,255,0.85)":C.textFaint,marginTop:1}}>{rd}/{chs}</span>
+    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:56,padding:"5px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
+      <span style={{fontSize:16,fontWeight:800,color:f>0.45?"#fff":C.text,lineHeight:1,whiteSpace:"nowrap"}}>{labelFor(b)}</span>
+      <span style={{fontSize:11,fontWeight:700,color:f>0.45?"rgba(255,255,255,0.85)":C.textFaint,marginTop:2}}>{rd}/{chs}</span>
     </div>); };
-  const grid={display:"grid",gridTemplateColumns:"repeat(6, minmax(0,1fr))",gap:4};
+  const grid={display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:4};
+  const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:56,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
   return (
-    <div style={{padding:"4px 8px 10px"}}>
+    <div style={{padding:"4px 2px 10px"}}>
       <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
         <span style={{fontSize:20,fontWeight:800,color:C.gold,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span>
         <span style={{fontSize:11,color:C.textFaint,fontWeight:700}}>{total}/{BIBLE_TOTAL_CHAPTERS} · OT {otRead}/{OT_CH} · NT {ntRead}/{NT_CH}</span>
       </div>
-      <div style={{fontSize:11,fontWeight:800,color:BL,letterSpacing:"0.08em",margin:"2px 0 4px"}}>OLD TESTAMENT</div>
-      <div style={grid}>{BIBLE_OT.map(tile)}</div>
-      <div style={{fontSize:11,fontWeight:800,color:GOLD,letterSpacing:"0.08em",margin:"8px 0 4px"}}>NEW TESTAMENT</div>
-      <div style={grid}>{NT_BOOKS.map(tile)}</div>
+      <div style={grid}>
+        {labelTile("OT",BL)}
+        {BIBLE_OT.map(tile)}
+        {labelTile("NT",GOLD)}
+        {NT_BOOKS.map(tile)}
+      </div>
       {selBook && (()=>{ const b=selBook, chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`]) rd++; return (<>
         <div onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)"}}/>
         <div style={{position:"fixed",zIndex:200001,top:"50%",left:"50%",transform:"translate(-50%,-50%)",background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:"14px",width:"min(380px,calc(100vw - 28px))",maxHeight:"80vh",overflowY:"auto",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
