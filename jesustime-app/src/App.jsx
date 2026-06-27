@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·124";
+const APP_VERSION = "v26.06.26·126";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11770,17 +11770,19 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
   };
   const inputStyle = {width:"100%",boxSizing:"border-box",padding:"8px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:14,outline:"none"};
   const arrowBtn = {background:"none",border:`1px solid ${C.border}`,borderRadius:6,color:C.text,fontSize:10,cursor:"pointer",lineHeight:1,padding:"3px 6px"};
-  const persist = (next) => { setItems(next); try{ localStorage.setItem(storageKey, JSON.stringify(next)); if(storageKey==="jtPersonalNames"){ localStorage.setItem("jtPersonalNamesTs", String(Date.now())); } window.dispatchEvent(new Event(changeEvent)); }catch(e){} };
-  const rename = (i,v) => { const n=items.slice(); n[i]={...n[i], n:v}; persist(n); };
-  const setRef = (i,v) => { const n=items.slice(); n[i]={...n[i], a:v}; persist(n); };
-  const del = (i) => { const n=items.slice(); n.splice(i,1); persist(n); };
-  const move = (i,d) => { const j=i+d; if(j<0||j>=items.length) return; const n=items.slice(); const t=n[i]; n[i]=n[j]; n[j]=t; persist(n); };
-  const add = () => { const t=q.trim().slice(0,120); if(!t) return; persist([...items, {n:t, a:""}]); setQ(""); };
+  const itemsRef = React.useRef(items); itemsRef.current = items;
+  const writeStore = (arr) => { try{ localStorage.setItem(storageKey, JSON.stringify(arr)); if(storageKey==="jtPersonalNames"){ localStorage.setItem("jtPersonalNamesTs", String(Date.now())); } window.dispatchEvent(new Event(changeEvent)); }catch(e){} };
+  const commit = () => writeStore(itemsRef.current); // persist + sync on blur / discrete actions, NOT on every keystroke
+  const rename = (i,v) => setItems(prev => { const n=prev.slice(); n[i]={...n[i], n:v}; return n; });
+  const setRef = (i,v) => setItems(prev => { const n=prev.slice(); n[i]={...n[i], a:v}; return n; });
+  const del = (i) => { const n=items.slice(); n.splice(i,1); setItems(n); writeStore(n); };
+  const move = (i,d) => { const j=i+d; if(j<0||j>=items.length) return; const n=items.slice(); const t=n[i]; n[i]=n[j]; n[j]=t; setItems(n); writeStore(n); };
+  const add = () => { const t=q.trim().slice(0,120); if(!t) return; const n=[...items, {n:t, a:""}]; setItems(n); writeStore(n); setQ(""); };
   const doClose = () => { const cleaned = items.filter(x=>x && String(x.n||"").trim()); if(cleaned.length!==items.length){ try{ localStorage.setItem(storageKey, JSON.stringify(cleaned)); if(storageKey==="jtPersonalNames"){ localStorage.setItem("jtPersonalNamesTs", String(Date.now())); } window.dispatchEvent(new Event(changeEvent)); }catch(e){} } onClose(); };
   const ql = q.trim().toLowerCase();
   const view = items.map((it,i)=>({it,i})).filter(({it})=> !ql || String(it.n||"").toLowerCase().includes(ql) || String(it.a||"").toLowerCase().includes(ql));
   return (
-    <div onClick={doClose} style={{position:"fixed",inset:0,zIndex:9998,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+    <div onClick={doClose} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
       <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:560,maxHeight:"85vh",display:"flex",flexDirection:"column",background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,boxShadow:"0 -8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"14px 16px",borderBottom:`1px solid ${C.border}`}}>
           <span style={{fontSize:16,fontWeight:800,color:C.gold,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>✏️ {title}</span>
@@ -11796,8 +11798,8 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
                 <button onClick={()=>move(i,1)} style={{...arrowBtn, opacity:i===items.length-1?0.3:1}}>▼</button>
               </div>
               <div style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",gap:4}}>
-                <input value={it.n||""} onChange={e=>rename(i,e.target.value)} placeholder="Name" style={inputStyle}/>
-                <input value={it.a||""} onChange={e=>setRef(i,e.target.value)} placeholder="Reference / note (optional, e.g. John 1:1)" style={{...inputStyle,fontSize:12}}/>
+                <input value={it.n||""} onChange={e=>rename(i,e.target.value)} onBlur={commit} placeholder="Name" style={inputStyle}/>
+                <input value={it.a||""} onChange={e=>setRef(i,e.target.value)} onBlur={commit} placeholder="Reference / note (optional, e.g. John 1:1)" style={{...inputStyle,fontSize:12}}/>
               </div>
               <button onClick={()=>{ try{ window.dispatchEvent(new CustomEvent("jtSlideshowName",{detail:{n:it.n, a:it.a||""}})); }catch(e){} }} title="Show in slideshow" style={{background:"none",border:"none",color:C.gold,fontSize:18,cursor:"pointer",flexShrink:0}}>⛶</button>
               <button onClick={()=>del(i)} style={{background:"none",border:"none",color:"#f87171",fontSize:18,cursor:"pointer",flexShrink:0}}>🗑</button>
@@ -12758,11 +12760,19 @@ export default function App() {
       }
       if (Array.isArray(data.names)) {
         let local=[]; try{ local=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); }catch(e){}
-        const merged = mergeNames(local, data.names);
-        if (!sameNames(merged, local)) {
+        const localTs  = parseInt(localStorage.getItem("jtPersonalNamesTs")||"0",10) || 0;
+        const remoteTs = parseInt(data.namesTs||"0",10) || 0;
+        // Last-write-wins so renames/deletes actually stick. The old union merge
+        // re-added any name you'd just edited or removed. If the server sends no
+        // timestamp we fall back to union (legacy behavior, never deletes).
+        let next;
+        if (!remoteTs)                 next = mergeNames(local, data.names);
+        else if (remoteTs > localTs)   next = data.names.filter(x=>x && String(x.n||"").trim()).map(x=>({n:x.n, a:x.a||""}));
+        else                           next = local; // local is same-or-newer → keep this device's edits
+        if (!sameNames(next, local)) {
           try {
-            localStorage.setItem("jtPersonalNames", JSON.stringify(merged));
-            localStorage.setItem("jtPersonalNamesTs", String(Date.now()));
+            localStorage.setItem("jtPersonalNames", JSON.stringify(next));
+            localStorage.setItem("jtPersonalNamesTs", String(Math.max(localTs, remoteTs) || Date.now()));
             window.dispatchEvent(new Event("jtPersonalNamesChanged"));
           } catch(e){}
         }
