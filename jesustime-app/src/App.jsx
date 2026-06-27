@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·131";
+const APP_VERSION = "v2";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1885,9 +1885,12 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false}) {
   // Fit the full 52-week grid within the screen width — every square visible, no horizontal scroll.
   const availW = fill ? Math.min((typeof window!=="undefined" ? window.innerWidth : 390), 540) - 16 : 0;
   const gap = fill ? 3 : 2;
-  const TARGET = 19;                         // square size when filling
-  const weeksPerRow = fill ? Math.max(7, Math.floor((availW + gap) / (TARGET + gap))) : 52;
-  const cell = fill ? TARGET : 5.6;
+  // Fill mode: size squares so the weeks actually shown fill the width, wrapping to more
+  // rows only when they can't fit at a sensible minimum size.
+  const minCell = 14, maxCell = 46;
+  const maxPerRow = fill ? Math.max(1, Math.floor((availW + gap) / (minCell + gap))) : 52;
+  const weeksPerRow = fill ? Math.min(WEEKS, maxPerRow) : 52;
+  const cell = fill ? Math.max(minCell, Math.min(maxCell, Math.floor((availW - (weeksPerRow-1)*gap) / weeksPerRow))) : 5.6;
   const radius = fill ? Math.max(1.5, cell*0.2) : 1.4;
   const myy = iso => { const p=(iso||"").split("-"); return p.length===3 ? `${+p[1]}/${p[0].slice(2)}` : ""; };
   const weekRows = [];
@@ -14062,7 +14065,7 @@ export default function App() {
             borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
-            display:"flex",flexDirection:"row",flexWrap:"wrap",gap:6,maxWidth:"min(94vw,440px)",justifyContent:"center"}}>
+            display:"flex",flexDirection:"row",flexWrap:"nowrap",gap:6,maxWidth:"96vw",overflowX:"auto",justifyContent:"center"}}>
             {(() => {
               const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
               const lockIdx = bottomTabOrder.indexOf("LOCK");
@@ -14130,7 +14133,7 @@ export default function App() {
             borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
-            display:"flex",flexDirection:"row",flexWrap:"wrap",gap:6,maxWidth:"min(94vw,440px)",justifyContent:"center"}}>
+            display:"flex",flexDirection:"row",flexWrap:"nowrap",gap:6,maxWidth:"96vw",overflowX:"auto",justifyContent:"center"}}>
             {[["read","📖","Bible Reading","reading"],["mem","💜","Bible Memory","memory"]].filter(([v])=>!bibleViewHidden[v]).map(([v,icon,label,dk])=>{
               const done = tabStarMap[dk]===true;
               return (
