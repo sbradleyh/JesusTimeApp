@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v33";
+const APP_VERSION = "v38";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5062,7 +5062,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"],names:["🎞️","Names"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🎞️","Names"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5163,20 +5163,6 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
                           <span style={{fontSize:22}}>☀️</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Today</span>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
-                          <input type="checkbox" checked={bottomTabVisible["readcircle"]===true}
-                            onChange={e=>{const next={...bottomTabVisible,readcircle:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>📖</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Bible Read ⊙</span>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
-                          <input type="checkbox" checked={bottomTabVisible["books"]===true}
-                            onChange={e=>{const next={...bottomTabVisible,books:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>📚</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>All Books</span>
                         </div>
                         <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
                           <input type="checkbox" checked={bottomTabVisible["names"]!==false}
@@ -6075,27 +6061,30 @@ function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
   const OT_CH=BIBLE_OT.reduce((s,b)=>s+chCount(b),0); const NT_CH=BIBLE_TOTAL_CHAPTERS-OT_CH;
   const logSel=async()=>{ const b=selBook; const sorted=[...selChs].sort((x,y)=>x-y); if(!b||!sorted.length) return; const runs=[]; let s=sorted[0],p=sorted[0]; for(let i=1;i<sorted.length;i++){ if(sorted[i]===p+1)p=sorted[i]; else {runs.push([s,p]);s=p=sorted[i];} } runs.push([s,p]); const tags=runs.map(([a,b2])=>`#Bible_Read_${tagBook(b)}-${a}${b2>a?`-${b2}`:""}`).join(" "); const mins=sorted.length*5; await addEntry(mins,{dur:`${mins}m`,notes:tags,time:nowTimeStr()},today); setSelChs(new Set()); };
   const tile=(b)=>{ const chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`])rd++; const f=rd/chs; const rgb=OT_SET.has(b)?"74,144,217":"212,160,23"; const done=f>=1; return (
-    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:56,padding:"5px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
-      <span style={{fontSize:16,fontWeight:800,color:f>0.45?"#fff":C.text,lineHeight:1,whiteSpace:"nowrap"}}>{labelFor(b)}</span>
-      <span style={{fontSize:11,fontWeight:700,color:f>0.45?"rgba(255,255,255,0.85)":C.textFaint,marginTop:2}}>{rd}/{chs}</span>
+    <div key={b} onClick={()=>{setSelBook(b);setSelChs(new Set());}} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:64,padding:"5px 1px",background:f>0?`rgba(${rgb},${(0.18+0.72*f).toFixed(3)})`:C.inputBg,border:done?`1px solid rgba(${rgb},1)`:`0.5px solid ${C.border}`,overflow:"hidden"}}>
+      <span style={{fontSize:17,fontWeight:800,color:f>0.45?"#fff":C.text,lineHeight:1,whiteSpace:"nowrap"}}>{labelFor(b)}</span>
+      <span style={{fontSize:12,fontWeight:700,color:f>0.45?"rgba(255,255,255,0.85)":C.textFaint,marginTop:2}}>{rd}/{chs}</span>
     </div>); };
-  const grid={display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:4};
-  const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:56,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
+  const grid={display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:3};
+  const labelTile=(t,col)=>(<div key={"L"+t} style={{borderRadius:7,display:"flex",alignItems:"center",justifyContent:"center",minHeight:64,background:col,color:"#fff",fontSize:16,fontWeight:900,letterSpacing:"0.06em"}}>{t}</div>);
+  const statTile=(t,rd,tot,col)=>(<div key={"S"+t} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"2px 1px",background:col,color:"#fff",overflow:"hidden"}}><span style={{fontSize:13,fontWeight:900,lineHeight:1}}>{t}</span><span style={{fontSize:11,fontWeight:700,marginTop:2}}>{rd}/{tot}</span><span style={{fontSize:10,fontWeight:700,opacity:0.9}}>{tot?Math.round(rd/tot*100):0}%</span></div>);
+  const wholeTile=()=>(<div key="whole" style={{gridColumn:"span 2",borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:64,padding:"3px",background:C.gold,color:"#1a1107",overflow:"hidden"}}><span style={{fontSize:18,fontWeight:900,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span><span style={{fontSize:10,fontWeight:800,marginTop:2}}>{total}/{BIBLE_TOTAL_CHAPTERS}</span><span style={{fontSize:9,fontWeight:700,opacity:0.85}}>whole Bible</span></div>);
   return (
-    <div style={{padding:"4px 2px 10px"}}>
+    <div style={{padding:"4px 0px 10px"}}>
       {!hideSummary && (<div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:8,marginBottom:6}}>
         <span style={{fontSize:20,fontWeight:800,color:C.gold,lineHeight:1}}>{Math.round(total/BIBLE_TOTAL_CHAPTERS*1000)/10}%</span>
         <span style={{fontSize:11,color:C.textFaint,fontWeight:700}}>{total}/{BIBLE_TOTAL_CHAPTERS} · OT {otRead}/{OT_CH} · NT {ntRead}/{NT_CH}</span>
       </div>)}
       <div style={grid}>
-        {labelTile("OT",BL)}
+        {wholeTile()}
+        {statTile("OT",otRead,OT_CH,BL)}
         {BIBLE_OT.map(tile)}
-        {labelTile("NT",GOLD)}
+        {statTile("NT",ntRead,NT_CH,GOLD)}
         {NT_BOOKS.map(tile)}
       </div>
-      {selBook && (()=>{ const b=selBook, chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`]) rd++; return (<>
-        <div onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)"}}/>
-        <div style={{position:"fixed",zIndex:200001,top:"50%",left:"50%",transform:"translate(-50%,-50%)",background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:"14px",width:"min(380px,calc(100vw - 28px))",maxHeight:"80vh",overflowY:"auto",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
+      {selBook && (()=>{ const b=selBook, chs=chCount(b); let rd=0; for(let c=1;c<=chs;c++) if(readInfo[`${b}:${c}`]) rd++; return (
+        <div onClick={()=>{setSelBook(null);setSelChs(new Set());}} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",padding:14,boxSizing:"border-box"}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:"14px",width:"min(380px,100%)",maxHeight:"82vh",overflowY:"auto",boxSizing:"border-box",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,marginBottom:10}}>
             <span style={{fontSize:22,fontWeight:800,color:C.text}}>{b}</span>
             <span style={{fontSize:12,color:BL,fontWeight:700,marginLeft:"auto"}}>{rd}/{chs} read</span>
@@ -6106,7 +6095,7 @@ function BibleBooksPage({entries, addEntry, today, hideSummary=false}) {
           </div>
           <button onClick={logSel} disabled={!selChs.size} style={{width:"100%",padding:"11px 0",borderRadius:10,border:"none",background:selChs.size?BL:C.inputBg,color:selChs.size?"#fff":C.textFaint,fontSize:15,fontWeight:800,cursor:selChs.size?"pointer":"default"}}>✓ Log read{selChs.size?` · +${selChs.size*5}m`:""}</button>
         </div>
-      </>); })()}
+      </div>); })()}
     </div>
   );
 }
@@ -10547,9 +10536,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
         </div>
         {menuOpen && (<>
           <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000}}/>
-          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:"50%",transform:"translateX(-50%)",zIndex:200001,
-            background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:12,overflow:"hidden",minWidth:0,width:"96vw",maxWidth:"min(96vw, 460px)",
-            boxShadow:"0 8px 24px rgba(0,0,0,0.7)"}}>
+          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:0,right:0,bottom:0,zIndex:200001,
+            background:C.bg,borderTop:`1px solid ${C.borderHi}`,overflowY:"auto",WebkitOverflowScrolling:"touch",
+            boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
             <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 <div style={{flex:1,fontSize:20,fontWeight:800,color:nameColor,fontFamily:titleFont||undefined,lineHeight:1.3}}>{cur.n}</div>
@@ -14055,7 +14044,7 @@ export default function App() {
         paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],readcircle:["📖","Read⊙"],books:["📚","Books"],names:["🎞️","Names"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🎞️","Names"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -14072,7 +14061,7 @@ export default function App() {
           // Abide tab is "done" when every SHOWN grouped tab is done.
           const abideVisible = abideGroupIds.filter(tid => bottomTabVisible[tid]!==false);
           const abideDone = abideVisible.length>0 && abideVisible.every(tid => tid==="bible" ? bibleDone : isDoneId(tid));
-          const forcedBar = ["chart","readcircle","books","names","abide","bible","streaks"];
+          const forcedBar = ["chart","names","abide","bible","streaks"];
           const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; if (a==="MENU") return -1; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
           const _barCore = bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
@@ -14081,8 +14070,6 @@ export default function App() {
             .filter(id => !groupedIds.includes(id))   // grouped tabs live in their container popup
             .filter(id => id!=="today");   // Day reached via the Today popup, not its own tab
           if (bottomTabVisible["chart"]===true && !_barCore.includes("chart")) _barCore.push("chart");
-          if (bottomTabVisible["readcircle"]===true && !_barCore.includes("readcircle")) _barCore.push("readcircle");
-          if (bottomTabVisible["books"]===true && !_barCore.includes("books")) _barCore.push("books");
           if (bottomTabVisible["names"]!==false && !_barCore.includes("names")) _barCore.push("names");
           const barIds = ["MENU"].concat(_barCore)
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
@@ -14127,8 +14114,6 @@ export default function App() {
                   if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="readcircle"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("readcircle"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="books"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("books"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="names"){ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
