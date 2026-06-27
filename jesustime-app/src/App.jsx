@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v26.06.26·119";
+const APP_VERSION = "v26.06.26·120";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -13136,13 +13136,13 @@ export default function App() {
   return (
     <div className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
       overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,padding:0}}>
-      <div onClick={()=>{ try{ location.reload(); }catch(e){ location.href = location.href; } }}
-        title="Tap to reload" style={{position:"fixed",left:"calc(env(safe-area-inset-left) + 33px)",top:"calc(env(safe-area-inset-top) + 4px)",zIndex:9999,
-        fontSize:10,fontWeight:700,letterSpacing:"0.04em",color:C.gold,opacity:0.7,cursor:"pointer",
-        padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>{APP_VERSION}</div>
       {/* Title/stats row */}
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
         style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",padding:"4px 0px",paddingTop:"calc(env(safe-area-inset-top) - 22px)",marginTop:"0px",gap:0,borderBottom:`1px solid ${C.border}`,background:C.bg,position:"relative",zIndex:30}}>
+        <div onClick={()=>{ try{ location.reload(); }catch(e){ location.href = location.href; } }}
+          title="Tap to reload" style={{position:"absolute",left:6,top:"calc(env(safe-area-inset-top) + 2px)",zIndex:40,
+          fontSize:10,fontWeight:700,letterSpacing:"0.04em",color:C.gold,opacity:0.7,cursor:"pointer",
+          padding:"6px 9px",margin:"-6px -9px",WebkitTapHighlightColor:"transparent",fontFamily:"monospace"}}>{APP_VERSION}</div>
         {/* Name of Jesus bubble (with title) at top */}
         <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
         {/* Stats — flex:1, shifts right as date expands */}
