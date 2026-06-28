@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v62";
+const APP_VERSION = "v73";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5052,7 +5052,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5078,7 +5078,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                 };
                 const subDone = (cid,v) => cid==="bible" ? (v==="drill"?tabStarMap.drill===true:v==="mem"?tabStarMap.memory===true:v==="read"?tabStarMap.reading===true:null) : null;
                 const starSpan = (dn) => dn===null ? null : (<span style={{fontSize:22,flexShrink:0,color:dn?"#d4a017":`rgba(${C.ink},0.22)`}}>{dn?"★":"☆"}</span>);
-                const fIcon = id => id==="friends"?"sepia(1) saturate(5) hue-rotate(180deg)":id==="names"?"sepia(1) saturate(3) hue-rotate(80deg)":"none";
+                const fIcon = id => id==="friends"?"sepia(1) saturate(5) hue-rotate(180deg)":"none";
                 const subviewRow = (cid,v,ic,lb) => (
                   <div key={cid+":"+v} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",paddingLeft:8}}>
                     <input type="checkbox" checked={!SUBVIEWS[cid].hidden[v]}
@@ -6329,6 +6329,8 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
       );
     }
     const cur = rev.seq[rev.idx];
+    const hasQ = !!(cur.question && String(cur.question).trim());
+    const revealed = rev.revealed || !hasQ; // answer-only cards are shown straight away
     return (
       <div onClick={()=>setRevMenu(m=>!m)}
         style={{position:"fixed",inset:0,zIndex:100000,background:C.bg,display:"flex",flexDirection:"column",
@@ -6337,17 +6339,19 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
         <div style={{position:"fixed",top:"calc(10px + env(safe-area-inset-top))",left:0,right:0,fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:C.textFaint,pointerEvents:"none"}}>
           {(CATECHISMS[cur.cat]||{}).name||"Teaching"} · Q{cur.q} · {rev.idx+1}/{rev.seq.length}
         </div>
-        <div style={{fontSize:ssFont,fontWeight:800,color:revColor,lineHeight:1.3,maxWidth:840}}>{cur.question || (cur.refs||"Recall…")}</div>
-        {!rev.revealed && (rev.hintWords||0)>0 && (()=>{ const words=(cur.answer||"").split(/\s+/); const shown=Math.min(rev.hintWords,words.length); return (
+        <div style={{fontSize:ssFont,fontWeight:800,color:revColor,lineHeight:1.3,maxWidth:840}}>{hasQ ? cur.question : cur.answer}</div>
+        {!revealed && hasQ && (rev.hintWords||0)>0 && (()=>{ const words=(cur.answer||"").split(/\s+/); const shown=Math.min(rev.hintWords,words.length); return (
           <div style={{marginTop:18,fontSize:Math.round(ssFont*0.6),color:C.textMid,lineHeight:1.5,maxWidth:820}}>{words.slice(0,shown).join(" ")}{shown<words.length?" …":""}</div>
         ); })()}
-        {rev.revealed && (
+        {revealed && hasQ && (
           <div style={{marginTop:22,fontSize:Math.round(ssFont*0.72),color:revColor,opacity:0.93,fontWeight:600,lineHeight:1.5,maxWidth:840}}>
             {cur.answer}
-            {cur.refs && cur.refs!=="—" && <div style={{marginTop:10,fontSize:Math.round(ssFont*0.46),color:C.textFaint,fontStyle:"italic"}}>{cur.refs}</div>}
           </div>
         )}
-        {!rev.revealed && !(rev.hintWords>0) && (
+        {revealed && cur.refs && cur.refs!=="—" && (
+          <div style={{marginTop:hasQ?12:14,fontSize:Math.round(ssFont*0.46),color:C.textFaint,fontStyle:"italic",maxWidth:840}}>{cur.refs}</div>
+        )}
+        {!revealed && !(rev.hintWords>0) && (
           <div style={{marginTop:20,fontSize:13,fontStyle:"italic",color:C.textFaint,pointerEvents:"none"}}>tap screen for menu</div>
         )}
         {revMenu && (
@@ -6356,7 +6360,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
               padding:`8px calc(8px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left))`,
               background:"rgba(0,0,0,0.6)",borderTop:`1px solid ${C.border}`,boxSizing:"border-box"}}>
             <span style={{fontSize:13,fontWeight:800,color:PU,flexShrink:0,whiteSpace:"nowrap"}}>⏱{fmtEl(revElapsed())}</span>
-            {!rev.revealed ? (
+            {!revealed ? (
               <>
                 <button onClick={showHint} title="Hint" style={{flexShrink:0,padding:"9px 12px",borderRadius:10,border:`1px solid ${GD}`,background:"transparent",color:GD,fontSize:15,fontWeight:800,cursor:"pointer"}}>💡</button>
                 <button onClick={()=>setRev(r=>({...r,revealed:true}))} style={{flex:1,padding:"9px",borderRadius:10,border:`1px solid ${PU}`,background:"rgba(127,119,221,0.18)",color:PU,fontSize:14,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>Show answer</button>
@@ -10506,7 +10510,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>📖 Reader</button>
               <button onClick={()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }}
                 style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",
-                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>⛶ Slideshow</button>
+                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🌅 Slideshow</button>
             </div>
             <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:6}}>Show</div>
@@ -11935,6 +11939,122 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
   );
 }
 
+const GREEK_BASE = "/greek/"; // host the generated JSON here (same origin as the app), fetched on demand
+const GREEK_BOOKS = [
+ {f:"01-matthew.json",b:"Matthew",c:28},{f:"02-mark.json",b:"Mark",c:16},{f:"03-luke.json",b:"Luke",c:24},{f:"04-john.json",b:"John",c:21},
+ {f:"05-acts.json",b:"Acts",c:28},{f:"06-romans.json",b:"Romans",c:16},{f:"07-1corinthians.json",b:"1 Corinthians",c:16},{f:"08-2corinthians.json",b:"2 Corinthians",c:13},
+ {f:"09-galatians.json",b:"Galatians",c:6},{f:"10-ephesians.json",b:"Ephesians",c:6},{f:"11-philippians.json",b:"Philippians",c:4},{f:"12-colossians.json",b:"Colossians",c:4},
+ {f:"13-1thessalonians.json",b:"1 Thessalonians",c:5},{f:"14-2thessalonians.json",b:"2 Thessalonians",c:3},{f:"15-1timothy.json",b:"1 Timothy",c:6},{f:"16-2timothy.json",b:"2 Timothy",c:4},
+ {f:"17-titus.json",b:"Titus",c:3},{f:"18-philemon.json",b:"Philemon",c:1},{f:"19-hebrews.json",b:"Hebrews",c:13},{f:"20-james.json",b:"James",c:5},
+ {f:"21-1peter.json",b:"1 Peter",c:5},{f:"22-2peter.json",b:"2 Peter",c:3},{f:"23-1john.json",b:"1 John",c:5},{f:"24-2john.json",b:"2 John",c:1},
+ {f:"25-3john.json",b:"3 John",c:1},{f:"26-jude.json",b:"Jude",c:1},{f:"27-revelation.json",b:"Revelation",c:22},
+];
+function gkNorm(s){ return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ"); }
+function gkTranslit(word){
+  if(!word) return "";
+  const tokens=[];
+  for(const c of word.normalize("NFD")){
+    if(/[\u0300-\u036f]/.test(c)){ if(tokens.length) tokens[tokens.length-1].m.push(c); }
+    else tokens.push({c, m:[]});
+  }
+  const map={'α':'a','β':'b','γ':'g','δ':'d','ε':'e','ζ':'z','η':'ē','θ':'th','ι':'i','κ':'k','λ':'l','μ':'m','ν':'n','ξ':'x','ο':'o','π':'p','ρ':'r','σ':'s','ς':'s','τ':'t','υ':'y','φ':'ph','χ':'ch','ψ':'ps','ω':'ō'};
+  let out="";
+  for(let k=0;k<tokens.length;k++){
+    const ch=tokens[k].c.toLowerCase();
+    let base=map[ch];
+    if(base===undefined){ out+=tokens[k].c; continue; }
+    if(ch==='γ'){ const nx=tokens[k+1]&&tokens[k+1].c.toLowerCase(); if(nx&&'γκξχ'.includes(nx)) base='n'; }
+    if(ch==='υ'){ const pv=tokens[k-1]&&tokens[k-1].c.toLowerCase(); if(pv&&'αεηο'.includes(pv)) base='u'; }
+    if(tokens[k].m.includes('\u0314')){ base = ch==='ρ' ? 'rh' : 'h'+base; }
+    out+=base;
+  }
+  return out;
+}
+
+function GreekReader({ C, onClose=()=>{} }) {
+  const [book,setBook]=React.useState(null);
+  const [ch,setCh]=React.useState(null);
+  const [data,setData]=React.useState(null);
+  const [busy,setBusy]=React.useState(false);
+  const [err,setErr]=React.useState("");
+  const [lex,setLex]=React.useState(null);
+  const [sel,setSel]=React.useState(null);
+  const cacheRef=React.useRef({});
+  React.useEffect(()=>{ let ok=true; fetch(GREEK_BASE+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{if(ok&&j)setLex(j);}).catch(()=>{}); return ()=>{ok=false;}; },[]);
+  const openBook=async(bk)=>{
+    setBook(bk); setCh(null); setErr("");
+    if(cacheRef.current[bk.f]){ setData(cacheRef.current[bk.f]); return; }
+    setData(null); setBusy(true);
+    try{ const r=await fetch(GREEK_BASE+bk.f); if(!r.ok) throw new Error("HTTP "+r.status); const j=await r.json(); cacheRef.current[bk.f]=j; setData(j); }
+    catch(e){ setErr("Couldn’t load "+bk.b+" — make sure the Greek JSON files are deployed under "+GREEK_BASE); }
+    finally{ setBusy(false); }
+  };
+  const tapWord=(g,lemma)=>{ const e=lex&&lex[gkNorm(lemma)]; setSel({w:g,t:gkTranslit(g),lemma,gloss:e?e.g:"(definition not found)"}); };
+  const back=()=>{ if(sel){setSel(null);return;} if(ch!=null){setCh(null);return;} if(book){setBook(null);setData(null);return;} onClose(); };
+  const verseKeys = (data&&ch!=null) ? Object.keys(data.v).filter(k=>k.slice(0,k.indexOf(":"))===String(ch)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])) : [];
+  const tileBtn={padding:"12px 6px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:100001,background:C.bg,display:"flex",flexDirection:"column",
+      paddingTop:"env(safe-area-inset-top)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
+        <button onClick={back} style={{background:"transparent",border:"none",color:C.gold,fontSize:18,fontWeight:800,cursor:"pointer"}}>‹</button>
+        <span style={{flex:1,minWidth:0,fontSize:16,fontWeight:800,color:C.gold,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+          {book ? (ch!=null ? `${book.b} ${ch}` : book.b) : "Greek NT"}
+        </span>
+        <button onClick={onClose} style={{background:"transparent",border:"none",color:C.textFaint,fontSize:20,fontWeight:800,cursor:"pointer"}}>✕</button>
+      </div>
+      <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"12px 14px calc(28px + env(safe-area-inset-bottom))"}}>
+        {!book && (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
+            {GREEK_BOOKS.map(bk=>(<button key={bk.f} onClick={()=>openBook(bk)} style={{...tileBtn,textAlign:"left"}}>{bk.b}</button>))}
+          </div>
+        )}
+        {book && ch==null && (
+          <>
+            {busy && <div style={{color:C.textFaint,fontSize:14,padding:"8px 2px"}}>Loading {book.b}…</div>}
+            {err && <div style={{color:C.red||"#e07a5f",fontSize:13,padding:"8px 2px"}}>{err}</div>}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
+              {Array.from({length:book.c},(_,i)=>i+1).map(n=>(
+                <button key={n} onClick={()=>setCh(n)} disabled={!data} style={{...tileBtn,opacity:data?1:0.5}}>{n}</button>
+              ))}
+            </div>
+          </>
+        )}
+        {book && ch!=null && data && (
+          <div style={{lineHeight:1.9}}>
+            {verseKeys.map(vk=>{
+              const vs=vk.split(":")[1];
+              return (
+                <span key={vk} style={{display:"block",marginBottom:14}}>
+                  <span style={{fontSize:11,fontWeight:800,color:C.gold,verticalAlign:"top",marginRight:4}}>{vs}</span>
+                  {data.v[vk].map((wd,i)=>(
+                    <button key={i} onClick={()=>tapWord(wd[0],wd[1])}
+                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 2px",margin:0}}>
+                      <span style={{fontSize:21,color:C.text,lineHeight:1.25}}>{wd[0]}</span>
+                      <span style={{fontSize:10.5,color:C.gold,lineHeight:1,opacity:0.85}}>{gkTranslit(wd[0])}</span>
+                    </button>
+                  ))}
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      {sel && (
+        <div onClick={()=>setSel(null)} style={{position:"fixed",inset:0,zIndex:100002,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:520,background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,padding:"16px 18px calc(18px + env(safe-area-inset-bottom))"}}>
+            <div style={{fontSize:27,fontWeight:800,color:C.text}}>{sel.w}</div>
+            <div style={{fontSize:15,color:C.gold,marginTop:2}}>{sel.t}</div>
+            <div style={{fontSize:13,color:C.textFaint,marginTop:3,fontStyle:"italic"}}>lemma · {sel.lemma}</div>
+            <div style={{fontSize:15,color:C.textMid,marginTop:10,lineHeight:1.5}}>{sel.gloss}</div>
+            <button onClick={()=>setSel(null)} style={{marginTop:14,width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:14,fontWeight:700,cursor:"pointer"}}>Close</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvPassage=()=>{}, entries={}, addEntry=()=>{}, today="", initialBible=null, onClose=null}) {
   const readArr = (k) => { try { const a=JSON.parse(localStorage.getItem(k)||"null"); return Array.isArray(a)?a:null; } catch(e){ return null; } };
   const myCat = readArr("jtPersonalCatechism") || [];
@@ -11971,6 +12091,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [bookId, setBookId] = React.useState(()=>{ try { return localStorage.getItem("jtReaderBook")||BOOKS[0].id; } catch(e){ return BOOKS[0].id; } });
   const [showBooks, setShowBooks] = React.useState(false);
   const [showBookList, setShowBookList] = React.useState(false);
+  const [greekOpen, setGreekOpen] = React.useState(false);
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
   const [bookLogPop, setBookLogPop] = React.useState(false);
   const [hdrBookPop, setHdrBookPop] = React.useState(false);
@@ -12476,12 +12597,15 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               <button key={b.id} onClick={()=>pickBook(b.id)}
                 style={{textAlign:"left",padding:"9px 12px",borderRadius:9,border:`1px solid ${b.id===bookId?C.gold:C.border}`,background:b.id===bookId?C.buttonActive:"transparent",color:b.id===bookId?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>{bookIcon(b.id)} {b.title}</button>
             ))}
+            <button onClick={()=>{ setShowBooks(false); setGreekOpen(true); }}
+              style={{textAlign:"left",padding:"9px 12px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>ΑΩ Greek NT</button>
           </div></>)}
       </div>
       {selPop && (
         <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ setSelRef(selPop.ref); setNoteDraft("“"+selPop.text+"”\n\n"); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
           style={{position:"fixed",left:Math.max(8,Math.min((typeof window!=="undefined"?window.innerWidth:360)-148,selPop.x-70)),top:Math.max(8,selPop.y-46),zIndex:1200,padding:"8px 14px",borderRadius:20,border:`1px solid ${C.gold}`,background:C.bg,color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.55)",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>📝 Add note</button>
       )}
+      {greekOpen && <GreekReader C={C} onClose={()=>setGreekOpen(false)} />}
     </div>
   );
 }
@@ -14059,7 +14183,7 @@ export default function App() {
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -14152,7 +14276,7 @@ export default function App() {
                     transition:"transform .18s ease, opacity .18s ease",
                     opacity:activeMainTab===id?1:0.65,
                     color:(activeMainTab===id||(id==="abide"&&showAbideMenu))?C.gold:C.text,
-                    filter:id==="friends"?"sepia(1) saturate(5) hue-rotate(180deg)":id==="names"?"sepia(1) saturate(3) hue-rotate(80deg)":"none",
+                    filter:id==="friends"?"sepia(1) saturate(5) hue-rotate(180deg)":"none",
                     transform:`${activeMainTab===id?"translateY(-2px) scale(1.08)":"scale(1)"}`}}>{icon}</span>
                   <span style={{display:"block",fontSize:16,fontWeight:700,transition:"color .18s ease",
                     color:(activeMainTab===id||(id==="abide"&&showAbideMenu))?C.gold:C.textFaint,whiteSpace:"nowrap"}}>
