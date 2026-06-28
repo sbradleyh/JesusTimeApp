@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v85";
+const APP_VERSION = "v86";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12314,6 +12314,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                   return <button key={b.id} onClick={()=>{ pickBook(b.id); setHdrBookPop(false); }}
                     style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{bookIcon(b.id)} {b.title}</button>;
                 })}
+                <button onClick={()=>{ setHdrBookPop(false); setGreekOpen(true); }}
+                  style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>ΑΩ Greek NT</button>
               </div>
             </>)}
           </div>
