@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v50";
+const APP_VERSION = "v54";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1849,7 +1849,7 @@ function MiniTripleArc({f=[0,0,0], size=34, ring=null}) {
   );
 }
 
-function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=false}) {
+function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=false, zoom: zoomProp, onZoom}) {
   const minsBy = React.useMemo(() => {
     const m = {};
     Object.keys(entries).forEach(iso => { m[iso] = (entries[iso]||[]).reduce((s,e)=>s+(e.minutes||0),0); });
@@ -1868,14 +1868,16 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
     {label:"Wk",  days:7},
     {label:"Day", days:1},
   ];
-  const [zoom, setZoom] = React.useState(()=>{ const v=parseInt((typeof localStorage!=="undefined"&&localStorage.getItem("jtHeatZoom"))||"2",10); return isNaN(v)?2:Math.max(0,Math.min(6,v)); });
-  const setZ = v => { setZoom(v); try{localStorage.setItem("jtHeatZoom",String(v));}catch(e){} };
+  const [zoomInternal, setZoomInternal] = React.useState(()=>{ const v=parseInt((typeof localStorage!=="undefined"&&localStorage.getItem("jtHeatZoom"))||"2",10); return isNaN(v)?2:Math.max(0,Math.min(6,v)); });
+  const zoom = (zoomProp!=null && !isNaN(zoomProp)) ? Math.max(0,Math.min(6,zoomProp)) : zoomInternal;
+  const setZ = v => { if(typeof onZoom==="function") onZoom(v); else { setZoomInternal(v); try{localStorage.setItem("jtHeatZoom",String(v));}catch(e){} } };
 
   // Measure available height so the grid always fills the window.
   const wrapRef = React.useRef(null);
   const [availH, setAvailH] = React.useState(0);
+  const [mW, setMW] = React.useState(0);
   React.useEffect(() => {
-    const measure = () => { const el=wrapRef.current; if(!el) return; const r=el.getBoundingClientRect(); const vh=(typeof window!=="undefined")?window.innerHeight:740; setAvailH(Math.max(150, Math.round(vh - r.top - 70))); };
+    const measure = () => { const el=wrapRef.current; if(!el) return; const r=el.getBoundingClientRect(); const vh=(typeof window!=="undefined")?window.innerHeight:740; setAvailH(Math.max(150, Math.round(vh - r.top - 70))); setMW(Math.round(el.clientWidth||r.width||0)); };
     measure();
     let ro; if (typeof ResizeObserver!=="undefined" && wrapRef.current){ ro=new ResizeObserver(measure); ro.observe(wrapRef.current); }
     if (typeof window!=="undefined") window.addEventListener("resize", measure);
@@ -1906,28 +1908,12 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
   const dayList = [];
   { let d=new Date(startIso+"T00:00:00"); for(; d<=t; d.setDate(d.getDate()+1)) dayList.push(fmtIso(d)); }
 
-  const SLIDER_W = 50;
-  const availW = Math.min((typeof window!=="undefined"?window.innerWidth:390),540) - 16 - SLIDER_W;
+  const availW = (mW>0 ? mW : Math.min((typeof window!=="undefined"?window.innerWidth:680),680)) - 2;
   const gh = availH || 360;
   const gap = 3;
   const monStr = iso => { const p=(iso||"").split("-"); return p.length===3?`${+p[1]}/${p[0].slice(2)}`:""; };
   const WD = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
-  const slider = (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",justifyContent:"space-between",gap:2,width:SLIDER_W,flexShrink:0,paddingTop:2,paddingBottom:6}}>
-      {ZOOMS.map((z,i)=>{
-        const on = i===zoom;
-        return (
-          <button key={i} onClick={()=>setZ(i)}
-            style={{display:"flex",alignItems:"center",gap:5,border:"none",background:"transparent",cursor:"pointer",padding:"3px 0",width:"100%",justifyContent:"flex-end"}}>
-            <span style={{fontSize:on?12:10,fontWeight:on?800:600,color:on?C.gold:C.textFaint,whiteSpace:"nowrap"}}>{z.label}</span>
-            <span style={{width:on?13:9,height:on?13:9,borderRadius:"50%",flexShrink:0,
-              background:on?C.gold:`rgba(${C.ink},0.22)`,boxShadow:on?`0 0 0 2px rgba(212,160,23,0.3)`:"none"}}/>
-          </button>
-        );
-      })}
-    </div>
-  );
 
   let gridEl;
   if (dayList.length <= 10) {
@@ -1962,23 +1948,28 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
     for (let w=0; w<WEEKS; w++){ const col=[]; for(let dd=0;dd<7;dd++){ const dt=new Date(startSun); dt.setDate(startSun.getDate()+w*7+dd); const iso=fmtIso(dt); col.push({iso, m:minsBy[iso]||0, future: iso>today, before: iso<startIso}); } cols.push(col); }
     // choose weeks-per-row + cell so the whole grid fills BOTH width and height
     const LABEL=20, ROWGAP=8;
-    let best={cell:0,wpr:Math.min(WEEKS,Math.max(1,Math.floor((availW+gap)/(12+gap))))};
-    for (let wpr=1; wpr<=WEEKS; wpr++){
-      const rows=Math.ceil(WEEKS/wpr);
-      const cw=(availW-(wpr-1)*gap)/wpr;
-      const ch=(gh - rows*(LABEL+6*gap) - (rows-1)*ROWGAP)/(rows*7);
+    // pick number of bands (rows); balanced weeks per row; biggest cells that fill the width yet still fit the height
+    let best=null;
+    for (let nr=1; nr<=WEEKS; nr++){
+      const wpr=Math.ceil(WEEKS/nr);
+      const cw=(availW - wpr*gap)/wpr;                         // reserve a trailing gap so a full row never overflows right
+      const ch=(gh - nr*(LABEL+6*gap) - (nr-1)*ROWGAP)/(nr*7);
       const c=Math.min(cw,ch);
-      if (c>best.cell) best={cell:c,wpr};
+      if (c<4) continue;
+      const fill=Math.min(1,(wpr*c + (wpr-1)*gap)/availW);
+      const score=c*fill;                                      // reward big cells AND filling the width
+      if (!best || score>best.score) best={score,wpr,nr,c};
     }
-    const weeksPerRow=Math.max(1,best.wpr);
-    const cell=Math.max(8,Math.min(60,Math.floor(best.cell)));
+    if(!best){ const wpr=Math.max(1,Math.floor((availW+gap)/(5+gap))); best={wpr,nr:Math.ceil(WEEKS/wpr),c:5}; }
+    const cell=Math.max(4,Math.min(96,Math.floor(best.c)));
+    let weeksPerRow=Math.min(Math.max(1,best.wpr), Math.max(1,Math.floor((availW+gap)/(cell+gap))));
     const radius=Math.max(1.5,cell*0.2);
     const showNum = cell>=24;
     const monthStart=new Set(); { let pm=null; cols.forEach(col=>{ const mk=(col[0].iso||"").slice(0,7); if(mk!==pm){monthStart.add(col[0].iso);pm=mk;} }); }
-    const rows=[]; { const rem=cols.length%weeksPerRow; let i=0; if(rem>0){rows.push(cols.slice(0,rem));i=rem;} for(;i<cols.length;i+=weeksPerRow) rows.push(cols.slice(i,i+weeksPerRow)); }
+    const rows=[]; for(let i=0;i<cols.length;i+=weeksPerRow) rows.push(cols.slice(i,i+weeksPerRow));
     rows.reverse(); // newest weeks on top
     gridEl = (
-      <div style={{display:"flex",flexDirection:"column",gap:ROWGAP,alignItems:"flex-start",justifyContent:"space-between",minHeight:gh}}>
+      <div style={{display:"flex",flexDirection:"column",gap:ROWGAP,alignItems:"center",justifyContent:"center",minHeight:gh}}>
         {rows.map((rowCols,ri)=>(
           <div key={ri} style={{display:"flex",flexDirection:"column",alignItems:"flex-start",gap:2}}>
             <div style={{display:"flex",gap:gap,height:LABEL}}>
@@ -2015,13 +2006,12 @@ function YearGridBody({entries, today, onPick=()=>{}, fill=false, hideTitle=fals
   return (
     <div style={{margin:"0 0 8px",paddingTop:hideTitle?28:30}}>
       {!hideTitle && (
-        <div style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:C.textFaint,fontWeight:800,padding:"2px 4px 6px"}}>
+        <div style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:C.textFaint,fontWeight:800,padding:"2px 4px 2px"}}>
           📅 Last Year with Jesus
         </div>
       )}
-      <div ref={wrapRef} style={{display:"flex",alignItems:"stretch",gap:6,height:availH||undefined}}>
+      <div ref={wrapRef} style={{display:"flex",alignItems:"stretch",height:availH||undefined}}>
         <div style={{flex:1,minWidth:0,overflow:"hidden"}}>{gridEl}</div>
-        {slider}
       </div>
     </div>
   );
@@ -5062,7 +5052,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🎞️","Names"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -5168,7 +5158,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                           <input type="checkbox" checked={bottomTabVisible["names"]!==false}
                             onChange={e=>{const next={...bottomTabVisible,names:e.target.checked};saveBottomTabVisible(next);}}
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>🎞️</span>
+                          <span style={{fontSize:22}}>✝️</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Names Slideshow</span>
                         </div>
                       </div>
@@ -12511,6 +12501,8 @@ export default function App() {
   const [openCollapsible, setOpenCollapsible] = useState(null);
   const [selectedFilterTags, setSelectedFilterTags] = useState([]);
   const [showGraphFilter, setShowGraphFilter] = useState(false);
+  const [heatZoom, setHeatZoom] = useState(()=>{ try{ const v=parseInt(localStorage.getItem("jtHeatZoom")||"2",10); return isNaN(v)?2:Math.max(0,Math.min(6,v)); }catch(e){ return 2; } });
+  const setHeatZoomP = v => { setHeatZoom(v); try{ localStorage.setItem("jtHeatZoom", String(v)); }catch(e){} };
   const DEFAULT_STARRED = ["Bible_Read","Prayed"];
   const [starredTags, setStarredTags] = useLocalStorage("starredTags", DEFAULT_STARRED);
   const [selectedCenterTag, setSelectedCenterTag] = useState(null);
@@ -13779,6 +13771,14 @@ export default function App() {
                             + Filter{selectedFilterTags.length?` (${selectedFilterTags.length})`:""}
                           </button>
                           {todayView==="year" && (
+                            <select value={heatZoom} onChange={e=>setHeatZoomP(parseInt(e.target.value,10))}
+                              style={{position:"absolute",top:0,right:78,zIndex:5,height:27,borderRadius:8,
+                                border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:12,fontWeight:800,
+                                padding:"0 6px",cursor:"pointer",WebkitAppearance:"menulist"}}>
+                              {["All","5y","1y","Qtr","Mo","Wk","Day"].map((lb,i)=>(<option key={i} value={i}>{lb}</option>))}
+                            </select>
+                          )}
+                          {todayView==="year" && (
                             <div style={{position:"absolute",top:4,left:4,zIndex:5,fontSize:13,letterSpacing:"0.07em",textTransform:"uppercase",fontWeight:800,color:C.textFaint,whiteSpace:"nowrap"}}>
                               📅 <span style={{color:C.gold}}>Last Year with Jesus</span>
                             </div>
@@ -13809,7 +13809,7 @@ export default function App() {
                           {todayView==="week" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="month" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
-                          {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true}
+                          {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
@@ -14045,7 +14045,7 @@ export default function App() {
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🎞️","Names"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
