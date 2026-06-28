@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v96";
+const APP_VERSION = "v97";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10579,7 +10579,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const base=gkBaseOf(bk); gkLoadLex(base); const url=base+bk.f;
     if(!gkCacheRef.current[url]){ setGkBusy(true); fetch(url).then(r=>{if(!r.ok)throw new Error("x");return r.json();}).then(j=>{gkCacheRef.current[url]=j; setGkVer(v=>v+1);}).catch(()=>setGkErr("Couldn’t load "+bk.b+" — is "+base+" deployed?")).finally(()=>setGkBusy(false)); }
   };
-  const renderGreekBody = (fp) => {
+  const renderGreekBody = (fp, lh=2.0) => {
     const base = gkBaseOf(gkBook);
     const lex = gkBook ? (gkLexRef.current[base]||null) : null;
     const data = gkBook ? gkCacheRef.current[base+gkBook.f] : null;
@@ -10618,7 +10618,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           </div>
         </>)}
         {gkBook && gkCh!=null && data && (
-          <div style={{lineHeight:2.0}}>
+          <div style={{lineHeight:lh}}>
             {verseKeys.map(vk=>{ const vs=vk.split(":")[1]; return (
               <span key={vk}>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
@@ -10676,7 +10676,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           </div>
         </div>
         <div data-rdbody="1">
-        {book.greek ? renderGreekBody(fp) : (<>
+        {book.greek ? renderGreekBody(fp, lh) : (<>
         {bookLoading && (!book.paras || !book.paras.length) && (
           <div style={{padding:"28px 16px",textAlign:"center",color:C.textFaint,fontSize:14}}>Loading {book.title}…</div>
         )}
