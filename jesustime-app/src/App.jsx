@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v95";
+const APP_VERSION = "v96";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10355,6 +10355,14 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [gkBusy,setGkBusy]=React.useState(false);
   const [gkErr,setGkErr]=React.useState("");
   const [gkSel,setGkSel]=React.useState(null);
+  const [gkShow,setGkShow]=React.useState(()=>{ try{ return {greek:false,translit:true,english:true, ...(JSON.parse(localStorage.getItem("jtGkShow")||"null")||{})}; }catch(_){ return {greek:false,translit:true,english:true}; } });
+  const [gkFont,setGkFont]=React.useState(()=>{ try{ return {greek:18,translit:15,english:13, ...(JSON.parse(localStorage.getItem("jtGkFont")||"null")||{})}; }catch(_){ return {greek:18,translit:15,english:13}; } });
+  React.useEffect(()=>{ try{ localStorage.setItem("jtGkShow",JSON.stringify(gkShow)); }catch(_){} },[gkShow]);
+  React.useEffect(()=>{ try{ localStorage.setItem("jtGkFont",JSON.stringify(gkFont)); }catch(_){} },[gkFont]);
+  React.useEffect(()=>{ try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){} },[]);
+  const gkCanSpeak = typeof window!=="undefined" && !!window.speechSynthesis;
+  const gkSpeak=(t)=>{ try{ if(!window.speechSynthesis||!t) return; const u=new SpeechSynthesisUtterance(t); u.lang="el-GR"; u.rate=0.9; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(_){} };
+  const gkStep={width:22,height:22,borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:800,lineHeight:1,cursor:"pointer",padding:0};
   const [,setGkVer]=React.useState(0);
   const gkCacheRef=React.useRef({});
   const gkLexRef=React.useRef({});
@@ -10614,11 +10622,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             {verseKeys.map(vk=>{ const vs=vk.split(":")[1]; return (
               <span key={vk}>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
-                {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
+                {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
                   <button key={i} onClick={(e)=>tap(e,wd[0],wd[1])}
-                    style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:170}}>
-                    <span style={{fontSize:tSize,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>
-                    <span style={{fontSize:gSize,color:C.text,lineHeight:1.25,maxWidth:170,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
+                    style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:200}}>
+                    {(gkShow.greek||!any) && <span style={{fontSize:gkFont.greek,color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
+                    {gkShow.translit && <span style={{fontSize:gkFont.translit,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>}
+                    {gkShow.english && <span style={{fontSize:gkFont.english,color:C.textMid,lineHeight:1.25,maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>}
                   </button>
                 );})}
                 {" "}
@@ -10944,11 +10953,26 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
       )}
       {gkSel && (
         <div onClick={()=>setGkSel(null)} style={{position:"fixed",inset:0,zIndex:100050}}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"fixed",top:Math.min(gkSel.y+6,(typeof window!=="undefined"?window.innerHeight:800)-200),left:Math.max(8,Math.min(gkSel.x-135,(typeof window!=="undefined"?window.innerWidth:360)-278)),width:270,background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:"12px 14px",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
-            <div style={{fontSize:24,fontWeight:800,color:C.text}}>{gkSel.w}</div>
+          <div onClick={e=>e.stopPropagation()} style={{position:"fixed",top:Math.min(gkSel.y+6,(typeof window!=="undefined"?window.innerHeight:800)-330),left:Math.max(8,Math.min(gkSel.x-135,(typeof window!=="undefined"?window.innerWidth:360)-278)),width:270,maxHeight:"86vh",overflowY:"auto",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:"12px 14px",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <div style={{fontSize:24,fontWeight:800,color:C.text,flex:1,wordBreak:"break-word"}}>{gkSel.w}</div>
+              {gkCanSpeak && <button onClick={()=>gkSpeak(gkSel.w)} title="Hear (device voice)" style={{flex:"0 0 auto",width:36,height:36,borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:18,cursor:"pointer",lineHeight:1}}>🔊</button>}
+            </div>
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
             <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
+            <div style={{borderTop:`1px solid ${C.border}`,margin:"11px 0 7px"}}/>
+            <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",marginBottom:4}}>DISPLAY IN TEXT</div>
+            {[["greek","Greek"],["translit","Translit"],["english","English"]].map(([k,label])=>(
+              <div key={k} style={{display:"flex",alignItems:"center",gap:6,marginTop:5}}>
+                <button onClick={()=>setGkShow(s=>({...s,[k]:!s[k]}))} style={{width:78,textAlign:"left",background:"transparent",border:"none",color:gkShow[k]?C.gold:C.textFaint,fontSize:13,fontWeight:700,cursor:"pointer",padding:0}}>{gkShow[k]?"●":"○"} {label}</button>
+                <span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,opacity:gkShow[k]?1:0.35}}>
+                  <button onClick={()=>setGkFont(f=>({...f,[k]:Math.max(8,f[k]-1)}))} style={gkStep}>−</button>
+                  <span style={{fontSize:12,color:C.textMid,width:20,textAlign:"center"}}>{gkFont[k]}</span>
+                  <button onClick={()=>setGkFont(f=>({...f,[k]:Math.min(40,f[k]+1)}))} style={gkStep}>+</button>
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
