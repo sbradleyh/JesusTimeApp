@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v87";
+const APP_VERSION = "v88";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12021,19 +12021,20 @@ function GreekReader({ C, onClose=()=>{} }) {
           </>
         )}
         {book && ch!=null && data && (
-          <div style={{lineHeight:1.9}}>
+          <div style={{lineHeight:1.5}}>
             {verseKeys.map(vk=>{
               const vs=vk.split(":")[1];
               return (
                 <span key={vk} style={{display:"block",marginBottom:14}}>
                   <span style={{fontSize:11,fontWeight:800,color:C.gold,verticalAlign:"top",marginRight:4}}>{vs}</span>
-                  {data.v[vk].map((wd,i)=>(
+                  {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.split(/[;,]/)[0].trim():""; return (
                     <button key={i} onClick={()=>tapWord(wd[0],wd[1])}
-                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 2px",margin:0}}>
-                      <span style={{fontSize:21,color:C.text,lineHeight:1.25}}>{wd[0]}</span>
-                      <span style={{fontSize:10.5,color:C.gold,lineHeight:1,opacity:0.85}}>{gkTranslit(wd[0])}</span>
+                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 5px 6px",margin:0,maxWidth:150}}>
+                      <span style={{fontSize:11,color:C.gold,lineHeight:1.15,opacity:0.9}}>{gkTranslit(wd[0])}</span>
+                      <span style={{fontSize:11,color:C.textMid,lineHeight:1.2,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
+                      <span style={{fontSize:21,color:C.text,lineHeight:1.3}}>{wd[0]}</span>
                     </button>
-                  ))}
+                  );})}
                 </span>
               );
             })}
