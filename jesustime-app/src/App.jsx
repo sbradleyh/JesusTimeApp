@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v94";
+const APP_VERSION = "v95";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10399,6 +10399,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     let isTap = false;
     if (start && t) { const dx=Math.abs(t.clientX-start.x), dy=Math.abs(t.clientY-start.y); isTap = dx<10 && dy<10; }
     swipeRef.current=null;
+    if (isTap && e.target && e.target.closest && e.target.closest("button,[data-gkword],input,select,textarea,a")) { return; }
     let hasSel = false;
     try { const s=window.getSelection(); hasSel = !!(s && !s.isCollapsed && s.toString().trim()); } catch(_){}
     if (isTap && !hasSel) {
