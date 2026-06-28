@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v90";
+const APP_VERSION = "v91";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10285,90 +10285,7 @@ function gkTranslit(word){
   return out;
 }
 
-function GreekReader({ C, onClose=()=>{} }) {
-  const [book,setBook]=React.useState(null);
-  const [ch,setCh]=React.useState(null);
-  const [data,setData]=React.useState(null);
-  const [busy,setBusy]=React.useState(false);
-  const [err,setErr]=React.useState("");
-  const [lex,setLex]=React.useState(null);
-  const [sel,setSel]=React.useState(null);
-  const cacheRef=React.useRef({});
-  React.useEffect(()=>{ let ok=true; fetch(GREEK_BASE+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{if(ok&&j)setLex(j);}).catch(()=>{}); return ()=>{ok=false;}; },[]);
-  const openBook=async(bk)=>{
-    setBook(bk); setCh(null); setErr("");
-    if(cacheRef.current[bk.f]){ setData(cacheRef.current[bk.f]); return; }
-    setData(null); setBusy(true);
-    try{ const r=await fetch(GREEK_BASE+bk.f); if(!r.ok) throw new Error("HTTP "+r.status); const j=await r.json(); cacheRef.current[bk.f]=j; setData(j); }
-    catch(e){ setErr("Couldn’t load "+bk.b+" — make sure the Greek JSON files are deployed under "+GREEK_BASE); }
-    finally{ setBusy(false); }
-  };
-  const tapWord=(g,lemma)=>{ const e=lex&&lex[gkNorm(lemma)]; setSel({w:g,t:gkTranslit(g),lemma,gloss:e?e.g:"(definition not found)"}); };
-  const back=()=>{ if(sel){setSel(null);return;} if(ch!=null){setCh(null);return;} if(book){setBook(null);setData(null);return;} onClose(); };
-  const verseKeys = (data&&ch!=null) ? Object.keys(data.v).filter(k=>k.slice(0,k.indexOf(":"))===String(ch)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])) : [];
-  const tileBtn={padding:"12px 6px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
-  return (
-    <div style={{position:"fixed",inset:0,zIndex:100001,background:C.bg,display:"flex",flexDirection:"column",
-      paddingTop:"env(safe-area-inset-top)"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
-        <button onClick={back} style={{background:"transparent",border:"none",color:C.gold,fontSize:18,fontWeight:800,cursor:"pointer"}}>‹</button>
-        <span style={{flex:1,minWidth:0,fontSize:16,fontWeight:800,color:C.gold,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-          {book ? (ch!=null ? `${book.b} ${ch}` : book.b) : "Greek NT"}
-        </span>
-        <button onClick={onClose} style={{background:"transparent",border:"none",color:C.textFaint,fontSize:20,fontWeight:800,cursor:"pointer"}}>✕</button>
-      </div>
-      <div style={{flex:1,overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"12px 14px calc(28px + env(safe-area-inset-bottom))"}}>
-        {!book && (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
-            {GREEK_BOOKS.map(bk=>(<button key={bk.f} onClick={()=>openBook(bk)} style={{...tileBtn,textAlign:"left"}}>{bk.b}</button>))}
-          </div>
-        )}
-        {book && ch==null && (
-          <>
-            {busy && <div style={{color:C.textFaint,fontSize:14,padding:"8px 2px"}}>Loading {book.b}…</div>}
-            {err && <div style={{color:C.red||"#e07a5f",fontSize:13,padding:"8px 2px"}}>{err}</div>}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
-              {Array.from({length:book.c},(_,i)=>i+1).map(n=>(
-                <button key={n} onClick={()=>setCh(n)} disabled={!data} style={{...tileBtn,opacity:data?1:0.5}}>{n}</button>
-              ))}
-            </div>
-          </>
-        )}
-        {book && ch!=null && data && (
-          <div style={{lineHeight:2.0}}>
-            {verseKeys.map(vk=>{
-              const vs=vk.split(":")[1];
-              return (
-                <span key={vk}>
-                  <span style={{fontSize:10,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
-                  {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
-                    <button key={i} onClick={()=>tapWord(wd[0],wd[1])}
-                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:150}}>
-                      <span style={{fontSize:11,color:C.gold,lineHeight:1.2,opacity:0.85}}>{gkTranslit(wd[0])}</span>
-                      <span style={{fontSize:14,color:C.text,lineHeight:1.25,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
-                    </button>
-                  );})}
-                  {" "}
-                </span>
-              );
-            })}
-          </div>
-        )}
-      </div>
-      {sel && (
-        <div onClick={()=>setSel(null)} style={{position:"fixed",inset:0,zIndex:100002,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:520,background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,padding:"16px 18px calc(18px + env(safe-area-inset-bottom))"}}>
-            <div style={{fontSize:27,fontWeight:800,color:C.text}}>{sel.w}</div>
-            <div style={{fontSize:15,color:C.gold,marginTop:2}}>{sel.t}</div>
-            <div style={{fontSize:13,color:C.textFaint,marginTop:3,fontStyle:"italic"}}>lemma · {sel.lemma}</div>
-            <div style={{fontSize:15,color:C.textMid,marginTop:10,lineHeight:1.5}}>{sel.gloss}</div>
-            <button onClick={()=>setSel(null)} style={{marginTop:14,width:"100%",padding:"10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:14,fontWeight:700,cursor:"pointer"}}>Close</button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+
 
 // Long-form reading texts are served as static assets (/data/*.json) and fetched on demand,
 // to keep the Worker bundle small. They start empty and populate when a book is first opened.
@@ -10402,7 +10319,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     window.addEventListener("jtPersonalCatechismChanged", bump);
     return () => { window.removeEventListener("jtPersonalCatechismChanged", bump); };
   }, []);
-  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myCatBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false)];
+  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myCatBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false), {id:"greeknt", title:"Greek NT", greek:true, paras:[], scenes:[]}];
   const BOOK_ICONS = ["📕","📗","📘","📙","📒","📔","📓"];
   const bookIcon = (id) => { const i = BOOKS.findIndex(b=>b.id===id); return BOOK_ICONS[(i<0?0:i) % BOOK_ICONS.length]; };
   const PREF = (()=>{ try { return JSON.parse(localStorage.getItem("jtReaderPanes")||"{}"); } catch(e){ return {}; } })();
@@ -10430,9 +10347,19 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
       loadBookData(bookId).then(()=>{ setBookLoading(false); setBookDataVer(v=>v+1); }).catch(()=>{ setBookLoading(false); });
     }
   }, [bookId]);
+  const [gkBook,setGkBook]=React.useState(null);
+  const [gkCh,setGkCh]=React.useState(null);
+  const [gkData,setGkData]=React.useState(null);
+  const [gkBusy,setGkBusy]=React.useState(false);
+  const [gkErr,setGkErr]=React.useState("");
+  const [gkLex,setGkLex]=React.useState(null);
+  const [gkSel,setGkSel]=React.useState(null);
+  const gkCacheRef=React.useRef({});
+  React.useEffect(()=>{ if(bookId!=="greeknt"||gkLex) return; let ok=true; fetch(GREEK_BASE+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{if(ok&&j)setGkLex(j);}).catch(()=>{}); return ()=>{ok=false;}; }, [bookId]); // eslint-disable-line
+  const gkOpenBook=(bk)=>{ setGkBook(bk); setGkCh(null); setGkErr(""); if(gkCacheRef.current[bk.f]){ setGkData(gkCacheRef.current[bk.f]); return; } setGkData(null); setGkBusy(true); fetch(GREEK_BASE+bk.f).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(j=>{gkCacheRef.current[bk.f]=j; setGkData(j);}).catch(()=>setGkErr("Couldn’t load "+bk.b+" — is /greek/ deployed?")).finally(()=>setGkBusy(false)); };
+  const gkTapWord=(e,g,lemma)=>{ const r=e.currentTarget.getBoundingClientRect(); const le=gkLex&&gkLex[gkNorm(lemma)]; setGkSel({w:g,t:gkTranslit(g),lemma,gloss:le?le.g:"(definition not found)",x:r.left+r.width/2,y:r.bottom}); };
   const [showBooks, setShowBooks] = React.useState(false);
   const [showBookList, setShowBookList] = React.useState(false);
-  const [greekOpen, setGreekOpen] = React.useState(false);
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
   const [bookLogPop, setBookLogPop] = React.useState(false);
   const [hdrBookPop, setHdrBookPop] = React.useState(false);
@@ -10636,6 +10563,58 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const cur=esvChapCache[ibKey]; const hasVerses=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k));
     if(!hasVerses) loadEsvPassage(ibKey, ibKey, false);
   }, [ibKey]); // eslint-disable-line
+  const renderGreekBody = (fp) => {
+    const tSize=Math.round(fp*0.9), gSize=Math.round(fp*0.75), vSize=Math.round(fp*0.62);
+    const tile={padding:"11px 8px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
+    const arrow={width:30,height:26,borderRadius:7,border:`1px solid rgba(${C.ink},0.22)`,background:"transparent",color:C.gold,fontSize:16,fontWeight:800,lineHeight:1,cursor:"pointer"};
+    const verseKeys=(gkData&&gkCh!=null)?Object.keys(gkData.v).filter(k=>k.slice(0,k.indexOf(":"))===String(gkCh)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])):[];
+    return (
+      <div>
+        {(gkBook || gkCh!=null) && (
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <button onClick={()=>{ if(gkCh!=null) setGkCh(null); else { setGkBook(null); setGkData(null); } }}
+              style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:700,padding:"4px 10px",cursor:"pointer"}}>‹ {gkCh!=null?"Chapters":"Books"}</button>
+            <span style={{fontSize:14,fontWeight:800,color:C.gold}}>{gkBook?gkBook.b:""}{gkCh!=null?` ${gkCh}`:""}</span>
+            {gkCh!=null && gkBook && (
+              <span style={{marginLeft:"auto",display:"flex",gap:6}}>
+                <button onClick={()=>setGkCh(c=>Math.max(1,c-1))} disabled={gkCh<=1} style={{...arrow,opacity:gkCh<=1?0.4:1}}>‹</button>
+                <button onClick={()=>setGkCh(c=>Math.min(gkBook.c,c+1))} disabled={gkCh>=gkBook.c} style={{...arrow,opacity:gkCh>=gkBook.c?0.4:1}}>›</button>
+              </span>
+            )}
+          </div>
+        )}
+        {!gkBook && (
+          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
+            {GREEK_BOOKS.map(bk=>(<button key={bk.f} onClick={()=>gkOpenBook(bk)} style={{...tile,textAlign:"left"}}>{bk.b}</button>))}
+          </div>
+        )}
+        {gkBook && gkCh==null && (<>
+          {gkBusy && <div style={{color:C.textFaint,fontSize:13,padding:"6px 2px"}}>Loading {gkBook.b}…</div>}
+          {gkErr && <div style={{color:"#e0786a",fontSize:13,padding:"6px 2px"}}>{gkErr}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
+            {Array.from({length:gkBook.c},(_,i)=>i+1).map(n=>(<button key={n} onClick={()=>setGkCh(n)} disabled={!gkData} style={{...tile,textAlign:"center",opacity:gkData?1:0.5}}>{n}</button>))}
+          </div>
+        </>)}
+        {gkBook && gkCh!=null && gkData && (
+          <div style={{lineHeight:2.0}}>
+            {verseKeys.map(vk=>{ const vs=vk.split(":")[1]; return (
+              <span key={vk}>
+                <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
+                {gkData.v[vk].map((wd,i)=>{ const le=gkLex&&gkLex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
+                  <button key={i} onClick={(e)=>gkTapWord(e,wd[0],wd[1])}
+                    style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:170}}>
+                    <span style={{fontSize:tSize,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>
+                    <span style={{fontSize:gSize,color:C.text,lineHeight:1.25,maxWidth:170,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
+                  </button>
+                );})}
+                {" "}
+              </span>
+            );})}
+          </div>
+        )}
+      </div>
+    );
+  };
   const renderPane = (mode, pane) => {
     const fp = pane==="bottom" ? botFont : topFont;
     const lh = pane==="bottom" ? botLineH : topLineH;
@@ -10655,8 +10634,6 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                   return <button key={b.id} onClick={()=>{ pickBook(b.id); setHdrBookPop(false); }}
                     style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{bookIcon(b.id)} {b.title}</button>;
                 })}
-                <button onClick={()=>{ setHdrBookPop(false); setGreekOpen(true); }}
-                  style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>ΑΩ Greek NT</button>
               </div>
             </>)}
           </div>
@@ -10676,6 +10653,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           </div>
         </div>
         <div data-rdbody="1">
+        {book.greek ? renderGreekBody(fp) : (<>
         {bookLoading && (!book.paras || !book.paras.length) && (
           <div style={{padding:"28px 16px",textAlign:"center",color:C.textFaint,fontSize:14}}>Loading {book.title}…</div>
         )}
@@ -10705,6 +10683,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             )}
           </div>
         ))}
+        </>)}
         </div>
       </div>
     );
@@ -10869,8 +10848,6 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                           <span style={{fontSize:12,color:C.textFaint,fontWeight:700,flexShrink:0}}>{cnt}× <span style={{fontSize:9}}>total</span></span>
                         </button>;
                       })}
-                      <button onClick={()=>{ setShowBookList(false); setShowPaneMenu(false); setGreekOpen(true); }}
-                        style={{textAlign:"left",padding:"9px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:15,fontWeight:700,cursor:"pointer"}}>ΑΩ Greek NT</button>
                     </div>
                   )}
                 </div>;
@@ -10945,15 +10922,22 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               <button key={b.id} onClick={()=>pickBook(b.id)}
                 style={{textAlign:"left",padding:"9px 12px",borderRadius:9,border:`1px solid ${b.id===bookId?C.gold:C.border}`,background:b.id===bookId?C.buttonActive:"transparent",color:b.id===bookId?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>{bookIcon(b.id)} {b.title}</button>
             ))}
-            <button onClick={()=>{ setShowBooks(false); setGreekOpen(true); }}
-              style={{textAlign:"left",padding:"9px 12px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>ΑΩ Greek NT</button>
           </div></>)}
       </div>
       {selPop && (
         <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ setSelRef(selPop.ref); setNoteDraft("“"+selPop.text+"”\n\n"); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
           style={{position:"fixed",left:Math.max(8,Math.min((typeof window!=="undefined"?window.innerWidth:360)-148,selPop.x-70)),top:Math.max(8,selPop.y-46),zIndex:1200,padding:"8px 14px",borderRadius:20,border:`1px solid ${C.gold}`,background:C.bg,color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.55)",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>📝 Add note</button>
       )}
-      {greekOpen && <GreekReader C={C} onClose={()=>setGreekOpen(false)} />}
+      {gkSel && (
+        <div onClick={()=>setGkSel(null)} style={{position:"fixed",inset:0,zIndex:100050}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"fixed",top:Math.min(gkSel.y+6,(typeof window!=="undefined"?window.innerHeight:800)-200),left:Math.max(8,Math.min(gkSel.x-135,(typeof window!=="undefined"?window.innerWidth:360)-278)),width:270,background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:"12px 14px",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
+            <div style={{fontSize:24,fontWeight:800,color:C.text}}>{gkSel.w}</div>
+            <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
+            <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}</div>
+            <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
