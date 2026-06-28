@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v49";
+const APP_VERSION = "v50";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -13342,10 +13342,6 @@ export default function App() {
             </span>
           </div>
         </div>
-        {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the 🎞️ tab) */}
-        <div style={{position:"fixed",left:-9999,top:0,width:1,height:1,overflow:"hidden",zIndex:0}}>
-          <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
-        </div>
         {/* Right: hamburger */}
         <div style={{marginLeft:"auto",flexShrink:0}}>
           <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={true} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
@@ -14199,6 +14195,10 @@ export default function App() {
         </>
       )}
 
+      {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the 🎞️ tab) */}
+      <div style={{position:"fixed",left:-9999,top:0,width:1,height:1,overflow:"hidden",zIndex:300000}}>
+        <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
+      </div>
       {showAbideMenu && (
         <>
           <div style={{position:"fixed",inset:0,zIndex:199,background:"transparent",touchAction:"none",overscrollBehavior:"none"}} onClick={()=>setShowAbideMenu(false)}/>
