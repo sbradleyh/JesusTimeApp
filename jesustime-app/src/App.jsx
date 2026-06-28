@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v91";
+const APP_VERSION = "v94";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10254,6 +10254,8 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
 }
 
 const GREEK_BASE = "/greek/"; // host the generated JSON here (same origin as the app), fetched on demand
+const LXX_BASE = "/lxx/"; // Septuagint (Rahlfs 1935, Eliran Wong, CC BY-NC-SA) — fetched on demand
+const LXX_BOOKS = [{f:"01-genesis.json",b:"Genesis",c:50},{f:"02-exodus.json",b:"Exodus",c:40},{f:"03-leviticus.json",b:"Leviticus",c:27},{f:"04-numbers.json",b:"Numbers",c:36},{f:"05-deuteronomy.json",b:"Deuteronomy",c:34},{f:"06-joshua.json",b:"Joshua",c:24},{f:"07-judges.json",b:"Judges",c:21},{f:"08-ruth.json",b:"Ruth",c:4},{f:"09-1samuel.json",b:"1 Samuel",c:31},{f:"10-2samuel.json",b:"2 Samuel",c:24},{f:"11-1kings.json",b:"1 Kings",c:22},{f:"12-2kings.json",b:"2 Kings",c:25},{f:"13-1chronicles.json",b:"1 Chronicles",c:29},{f:"14-2chronicles.json",b:"2 Chronicles",c:36},{f:"15-ezra.json",b:"Ezra",c:10},{f:"16-nehemiah.json",b:"Nehemiah",c:13},{f:"17-esther.json",b:"Esther",c:10},{f:"18-job.json",b:"Job",c:42},{f:"19-psalms.json",b:"Psalms",c:150},{f:"20-proverbs.json",b:"Proverbs",c:36},{f:"21-ecclesiastes.json",b:"Ecclesiastes",c:12},{f:"22-songofsongs.json",b:"Song of Songs",c:8},{f:"23-isaiah.json",b:"Isaiah",c:66},{f:"24-jeremiah.json",b:"Jeremiah",c:52},{f:"25-lamentations.json",b:"Lamentations",c:5},{f:"26-ezekiel.json",b:"Ezekiel",c:48},{f:"27-daniel.json",b:"Daniel",c:12},{f:"28-hosea.json",b:"Hosea",c:14},{f:"29-joel.json",b:"Joel",c:4},{f:"30-amos.json",b:"Amos",c:9},{f:"31-obadiah.json",b:"Obadiah",c:1},{f:"32-jonah.json",b:"Jonah",c:4},{f:"33-micah.json",b:"Micah",c:7},{f:"34-nahum.json",b:"Nahum",c:3},{f:"35-habakkuk.json",b:"Habakkuk",c:3},{f:"36-zephaniah.json",b:"Zephaniah",c:3},{f:"37-haggai.json",b:"Haggai",c:2},{f:"38-zechariah.json",b:"Zechariah",c:14},{f:"39-malachi.json",b:"Malachi",c:3}];
 const GREEK_BOOKS = [
  {f:"01-matthew.json",b:"Matthew",c:28},{f:"02-mark.json",b:"Mark",c:16},{f:"03-luke.json",b:"Luke",c:24},{f:"04-john.json",b:"John",c:21},
  {f:"05-acts.json",b:"Acts",c:28},{f:"06-romans.json",b:"Romans",c:16},{f:"07-1corinthians.json",b:"1 Corinthians",c:16},{f:"08-2corinthians.json",b:"2 Corinthians",c:13},
@@ -10263,6 +10265,7 @@ const GREEK_BOOKS = [
  {f:"21-1peter.json",b:"1 Peter",c:5},{f:"22-2peter.json",b:"2 Peter",c:3},{f:"23-1john.json",b:"1 John",c:5},{f:"24-2john.json",b:"2 John",c:1},
  {f:"25-3john.json",b:"3 John",c:1},{f:"26-jude.json",b:"Jude",c:1},{f:"27-revelation.json",b:"Revelation",c:22},
 ];
+const GREEK_CANON = [...LXX_BOOKS.map(b=>({...b,src:"lxx"})), ...GREEK_BOOKS.map(b=>({...b,src:"nt"}))];
 function gkNorm(s){ return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ"); }
 function gkTranslit(word){
   if(!word) return "";
@@ -10319,7 +10322,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     window.addEventListener("jtPersonalCatechismChanged", bump);
     return () => { window.removeEventListener("jtPersonalCatechismChanged", bump); };
   }, []);
-  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myCatBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false), {id:"greeknt", title:"Greek NT", greek:true, paras:[], scenes:[]}];
+  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myCatBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false), {id:"greekbible", title:"Greek Bible", greek:true, paras:[], scenes:[]}];
   const BOOK_ICONS = ["📕","📗","📘","📙","📒","📔","📓"];
   const bookIcon = (id) => { const i = BOOKS.findIndex(b=>b.id===id); return BOOK_ICONS[(i<0?0:i) % BOOK_ICONS.length]; };
   const PREF = (()=>{ try { return JSON.parse(localStorage.getItem("jtReaderPanes")||"{}"); } catch(e){ return {}; } })();
@@ -10349,15 +10352,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   }, [bookId]);
   const [gkBook,setGkBook]=React.useState(null);
   const [gkCh,setGkCh]=React.useState(null);
-  const [gkData,setGkData]=React.useState(null);
   const [gkBusy,setGkBusy]=React.useState(false);
   const [gkErr,setGkErr]=React.useState("");
-  const [gkLex,setGkLex]=React.useState(null);
   const [gkSel,setGkSel]=React.useState(null);
+  const [,setGkVer]=React.useState(0);
   const gkCacheRef=React.useRef({});
-  React.useEffect(()=>{ if(bookId!=="greeknt"||gkLex) return; let ok=true; fetch(GREEK_BASE+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{if(ok&&j)setGkLex(j);}).catch(()=>{}); return ()=>{ok=false;}; }, [bookId]); // eslint-disable-line
-  const gkOpenBook=(bk)=>{ setGkBook(bk); setGkCh(null); setGkErr(""); if(gkCacheRef.current[bk.f]){ setGkData(gkCacheRef.current[bk.f]); return; } setGkData(null); setGkBusy(true); fetch(GREEK_BASE+bk.f).then(r=>{if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(j=>{gkCacheRef.current[bk.f]=j; setGkData(j);}).catch(()=>setGkErr("Couldn’t load "+bk.b+" — is /greek/ deployed?")).finally(()=>setGkBusy(false)); };
-  const gkTapWord=(e,g,lemma)=>{ const r=e.currentTarget.getBoundingClientRect(); const le=gkLex&&gkLex[gkNorm(lemma)]; setGkSel({w:g,t:gkTranslit(g),lemma,gloss:le?le.g:"(definition not found)",x:r.left+r.width/2,y:r.bottom}); };
+  const gkLexRef=React.useRef({});
   const [showBooks, setShowBooks] = React.useState(false);
   const [showBookList, setShowBookList] = React.useState(false);
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
@@ -10563,17 +10563,29 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const cur=esvChapCache[ibKey]; const hasVerses=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k));
     if(!hasVerses) loadEsvPassage(ibKey, ibKey, false);
   }, [ibKey]); // eslint-disable-line
+  const gkBaseOf = (bk) => bk && bk.src==="lxx" ? LXX_BASE : GREEK_BASE;
+  const gkLoadLex = (base) => { if(gkLexRef.current[base]) return; fetch(base+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{ if(j){ gkLexRef.current[base]=j; setGkVer(v=>v+1);} }).catch(()=>{}); };
+  const gkOpenBook = (bk) => {
+    setGkBook(bk); setGkCh(null); setGkErr("");
+    const base=gkBaseOf(bk); gkLoadLex(base); const url=base+bk.f;
+    if(!gkCacheRef.current[url]){ setGkBusy(true); fetch(url).then(r=>{if(!r.ok)throw new Error("x");return r.json();}).then(j=>{gkCacheRef.current[url]=j; setGkVer(v=>v+1);}).catch(()=>setGkErr("Couldn’t load "+bk.b+" — is "+base+" deployed?")).finally(()=>setGkBusy(false)); }
+  };
   const renderGreekBody = (fp) => {
+    const base = gkBaseOf(gkBook);
+    const lex = gkBook ? (gkLexRef.current[base]||null) : null;
+    const data = gkBook ? gkCacheRef.current[base+gkBook.f] : null;
+    const tap = (e,g,lm) => { const r=e.currentTarget.getBoundingClientRect(); const le=lex&&lex[gkNorm(lm)]; setGkSel({w:g,t:gkTranslit(g),lemma:lm,gloss:le?le.g:"(definition not found)",strongs:(le&&le.s)?le.s:"",x:r.left+r.width/2,y:r.bottom}); };
     const tSize=Math.round(fp*0.9), gSize=Math.round(fp*0.75), vSize=Math.round(fp*0.62);
     const tile={padding:"11px 8px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
     const arrow={width:30,height:26,borderRadius:7,border:`1px solid rgba(${C.ink},0.22)`,background:"transparent",color:C.gold,fontSize:16,fontWeight:800,lineHeight:1,cursor:"pointer"};
-    const verseKeys=(gkData&&gkCh!=null)?Object.keys(gkData.v).filter(k=>k.slice(0,k.indexOf(":"))===String(gkCh)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])):[];
+    const hdr={fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",margin:"4px 2px 8px"};
+    const verseKeys=(data&&gkCh!=null)?Object.keys(data.v).filter(k=>k.slice(0,k.indexOf(":"))===String(gkCh)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])):[];
+    const grid=(items)=>(<div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8,marginBottom:14}}>{items.map(bk=>(<button key={bk.src+bk.f} onClick={()=>gkOpenBook(bk)} style={{...tile,textAlign:"left"}}>{bk.b}</button>))}</div>);
     return (
       <div>
         {(gkBook || gkCh!=null) && (
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-            <button onClick={()=>{ if(gkCh!=null) setGkCh(null); else { setGkBook(null); setGkData(null); } }}
-              style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:700,padding:"4px 10px",cursor:"pointer"}}>‹ {gkCh!=null?"Chapters":"Books"}</button>
+            <button onClick={()=>{ if(gkCh!=null) setGkCh(null); else setGkBook(null); }} style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:700,padding:"4px 10px",cursor:"pointer"}}>‹ {gkCh!=null?"Chapters":"Books"}</button>
             <span style={{fontSize:14,fontWeight:800,color:C.gold}}>{gkBook?gkBook.b:""}{gkCh!=null?` ${gkCh}`:""}</span>
             {gkCh!=null && gkBook && (
               <span style={{marginLeft:"auto",display:"flex",gap:6}}>
@@ -10583,25 +10595,26 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             )}
           </div>
         )}
-        {!gkBook && (
-          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
-            {GREEK_BOOKS.map(bk=>(<button key={bk.f} onClick={()=>gkOpenBook(bk)} style={{...tile,textAlign:"left"}}>{bk.b}</button>))}
-          </div>
-        )}
+        {!gkBook && (<>
+          <div style={hdr}>OLD TESTAMENT · SEPTUAGINT</div>
+          {grid(GREEK_CANON.filter(b=>b.src==="lxx"))}
+          <div style={hdr}>NEW TESTAMENT · SBLGNT</div>
+          {grid(GREEK_CANON.filter(b=>b.src==="nt"))}
+        </>)}
         {gkBook && gkCh==null && (<>
           {gkBusy && <div style={{color:C.textFaint,fontSize:13,padding:"6px 2px"}}>Loading {gkBook.b}…</div>}
           {gkErr && <div style={{color:"#e0786a",fontSize:13,padding:"6px 2px"}}>{gkErr}</div>}
           <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
-            {Array.from({length:gkBook.c},(_,i)=>i+1).map(n=>(<button key={n} onClick={()=>setGkCh(n)} disabled={!gkData} style={{...tile,textAlign:"center",opacity:gkData?1:0.5}}>{n}</button>))}
+            {Array.from({length:gkBook.c},(_,i)=>i+1).map(n=>(<button key={n} onClick={()=>setGkCh(n)} disabled={!data} style={{...tile,textAlign:"center",opacity:data?1:0.5}}>{n}</button>))}
           </div>
         </>)}
-        {gkBook && gkCh!=null && gkData && (
+        {gkBook && gkCh!=null && data && (
           <div style={{lineHeight:2.0}}>
             {verseKeys.map(vk=>{ const vs=vk.split(":")[1]; return (
               <span key={vk}>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
-                {gkData.v[vk].map((wd,i)=>{ const le=gkLex&&gkLex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
-                  <button key={i} onClick={(e)=>gkTapWord(e,wd[0],wd[1])}
+                {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
+                  <button key={i} onClick={(e)=>tap(e,wd[0],wd[1])}
                     style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:170}}>
                     <span style={{fontSize:tSize,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>
                     <span style={{fontSize:gSize,color:C.text,lineHeight:1.25,maxWidth:170,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
@@ -10933,7 +10946,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           <div onClick={e=>e.stopPropagation()} style={{position:"fixed",top:Math.min(gkSel.y+6,(typeof window!=="undefined"?window.innerHeight:800)-200),left:Math.max(8,Math.min(gkSel.x-135,(typeof window!=="undefined"?window.innerWidth:360)-278)),width:270,background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:"12px 14px",boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
             <div style={{fontSize:24,fontWeight:800,color:C.text}}>{gkSel.w}</div>
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
-            <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}</div>
+            <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
             <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
           </div>
         </div>
