@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v89";
+const APP_VERSION = "v90";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10335,20 +10335,20 @@ function GreekReader({ C, onClose=()=>{} }) {
           </>
         )}
         {book && ch!=null && data && (
-          <div style={{lineHeight:1.5}}>
+          <div style={{lineHeight:2.0}}>
             {verseKeys.map(vk=>{
               const vs=vk.split(":")[1];
               return (
-                <span key={vk} style={{display:"block",marginBottom:14}}>
-                  <span style={{fontSize:11,fontWeight:800,color:C.gold,verticalAlign:"top",marginRight:4}}>{vs}</span>
+                <span key={vk}>
+                  <span style={{fontSize:10,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
                   {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
                     <button key={i} onClick={()=>tapWord(wd[0],wd[1])}
-                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 5px 8px",margin:0,maxWidth:160}}>
-                      <span style={{fontSize:20,fontWeight:600,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>
-                      <span style={{fontSize:13,color:C.textMid,lineHeight:1.25,maxWidth:160,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
-                      <span style={{fontSize:14,color:C.text,lineHeight:1.3,opacity:0.8}}>{wd[0]}</span>
+                      style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:150}}>
+                      <span style={{fontSize:11,color:C.gold,lineHeight:1.2,opacity:0.85}}>{gkTranslit(wd[0])}</span>
+                      <span style={{fontSize:14,color:C.text,lineHeight:1.25,maxWidth:150,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>
                     </button>
                   );})}
+                  {" "}
                 </span>
               );
             })}
