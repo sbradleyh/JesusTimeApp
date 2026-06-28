@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v54";
+const APP_VERSION = "v60";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4860,7 +4860,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                   fontSize:13,fontWeight:900,textAlign:"center",letterSpacing:"0.18em",outline:"none"}}/>
             </div>
             <div style={{flex:1}}/>
-            <button onClick={()=>{ if(resetArmed){ saveBottomTabOrder(["today","streaks","bible","abide","log","TODAY","BIBLE","ABIDE","prayer","looking","catechism","names","reader","LOCK"]); saveBottomTabVisible({log:false}); setResetArmed(false); } else { setResetArmed(true); setTimeout(()=>setResetArmed(false),2500); } }}
+            <button onClick={()=>{ if(resetArmed){ saveBottomTabOrder(["today","streaks","bible","abide","log","TODAY","BIBLE","ABIDE","prayer","catechism","names","reader","LOCK"]); saveBottomTabVisible({log:false}); setResetArmed(false); } else { setResetArmed(true); setTimeout(()=>setResetArmed(false),2500); } }}
               style={{padding:"4px 12px",borderRadius:8,border:`1px solid ${resetArmed?"#e07a5f":C.border}`,background:"transparent",color:resetArmed?"#e07a5f":C.text,fontSize:12,fontWeight:resetArmed?700:400,cursor:"pointer",whiteSpace:"nowrap"}}>
               {resetArmed ? "Tap again to reset" : "↺ Reset Tabs"}
             </button>
@@ -5052,7 +5052,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -6095,12 +6095,17 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
   const PU = '#7F77DD', GD = '#d4a017';
   const LEVEL_NAMES = ["Daily","Odd/Even","Weekday","Date"];
   const LEVEL_COLORS = ["#e05a18","#d4a017","#3aaa55","#378ADD"];
+  // Personal (user-authored) catechism — editable list of {q,question,answer,review}
+  const [personalCat, setPersonalCat] = React.useState(()=>{ try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"null"); return Array.isArray(a)?a:[]; }catch(e){ return []; } });
+  const [editCat, setEditCat] = React.useState(false);
+  React.useEffect(()=>{ const r=()=>{ try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"null"); setPersonalCat(Array.isArray(a)?a:[]); }catch(e){} }; window.addEventListener("jtPersonalCatechismChanged", r); return ()=>window.removeEventListener("jtPersonalCatechismChanged", r); },[]);
   // Registry of available catechisms
   const CATECHISMS = {
     baptist: {name:"Baptist Catechism", short:"Keach's, 1689", data:BAPTIST_CATECHISM},
     heidelberg: {name:"Heidelberg Catechism", short:"1563", data:HEIDELBERG_CATECHISM},
+    personal: {name:"My Teaching", short:"My own", data: personalCat.map(it=>({q:it.q, question:it.question||"", answer:it.answer||"", refs:it.refs||""}))},
   };
-  const CAT_IDS = ["baptist","heidelberg"];
+  const CAT_IDS = ["baptist","heidelberg","personal"];
   const idNum = (cardId) => { const m=String(cardId).match(/(\d+)$/); return m?parseInt(m[1]):0; };
   const slotFor = (level, cardId) => { const id=idNum(cardId); return level===1 ? (id%2 ? "odd" : "even") : level===2 ? (id%7) : level===3 ? ((id-1)%28)+1 : null; };
 
@@ -6124,7 +6129,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     const existing = (box && box.cards) || [];
     const have = new Set(existing.map(c=>c.id));
     const additions = [];
-    CAT_IDS.forEach(cat => {
+    ["baptist","heidelberg"].forEach(cat => {
       CATECHISMS[cat].data.forEach(c => {
         const id = `${cat}:${c.q}`;
         if (!have.has(id)) additions.push({id, cat, q:c.q, question:c.question, answer:c.answer, refs:c.refs, level:0, slot:null, n:0, last:""});
@@ -6133,6 +6138,24 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     if (box === null) { saveBox({cards: additions, started:false}); }
     else if (additions.length) { saveBox({...box, cards:[...existing, ...additions]}); }
   }, [box]);
+
+  // Sync personal-catechism cards into the box: add newly-flagged, drop deleted/unchecked, update edits
+  React.useEffect(() => {
+    if (box === null) return;
+    const want = personalCat.filter(it => it && (String(it.answer||"").trim()||String(it.question||"").trim()) && it.review!==false);
+    const wantIds = new Set(want.map(it=>`personal:${it.q}`));
+    let cards = box.cards.slice();
+    let changed = false;
+    const filtered = cards.filter(c => c.cat!=="personal" || wantIds.has(c.id));
+    if (filtered.length !== cards.length) { cards = filtered; changed = true; }
+    const have2 = new Map(cards.filter(c=>c.cat==="personal").map(c=>[c.id,c]));
+    want.forEach(it => {
+      const id = `personal:${it.q}`; const ex = have2.get(id);
+      if (!ex) { cards = [...cards, {id, cat:"personal", q:it.q, question:it.question||"", answer:it.answer||"", refs:it.refs||"", level:0, slot:null, n:0, last:""}]; changed=true; }
+      else if (ex.question!==(it.question||"") || ex.answer!==(it.answer||"")) { cards = cards.map(c=> c.id===id ? {...c, question:it.question||"", answer:it.answer||""} : c); changed=true; }
+    });
+    if (changed) saveBox({...box, cards});
+  }, [personalCat, box]);
 
   const allCards = (box && box.cards) || [];
   const cards = allCards.filter(c => selected.includes(c.cat));
@@ -6274,7 +6297,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
   }, [selected]);
   const ssTouchX = React.useRef(null);
   const ssSwiped = React.useRef(false);
-  const ssGo = (d) => setSs(s => s ? {idx:(s.idx + d + ssList.length) % ssList.length, showA:false, showV:false} : s);
+  const ssGo = (d) => setSs(s => { if(!s) return s; const len = s.solo ? 1 : ssList.length; return {...s, idx:(s.idx + d + len) % len, showA:false, showV:false}; });
   const [ssFont, setSsFont] = React.useState(()=>{ try{ const v=parseInt(localStorage.getItem("jtCatSsFont")); return v>=16&&v<=120?v:30; }catch(e){ return 30; } });
   const bumpSsFont = d => setSsFont(v=>{ const n=Math.max(16,Math.min(120,v+d)); try{localStorage.setItem("jtCatSsFont",String(n));}catch(e){} return n; });
 
@@ -6307,6 +6330,8 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <span style={{fontSize:12,fontWeight:700,color:C.textFaint}}>{rev.idx+1} / {rev.seq.length}</span>
           <span style={{fontSize:12,fontWeight:700,color:PU}}>⏱ {fmtEl(revElapsed())}</span>
+          <button onClick={()=>{ ssSwiped.current=false; setSs({idx:0, showA:false, solo:cur}); }} title="Full screen this card"
+            style={{padding:"3px 11px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:GD,fontSize:14,cursor:"pointer"}}>⛶</button>
           <button onClick={()=>finishReview(false)}
             style={{padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:12,cursor:"pointer"}}>End</button>
         </div>
@@ -6315,7 +6340,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
             {(CATECHISMS[cur.cat]||{}).name || "Teaching"} · Q{cur.q}
           </div>
           <div style={{fontSize:19,fontWeight:700,color:C.text,lineHeight:1.4,marginBottom:(rev.revealed||(rev.hintWords||0)>0)?14:0}}>
-            {cur.question}
+            {cur.question || (cur.refs || "Recall…")}
           </div>
           {!rev.revealed && (rev.hintWords||0)>0 && (()=>{
             const words = cur.answer.split(/\s+/);
@@ -6396,8 +6421,9 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
   const chipShell = `rgba(${C.ink},0.04)`;
   return (
     <div style={{padding:"4px"}}>
-      {ss && ssList.length > 0 && (() => {
-        const cur = ssList[ss.idx % ssList.length];
+      {ss && (ss.solo || ssList.length > 0) && (() => {
+        const ssCards = ss.solo ? [ss.solo] : ssList;
+        const cur = ssCards[ss.idx % ssCards.length];
         const verses = cur && cur.refs ? verseCache[cur.refs] : null;
         const hasRefs = !!(cur && cur.refs && splitRefs(cur.refs).length);
         const onTap = () => { if (ssSwiped.current) { ssSwiped.current=false; return; } setSs(s=>s?{...s, showA:!s.showA, showV:false}:s); };
@@ -6419,15 +6445,15 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
                 style={{width:40,height:40,borderRadius:10,border:`1px solid ${C.border}`,background:C.bg,color:C.gold,fontSize:20,fontWeight:800,cursor:"pointer",lineHeight:1}}>A+</button>
             </div>
             <div style={{position:"fixed",top:"calc(14px + env(safe-area-inset-top))",left:0,right:0,fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:C.textFaint,pointerEvents:"none"}}>
-              {(CATECHISMS[cur.cat]||{}).name||"Teaching"} · Q{cur.q} · {ss.idx+1}/{ssList.length}
+              {(CATECHISMS[cur.cat]||{}).name||"Teaching"} · Q{cur.q}{ss.solo?"":` · ${ss.idx+1}/${ssList.length}`}
             </div>
 
-            <div style={{fontSize:ssFont,fontWeight:800,color:GD,lineHeight:1.3,maxWidth:820}}>{cur.question}</div>
+            <div style={{fontSize:ssFont,fontWeight:800,color:GD,lineHeight:1.3,maxWidth:820}}>{cur.question || cur.answer}</div>
 
             {ss.showA ? (
               <div style={{marginTop:24,fontSize:Math.round(ssFont*0.75),color:C.text,lineHeight:1.5,maxWidth:820,fontWeight:600}}>{cur.answer}</div>
             ) : (
-              <div style={{marginTop:22,fontSize:14,fontStyle:"italic",color:C.textFaint,pointerEvents:"none"}}>tap for answer · swipe for next</div>
+              <div style={{marginTop:22,fontSize:14,fontStyle:"italic",color:C.textFaint,pointerEvents:"none"}}>{ss.solo?"tap for answer":"tap for answer · swipe for next"}</div>
             )}
 
             {ss.showA && hasRefs && (
@@ -6482,48 +6508,36 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
           {catMins>0&&<span style={{fontSize:14,fontWeight:800,color:GD}}>{catMins>=60?`${Math.floor(catMins/60)}h${catMins%60?` ${catMins%60}m`:""}`:`${catMins}m`}</span>}
           {streak>0&&<span style={{fontSize:14,fontWeight:800,color:doneToday?"#f07a40":`rgba(${C.ink},0.4)`}}>🔥{streak}d</span>}
         </div>
-        {/* Teaching selector dropdown */}
-        <div style={{position:"relative"}}>
-          <button onClick={()=>setSelOpen(o=>!o)} title="Choose teachings"
-            style={{display:"flex",alignItems:"center",gap:4,padding:"8px 10px",borderRadius:12,cursor:"pointer",
-              border:`1px solid ${selOpen?PU:C.border}`,background:selOpen?"rgba(127,119,221,0.12)":"transparent",
-              color:selOpen?PU:C.textMid,fontSize:13,fontWeight:700}}>
-            📜<span style={{fontSize:11,fontWeight:800}}>{selected.length}</span>{selOpen?"▴":"▾"}
-          </button>
-          {selOpen && (
-            <>
-              <div style={{position:"fixed",inset:0,zIndex:199}} onClick={()=>setSelOpen(false)}/>
-              <div style={{position:"absolute",top:"100%",right:0,marginTop:6,zIndex:200,width:240,
-                background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:12,
-                boxShadow:"0 8px 24px rgba(0,0,0,0.7)",padding:"10px",boxSizing:"border-box"}}
-                onClick={e=>e.stopPropagation()}>
-                <div style={{fontSize:11,fontWeight:700,color:C.textFaint,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>
-                  Teachings {selected.length>1?`(combining ${selected.length})`:""}
-                </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6}}>
-                  {CAT_IDS.map(cid => {
-                    const on = selected.includes(cid);
-                    const n = CATECHISMS[cid].data.length;
-                    return (
-                      <button key={cid} onClick={()=>toggleCatechism(cid)}
-                        style={{textAlign:"left",padding:"9px 11px",borderRadius:11,cursor:"pointer",
-                          border:`1.5px solid ${on?PU:C.border}`,
-                          background:on?`rgba(${C.ink},0.10)`:"transparent"}}>
-                        <div style={{fontSize:13,fontWeight:800,color:on?C.text:C.textMid}}>
-                          {CATECHISMS[cid].name}
-                        </div>
-                        <div style={{fontSize:11,color:C.textFaint,marginTop:2}}>{CATECHISMS[cid].short} · {n} Q&amp;A</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
       {/* (Teaching header row removed — Circle/Share now handled via the chip popup) */}
+
+      {/* Teachings list — left checkbox adds to review; + adds to My Teaching; Edit opens it */}
+      <div style={{marginBottom:12,border:`1px solid ${C.border}`,borderRadius:12,padding:"8px 10px"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+          <span style={{fontSize:11,fontWeight:700,color:C.textFaint,textTransform:"uppercase",letterSpacing:"0.06em"}}>Teachings to review{selected.length>1?` · ${selected.length}`:""}</span>
+          <button onClick={()=>setEditCat(true)} title="Add to My Teaching"
+            style={{background:C.buttonActive,border:`1px solid ${C.gold}`,borderRadius:9,color:C.gold,fontSize:18,fontWeight:800,cursor:"pointer",padding:"0 12px",lineHeight:"26px"}}>+</button>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:3}}>
+          {CAT_IDS.map(cid => {
+            const on = selected.includes(cid);
+            const n = CATECHISMS[cid].data.length;
+            return (
+              <div key={cid} onClick={()=>toggleCatechism(cid)}
+                style={{display:"flex",alignItems:"center",gap:10,padding:"8px 4px",borderRadius:10,cursor:"pointer"}}>
+                <span style={{flexShrink:0,width:22,height:22,borderRadius:6,border:`2px solid ${on?PU:C.border}`,background:on?PU:"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14,fontWeight:900,lineHeight:1}}>{on?"✓":""}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:14,fontWeight:800,color:on?C.text:C.textMid}}>{CATECHISMS[cid].name}</div>
+                  <div style={{fontSize:11,color:C.textFaint,marginTop:1}}>{CATECHISMS[cid].short} · {n} Q&amp;A</div>
+                </div>
+                {cid==="personal" && <button onClick={(e)=>{ e.stopPropagation(); setEditCat(true); }}
+                  style={{flexShrink:0,background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.gold,fontSize:12,fontWeight:800,cursor:"pointer",padding:"6px 11px"}}>✏️ Edit</button>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Review controls */}
       {dueCards.length > 0 ? (
@@ -6555,15 +6569,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
         </div>
       )}
 
-      {/* Screensaver */}
-      {ssList.length > 0 && (
-        <button onClick={()=>{ ssSwiped.current=false; setSs({idx:0, showA:false}); }}
-          style={{width:"100%",padding:"10px",borderRadius:12,marginBottom:10,
-            border:`1px solid ${GD}`,background:"rgba(212,160,23,0.10)",
-            color:GD,fontSize:14,fontWeight:800,cursor:"pointer"}}>
-          🖥 Full Screen
-        </button>
-      )}
+      {editCat && <CatechismEditor C={C} onClose={()=>setEditCat(false)} />}
 
       {/* Progress summary — tap a status to review just those (up to 5) */}
       <div style={{display:"flex",gap:6,marginBottom:10}}>
@@ -10336,9 +10342,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [removed, setRemoved] = React.useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem("jtRemovedNames")||"[]")); } catch(e){ return new Set(); }
   });
-  const [personal, setPersonal] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); } catch(e){ return []; }
-  });
+  const readPersonalCat = () => { try { const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return (Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():""})).filter(x=>x.n); } catch(e){ return []; } };
+  const [personal, setPersonal] = React.useState(readPersonalCat);
   const [srcH, setSrcH] = React.useState(() => { try { const v=localStorage.getItem("jtSrcH"); return v===null?true:v==="1"; } catch(e){ return true; } });
   const [srcP, setSrcP] = React.useState(() => { try { const v=localStorage.getItem("jtSrcP"); return v===null?true:v==="1"; } catch(e){ return true; } });
   const [srcC, setSrcC] = React.useState(() => { try { const v=localStorage.getItem("jtSrcC"); return v===null?true:v==="1"; } catch(e){ return true; } });
@@ -10351,9 +10356,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     return () => window.removeEventListener("jtOpenNamesMenu", open);
   }, []);
   React.useEffect(() => {
-    const reload = () => { try { const a=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); setPersonal(Array.isArray(a)?a:[]); } catch(e){} };
-    window.addEventListener("jtPersonalNamesChanged", reload);
-    return () => window.removeEventListener("jtPersonalNamesChanged", reload);
+    const reload = () => setPersonal(readPersonalCat());
+    window.addEventListener("jtPersonalCatechismChanged", reload);
+    return () => window.removeEventListener("jtPersonalCatechismChanged", reload);
   }, []);
   React.useEffect(() => {
     const show = (e) => { const d = e && e.detail; if (d && d.n) { setForced({n:d.n, a:d.a||""}); setPaused(false); setMenuOpen(false); setPresent(true); } };
@@ -10478,12 +10483,13 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     }
   }, [presentIdx, present, transMs]);
   const isPersonal = (nm) => personal.some(p => p.n === nm.n);
+  const readCat = () => { try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
+  const writeCat = (arr) => { try{ localStorage.setItem("jtPersonalCatechism", JSON.stringify(arr)); localStorage.setItem("jtPersonalCatechismTs", String(Date.now())); window.dispatchEvent(new Event("jtPersonalCatechismChanged")); }catch(e){} };
   const removeCur = () => {
     if (inChrist) { setMenuOpen(false); return; }
     if (isPersonal(curName)) {
-      const next = personal.filter(p => p.n !== curName.n);
-      setPersonal(next);
-      try { localStorage.setItem("jtPersonalNames", JSON.stringify(next)); localStorage.setItem("jtPersonalNamesTs", String(Date.now())); window.dispatchEvent(new Event("jtPersonalNamesChanged")); } catch(e){}
+      writeCat(readCat().filter(it => String(it.answer||it.question||"").trim() !== curName.n));
+      setPersonal(readPersonalCat());
     } else {
       const next = new Set(removed); next.add(curName.n); setRemoved(next);
       try { localStorage.setItem("jtRemovedNames", JSON.stringify([...next])); } catch(e){}
@@ -10491,13 +10497,12 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     setNIdx(i => Math.max(0, i-1));
   };
   const addPersonal = () => {
-    const t = entryVal.trim().slice(0,80);
+    const t = entryVal.trim().slice(0,120);
     if (!t) return;
-    const ini = (initials||"").toUpperCase().trim();
-    const entry = { n:t, a:`${ini||"Me"} \u00B7 2020s` };
-    const next = [...personal, entry];
-    setPersonal(next);
-    try { localStorage.setItem("jtPersonalNames", JSON.stringify(next)); localStorage.setItem("jtPersonalNamesTs", String(Date.now())); window.dispatchEvent(new Event("jtPersonalNamesChanged")); } catch(e){}
+    const cat = readCat();
+    const maxQ = cat.reduce((m,it)=>Math.max(m,+it.q||0),0);
+    writeCat([...cat, {q:maxQ+1, question:"", answer:t, review:true}]);
+    setPersonal(readPersonalCat());
     try { onAddLook(t); } catch(e){}
     setEntryVal("");
   };
@@ -10546,7 +10551,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:6}}>Show</div>
               <div style={{display:"flex",gap:6}}>
-                {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","Personal Jesus Names",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
+                {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","My Teaching",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
                   <button key={key} onClick={()=>{
                     const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]);
                     if (on && !othersOn) return; // keep at least one source on
@@ -11860,6 +11865,54 @@ function JesusTabs({entries, addEntry, deleteEntry, today, chartTab, viewDay, vi
 }
 
 
+function CatechismEditor({ C, onClose=()=>{} }) {
+  const read = () => { try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"null"); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
+  const [items, setItems] = React.useState(read);
+  const persist = (n) => { try{ localStorage.setItem("jtPersonalCatechism", JSON.stringify(n)); localStorage.setItem("jtPersonalCatechismTs", String(Date.now())); window.dispatchEvent(new Event("jtPersonalCatechismChanged")); }catch(e){} };
+  const commit = (n) => { setItems(n); persist(n); };
+  const nextQ = () => (items.reduce((m,it)=>Math.max(m, +it.q||0), 0) + 1);
+  const add = () => commit([...items, {q:nextQ(), question:"", answer:"", review:true}]);
+  const update = (i, patch) => setItems(items.map((it,j)=> j===i?{...it,...patch}:it));
+  const blurSave = () => persist(items);
+  const del = (i) => commit(items.filter((_,j)=>j!==i));
+  const toggleReview = (i) => commit(items.map((it,j)=> j===i?{...it, review: it.review===false}:it));
+  const closeNow = () => { persist(items); onClose(); };
+  const openedAt = React.useRef(Date.now());
+  const backdropClose = () => { if (Date.now()-openedAt.current < 450) return; closeNow(); };
+  const inputStyle = {background:C.bg,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:14,padding:"8px 10px",width:"100%",boxSizing:"border-box"};
+  const reviewCount = items.filter(it=> it.review!==false && (String(it.answer||"").trim()||String(it.question||"").trim())).length;
+  return (
+    <div onClick={backdropClose} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:560,maxHeight:"88vh",display:"flex",flexDirection:"column",background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,boxShadow:"0 -8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom)"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"14px 16px",borderBottom:`1px solid ${C.border}`}}>
+          <span style={{fontSize:16,fontWeight:800,color:C.gold,flex:1,minWidth:0}}>✏️ My Teaching</span>
+          <button onClick={add} style={{flexShrink:0,background:C.buttonActive,border:`1px solid ${C.gold}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",padding:"6px 12px"}}>+ Add</button>
+          <button onClick={closeNow} style={{flexShrink:0,background:"none",border:"none",color:C.text,fontSize:20,cursor:"pointer"}}>✕</button>
+        </div>
+        <div style={{padding:"6px 16px 0",fontSize:11,color:C.textFaint}}>{items.length} total · {reviewCount} in review · tap a card’s button to add/remove it from review</div>
+        <div style={{overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"10px 16px 16px",display:"flex",flexDirection:"column",gap:14}}>
+          {items.length===0 && <div style={{color:C.textFaint,fontSize:14,textAlign:"center",lineHeight:1.5,padding:"22px 8px"}}>Nothing here yet. Tap “+ Add” to create your first entry. Fill in a question and answer, or leave the question blank and enter just an answer/statement to memorize.</div>}
+          {items.map((it,i)=>{
+            const inReview = it.review!==false;
+            return (
+              <div key={it.q} style={{border:`1px solid ${C.border}`,borderRadius:12,padding:"10px 11px",display:"flex",flexDirection:"column",gap:7}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,fontWeight:800,color:C.textFaint}}>Q{it.q}</span>
+                  <span style={{flex:1}}/>
+                  <button onClick={()=>toggleReview(i)} style={{background:inReview?"rgba(127,119,221,0.12)":"transparent",border:`1px solid ${inReview?"#7F77DD":C.border}`,borderRadius:8,color:inReview?"#7F77DD":C.textFaint,fontSize:11,fontWeight:800,cursor:"pointer",padding:"5px 10px",whiteSpace:"nowrap"}}>{inReview?"✓ In review":"+ Add to review"}</button>
+                  <button onClick={()=>del(i)} title="Delete" style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:"#e07a5f",fontSize:13,fontWeight:800,cursor:"pointer",padding:"5px 9px"}}>🗑</button>
+                </div>
+                <input value={it.question||""} onChange={e=>update(i,{question:e.target.value})} onBlur={blurSave} placeholder="Question (optional)" style={inputStyle}/>
+                <textarea value={it.answer||""} onChange={e=>update(i,{answer:e.target.value})} onBlur={blurSave} placeholder="Answer" rows={3} style={{...inputStyle,resize:"vertical",lineHeight:1.4,fontFamily:"inherit"}}/>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalNames", baseItems=[], changeEvent="jtPersonalNamesChanged" }) {
   const [items, setItems] = React.useState(() => {
     try { const a=JSON.parse(localStorage.getItem(storageKey)||"null"); if(Array.isArray(a)) return a; } catch(e){}
@@ -11885,9 +11938,11 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
   const add = () => { const t=q.trim().slice(0,120); if(!t) return; const n=[...items, {n:t, a:""}]; setItems(n); writeStore(n); setQ(""); };
   const doClose = () => { const cleaned = items.filter(x=>x && String(x.n||"").trim()); if(cleaned.length!==items.length){ try{ localStorage.setItem(storageKey, JSON.stringify(cleaned)); if(storageKey==="jtPersonalNames"){ localStorage.setItem("jtPersonalNamesTs", String(Date.now())); } window.dispatchEvent(new Event(changeEvent)); }catch(e){} } onClose(); };
   const ql = q.trim().toLowerCase();
+  const openedAt = React.useRef(Date.now());
+  const backdropClose = () => { if (Date.now()-openedAt.current < 450) return; doClose(); }; // ignore the ghost-click from the tap that opened it
   const view = items.map((it,i)=>({it,i})).filter(({it})=> !ql || String(it.n||"").toLowerCase().includes(ql) || String(it.a||"").toLowerCase().includes(ql));
   return (
-    <div onClick={doClose} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+    <div onClick={backdropClose} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
       <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:560,maxHeight:"85vh",display:"flex",flexDirection:"column",background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,boxShadow:"0 -8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"14px 16px",borderBottom:`1px solid ${C.border}`}}>
           <span style={{fontSize:16,fontWeight:800,color:C.gold,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>✏️ {title}</span>
@@ -11922,21 +11977,19 @@ function NamesEditor({ C, onClose=()=>{}, title="Names", storageKey="jtPersonalN
 
 function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvPassage=()=>{}, entries={}, addEntry=()=>{}, today="", initialBible=null, onClose=null}) {
   const readArr = (k) => { try { const a=JSON.parse(localStorage.getItem(k)||"null"); return Array.isArray(a)?a:null; } catch(e){ return null; } };
-  const myNames = readArr("jtPersonalNames") || [];
-  const myNamesItems = myNames.length ? myNames : [{n:"No personal names yet — tap ✏️ Edit above to add your own names for Jesus.", a:""}];
-  const myNamesBook = buildVerseListBook(myNamesItems, "Personal Names of Jesus", "mynames", true);
-  const l4jList = readArr("jtLook4JesusList") || [];
-  const l4jItems = l4jList.length ? l4jList : [{n:"Nothing here yet — tap ✏️ Edit above to add ways and places you look for Jesus.", a:""}];
-  const l4jBook = buildVerseListBook(l4jItems, "Looking 4 Jesus", "look4jesus", true);
+  const myCat = readArr("jtPersonalCatechism") || [];
+  const myCatItems = myCat.length
+    ? myCat.map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():""})).filter(x=>x.n)
+    : [{n:"Nothing here yet — tap ✏️ Edit above to add your own names for Jesus, things you look for in Him, or catechism Q&A.", a:""}];
+  const myCatBook = buildVerseListBook(myCatItems, "My Teaching", "mycatechism", true);
   const [editKey, setEditKey] = React.useState(null);
   const [, setRdVer] = React.useState(0);
   React.useEffect(() => {
     const bump = () => setRdVer(v=>v+1);
-    window.addEventListener("jtPersonalNamesChanged", bump);
-    window.addEventListener("jtLook4JesusChanged", bump);
-    return () => { window.removeEventListener("jtPersonalNamesChanged", bump); window.removeEventListener("jtLook4JesusChanged", bump); };
+    window.addEventListener("jtPersonalCatechismChanged", bump);
+    return () => { window.removeEventListener("jtPersonalCatechismChanged", bump); };
   }, []);
-  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, ...(CHECKBOOK_DAYS.length ? [buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE)] : []), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myNamesBook, l4jBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false)];
+  const BOOKS = [{id:"disciple", title:DISCIPLE_TITLE, paras:DISCIPLE_PARAS, scenes:DISCIPLE_SCENES}, {id:"pilgrim", title:PP_TITLE, paras:PP_PARAS, scenes:PP_SCENES}, ...(CHECKBOOK_DAYS.length ? [buildCheckbookBook(CHECKBOOK_DAYS, CHECKBOOK_TITLE)] : []), {id:"witnesses", title:WITNESSES_TITLE, paras:WITNESSES_PARAS, scenes:WITNESSES_SCENES}, buildVerseListBook(JESUS_NAMES, "Names of Jesus", "jesusnames", true), myCatBook, buildVerseListBook(IN_CHRIST, "What I Have in Christ", "inchrist", false)];
   const BOOK_ICONS = ["📕","📗","📘","📙","📒","📔","📓"];
   const bookIcon = (id) => { const i = BOOKS.findIndex(b=>b.id===id); return BOOK_ICONS[(i<0?0:i) % BOOK_ICONS.length]; };
   const PREF = (()=>{ try { return JSON.parse(localStorage.getItem("jtReaderPanes")||"{}"); } catch(e){ return {}; } })();
@@ -12183,7 +12236,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               </div>
             </>)}
           </div>
-          {(book.id==="mynames"||book.id==="look4jesus") && <button onClick={()=>setEditKey(book.id)}
+          {book.id==="mycatechism" && <button onClick={()=>setEditKey("mycatechism")}
             style={{flexShrink:0,padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:11,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✏️ Edit</button>}
           <div style={{position:"relative",flexShrink:0}}>
             <button onClick={()=>setBookLogPop(s=>!s)}
@@ -12304,8 +12357,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const setPaneMode = (pane,m) => { if(m==="off"){ const other=pane==="top"?botMode:topMode; if(other==="off") return; } if(pane==="top") setTop(m); else setBot(m); if(m!=="off") setActivePane(pane); };
   return (
     <div style={shell}>
-      {editKey==="mynames" && <NamesEditor C={C} title="Personal Names of Jesus" storageKey="jtPersonalNames" baseItems={[]} changeEvent="jtPersonalNamesChanged" onClose={()=>setEditKey(null)} />}
-      {editKey==="look4jesus" && <NamesEditor C={C} title="Looking 4 Jesus" storageKey="jtLook4JesusList" baseItems={[]} changeEvent="jtLook4JesusChanged" onClose={()=>setEditKey(null)} />}
+      {editKey==="mycatechism" && <CatechismEditor C={C} onClose={()=>setEditKey(null)} />}
       {refSelOpen && (
         <div onClick={()=>setRefSelOpen(false)} style={{position:"absolute",inset:0,zIndex:60,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",padding:12}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"min(460px,100%)",maxHeight:"100%",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,boxShadow:"0 14px 40px rgba(0,0,0,0.55)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
@@ -12542,7 +12594,7 @@ export default function App() {
   };
 
   // ABIDE sentinel groups tabs under the Abide tab (reached via its popup).
-  const DEFAULT_BOTTOM_TABS = ["today","streaks","bible","abide","log","TODAY","BIBLE","ABIDE","prayer","looking","catechism","names","reader","LOCK"];
+  const DEFAULT_BOTTOM_TABS = ["today","streaks","bible","abide","log","TODAY","BIBLE","ABIDE","prayer","catechism","names","reader","LOCK"];
   const TAB_LAYOUT_VERSION = "2026-06-26";
   const [bottomTabOrder, setBottomTabOrder] = useState(() => {
     try {
@@ -12812,25 +12864,52 @@ export default function App() {
               e.notes = e.notes.replace(/#Catechism\b/gi, "#Teaching");
               changed = true;
             }
+            if (e && typeof e.notes === "string" && /#Look4Jesus\b/i.test(e.notes)) {
+              e.notes = e.notes.replace(/#Look4Jesus\b/gi, "#Teaching");
+              changed = true;
+            }
           });
         });
         if (changed) { try { localStorage.setItem("jwDark2", JSON.stringify(data)); } catch(e){} }
         setEntries(data);
       }
     } catch(e){}
-    // Migrate starred/shared tag membership too
+    // One-time merge: fold the short personal lists (Personal Names of Jesus + Look4Jesus) into the single
+    // Personal Catechism list. Originals are left untouched as a backup; runs once via the jtListsMergedV1 flag.
+    try {
+      if (localStorage.getItem("jtListsMergedV1") !== "1") {
+        const readList = k => { try { const a=JSON.parse(localStorage.getItem(k)||"null"); return Array.isArray(a)?a:[]; } catch(e){ return []; } };
+        const cat = readList("jtPersonalCatechism");
+        let maxQ = cat.reduce((m,it)=>Math.max(m, +it.q||0), 0);
+        const haveA = new Set(cat.map(it=>String(it.answer||"").trim().toLowerCase()).filter(Boolean));
+        const fold = (list) => list.forEach(it => {
+          const name = String((it && (it.n||it.name||it.answer))||"").trim();
+          if (!name || haveA.has(name.toLowerCase())) return;       // skip blanks + duplicate answers
+          haveA.add(name.toLowerCase());
+          const attr = String((it && (it.a||it.attr||it.question))||"").trim();
+          cat.push({ q: ++maxQ, question: attr, answer: name, review: true });
+        });
+        fold(readList("jtPersonalNames"));
+        fold(readList("jtLook4JesusList"));
+        localStorage.setItem("jtPersonalCatechism", JSON.stringify(cat));
+        localStorage.setItem("jtPersonalCatechismTs", String(Date.now()));
+        // make sure the personal set is active in review
+        try { const sel=JSON.parse(localStorage.getItem("jtCatechismSelected")||"null"); const s=Array.isArray(sel)?sel.slice():["baptist"]; if(!s.includes("personal")){ s.push("personal"); localStorage.setItem("jtCatechismSelected", JSON.stringify(s)); } } catch(e){}
+        localStorage.setItem("jtListsMergedV1", "1");
+      }
+    } catch(e){}
     try {
       const st = JSON.parse(localStorage.getItem("starredTags")||"null");
-      if (Array.isArray(st) && st.includes("Catechism")) {
-        const m = st.map(t=>t==="Catechism"?"Teaching":t);
+      if (Array.isArray(st) && (st.includes("Catechism")||st.includes("Look4Jesus"))) {
+        const m = [...new Set(st.map(t=>(t==="Catechism"||t==="Look4Jesus")?"Teaching":t))];
         localStorage.setItem("starredTags", JSON.stringify(m));
         setStarredTags(m);
       }
     } catch(e){}
     try {
       const sh = JSON.parse(localStorage.getItem("ofSharedTags")||"null");
-      if (Array.isArray(sh) && sh.includes("Catechism")) {
-        const m = sh.map(t=>t==="Catechism"?"Teaching":t);
+      if (Array.isArray(sh) && (sh.includes("Catechism")||sh.includes("Look4Jesus"))) {
+        const m = [...new Set(sh.map(t=>(t==="Catechism"||t==="Look4Jesus")?"Teaching":t))];
         localStorage.setItem("ofSharedTags", JSON.stringify(m));
         setSharedTags(m);
       }
@@ -13673,7 +13752,7 @@ export default function App() {
                             if(m){const after=m[2].slice(0,L4J_MAX);setInlineNotes(m[1]+after);}
                             else setInlineNotes(v);
                           }}
-                            extraTags={["Prayer_Request", "Look4Jesus", ...customTags]}
+                            extraTags={["Prayer_Request", ...customTags]}
                             autoShowSuggestions={showInlineNotes && !suppressSuggestions}
                             suggestionTrigger={suggestionTrigger}
                             onFocus={()=>{ setSuppressSuggestions(false); setShowInlineNotes(true); setSuggestionTrigger(t=>t+1); }}
@@ -13862,31 +13941,6 @@ export default function App() {
                           <OnFireWidget workerUrl={workerUrl} groups={groups} refreshKey={refreshFriendsKey} appToken={appToken} entries={entries} userInitials={userInitials} defaultView={friendsView} pushAll={pushAllSharedTags} sharedTags={sharedTags}/>
                         </div>
                       )}
-                      {activeMainTab === "looking" && (
-                        <div style={{overflowX:"hidden",width:"100%"}}>
-                          {(()=>{
-                            const _lDone=tabStarMap.looking===true;
-                            const _lMins=(entries[today]||[]).filter(e=>(e.notes||"").toLowerCase().includes("#look4jesus")).reduce((s,e)=>s+(e.minutes||0),0);
-                            const _lStreak=computeStreak("Look4Jesus",entries,today);
-                            const _lC=starredTags.includes("Look4Jesus"),_lF=sharedTags.includes("Look4Jesus");
-                            return(
-                              <div style={{position:"relative"}}>
-                                <div style={{display:"flex",justifyContent:"center",position:"sticky",top:0,zIndex:10,background:"#000000",padding:"8px 62px 6px 16px",marginBottom:10}}>
-                                  <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"8px 16px",borderRadius:16,border:`1px solid ${_lDone?C.chipHi:`rgba(${C.ink},0.15)`}`,background:C.chipShell}}>
-                                    <span style={{fontSize:22}}>👓</span>
-                                    <span style={{fontSize:13,fontWeight:700,color:_lDone?C.chipHi:`rgba(${C.ink},0.4)`,letterSpacing:"0.05em"}}>Looking for Jesus</span>
-                                    {_lC&&<span style={{fontSize:11,fontWeight:800,padding:"1px 5px",borderRadius:5,color:"#d4a017",border:"1px solid #d4a017",background:"rgba(212,160,23,0.15)"}}>C</span>}
-                                    <span style={{fontSize:22,color:_lDone?"#d4a017":`rgba(${C.ink},0.25)`}}>{_lDone?"★":"•"}</span>
-                                    {_lMins>0&&<span style={{fontSize:14,fontWeight:800,color:C.chipHi}}>{fmtM(_lMins)}</span>}
-                                    {_lStreak>0&&<span style={{fontSize:14,fontWeight:800,color:_lDone?"#f07a40":`rgba(${C.ink},0.4)`}}>🔥{_lStreak}d</span>}
-                                  </div>
-                                </div>
-                                <Look4JesusTracker entries={entries} setEntries={setEntries} persist={persist} addEntry={addEntry} deleteEntry={deleteEntry} today={today} workerUrl={workerUrl||""} appToken={appToken||""} groups={groups} sharedTags={sharedTags} pushScore={pushScoreToGroups} computeStreak={computeStreak}/>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      )}
                       {activeMainTab === "bible" && !bibleChosen && (
                         <div style={{minHeight:"30vh"}}/>
                       )}
@@ -13976,7 +14030,7 @@ export default function App() {
               const lastWord=(v.split(/\s+/).pop()||"").replace(/^#+/,"");
               setStreakSearch(lastWord);
             }}
-              extraTags={["Prayer_Request", "Look4Jesus",...customTags]}
+              extraTags={["Prayer_Request", ...customTags]}
               autoShowSuggestions={showInlineNotes} suggestionTrigger={suggestionTrigger}
               onFocus={()=>{setShowInlineNotes(true);setSuggestionTrigger(t=>t+1);}}
               entries={entries}
@@ -14045,7 +14099,7 @@ export default function App() {
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["✝️","Names"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -14176,7 +14230,7 @@ export default function App() {
               );
             })}
             {groupRange(bottomTabOrder,"TODAY").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
-              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],bible:["📖","Bible"],friends:["👥","Friends"]};
+              const META={prayer:["🙏","Prayer"],names:["👤","Names"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],bible:["📖","Bible"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
@@ -14195,7 +14249,7 @@ export default function App() {
         </>
       )}
 
-      {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the 🎞️ tab) */}
+      {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the ✝️ tab) */}
       <div style={{position:"fixed",left:-9999,top:0,width:1,height:1,overflow:"hidden",zIndex:300000}}>
         <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
       </div>
@@ -14210,7 +14264,7 @@ export default function App() {
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"row",flexWrap:"nowrap",gap:6,maxWidth:"96vw",overflowX:"auto",justifyContent:"center"}}>
             {(() => {
-              const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],looking:["👓","Look"],bible:["📖","Bible"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
+              const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],bible:["📖","Bible"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
               const lockIdx = bottomTabOrder.indexOf("LOCK");
               const abideIdx = bottomTabOrder.indexOf("ABIDE");
               const abideEnd = lockIdx>=0 ? lockIdx : bottomTabOrder.length;
@@ -14251,7 +14305,7 @@ export default function App() {
             animation:"jtPopUp .18s ease both",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"column",gap:4,minWidth:160}}>
-            {[["board","Streaks"],["graph","Graph"],["l4j","👓 Look4Jesus"]].map(([v,label])=>(
+            {[["board","Streaks"],["graph","Graph"]].map(([v,label])=>(
               <button key={v} onClick={()=>{setFriendsView(v);setShowFriendsMenu(false);saveMainTab("friends");}}
                 style={{padding:"10px 16px",borderRadius:10,
                   border:`1px solid ${friendsView===v?C.gold:C.border}`,
@@ -14303,7 +14357,7 @@ export default function App() {
               <span style={{position:"absolute",top:2,right:5,fontSize:12,color:tabStarMap.drill?"#d4a017":`rgba(${C.ink},0.25)`}}>{tabStarMap.drill?"★":"☆"}</span>
             </button>)}
             {groupRange(bottomTabOrder,"BIBLE").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
-              const META={prayer:["🙏","Prayer"],names:["👤","Names"],looking:["👓","Look"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],today:["☀️","Day"],friends:["👥","Friends"]};
+              const META={prayer:["🙏","Prayer"],names:["👤","Names"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],today:["☀️","Day"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowBibleMenu(false); setShowFriendsMenu(false); setShowTodayMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
@@ -14487,7 +14541,7 @@ export default function App() {
           </div>
           <TagNotesInput value={editForm.notes} onChange={v=>setEditForm(p=>({...p,notes:v}))}
             placeholder="Notes… (type to #tag)"
-            extraTags={["Prayer_Request", "Look4Jesus", ...customTags]}
+            extraTags={["Prayer_Request", ...customTags]}
             autoShowSuggestions={true}
             style={{width:"100%",padding:"12px 14px",borderRadius:14,border:`1.5px solid ${C.borderHi}`,
               background:"rgba(212,160,23,0.04)",color:C.textMid,fontSize:18,
