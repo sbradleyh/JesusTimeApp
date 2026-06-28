@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v60";
+const APP_VERSION = "v62";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -6186,6 +6186,10 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
 
   // Review session
   const [rev, setRev] = React.useState(null);
+  const [revMenu, setRevMenu] = React.useState(true); // bottom control bar visible
+  const REV_COLORS = ["#d4a017","#ffffff","#7F77DD","#7ec699","#e0a96d","#7fd0e0"];
+  const [revColor, setRevColor] = React.useState(()=>{ try{ return localStorage.getItem("jtRevTextColor")||"#d4a017"; }catch(e){ return "#d4a017"; } });
+  const cycleColor = () => setRevColor(c=>{ const i=REV_COLORS.indexOf(c); const n=REV_COLORS[(i+1)%REV_COLORS.length]; try{localStorage.setItem("jtRevTextColor",n);}catch(e){} return n; });
   const [, setRevTick] = React.useState(0);
   React.useEffect(() => {
     if (!rev || rev.done) return;
@@ -6326,89 +6330,45 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     }
     const cur = rev.seq[rev.idx];
     return (
-      <div style={{padding:"8px 4px"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-          <span style={{fontSize:12,fontWeight:700,color:C.textFaint}}>{rev.idx+1} / {rev.seq.length}</span>
-          <span style={{fontSize:12,fontWeight:700,color:PU}}>⏱ {fmtEl(revElapsed())}</span>
-          <button onClick={()=>{ ssSwiped.current=false; setSs({idx:0, showA:false, solo:cur}); }} title="Full screen this card"
-            style={{padding:"3px 11px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:GD,fontSize:14,cursor:"pointer"}}>⛶</button>
-          <button onClick={()=>finishReview(false)}
-            style={{padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:12,cursor:"pointer"}}>End</button>
+      <div onClick={()=>setRevMenu(m=>!m)}
+        style={{position:"fixed",inset:0,zIndex:100000,background:C.bg,display:"flex",flexDirection:"column",
+          alignItems:"center",justifyContent:"center",cursor:"pointer",overflow:"auto",
+          padding:`calc(38px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(80px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left))`,textAlign:"center"}}>
+        <div style={{position:"fixed",top:"calc(10px + env(safe-area-inset-top))",left:0,right:0,fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:C.textFaint,pointerEvents:"none"}}>
+          {(CATECHISMS[cur.cat]||{}).name||"Teaching"} · Q{cur.q} · {rev.idx+1}/{rev.seq.length}
         </div>
-        <div style={{borderRadius:14,border:`1px solid ${C.borderHi}`,background:C.card,padding:"18px 16px",marginBottom:12}}>
-          <div style={{fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:PU,marginBottom:8}}>
-            {(CATECHISMS[cur.cat]||{}).name || "Teaching"} · Q{cur.q}
+        <div style={{fontSize:ssFont,fontWeight:800,color:revColor,lineHeight:1.3,maxWidth:840}}>{cur.question || (cur.refs||"Recall…")}</div>
+        {!rev.revealed && (rev.hintWords||0)>0 && (()=>{ const words=(cur.answer||"").split(/\s+/); const shown=Math.min(rev.hintWords,words.length); return (
+          <div style={{marginTop:18,fontSize:Math.round(ssFont*0.6),color:C.textMid,lineHeight:1.5,maxWidth:820}}>{words.slice(0,shown).join(" ")}{shown<words.length?" …":""}</div>
+        ); })()}
+        {rev.revealed && (
+          <div style={{marginTop:22,fontSize:Math.round(ssFont*0.72),color:revColor,opacity:0.93,fontWeight:600,lineHeight:1.5,maxWidth:840}}>
+            {cur.answer}
+            {cur.refs && cur.refs!=="—" && <div style={{marginTop:10,fontSize:Math.round(ssFont*0.46),color:C.textFaint,fontStyle:"italic"}}>{cur.refs}</div>}
           </div>
-          <div style={{fontSize:19,fontWeight:700,color:C.text,lineHeight:1.4,marginBottom:(rev.revealed||(rev.hintWords||0)>0)?14:0}}>
-            {cur.question || (cur.refs || "Recall…")}
-          </div>
-          {!rev.revealed && (rev.hintWords||0)>0 && (()=>{
-            const words = cur.answer.split(/\s+/);
-            const shown = Math.min(rev.hintWords, words.length);
-            return (
-              <div style={{borderTop:`1px solid ${C.border}`,paddingTop:12}}>
-                <div style={{fontSize:11,fontWeight:700,color:GD,marginBottom:6}}>💡 Hint — {shown}/{words.length} words</div>
-                <div style={{fontSize:16,color:C.textMid,lineHeight:1.5}}>
-                  {words.slice(0,shown).join(" ")}
-                  {shown<words.length && <span style={{color:C.textFaint}}> …</span>}
-                </div>
-              </div>
-            );
-          })()}
-          {rev.revealed && (
-            <div style={{borderTop:`1px solid ${C.border}`,paddingTop:14}}>
-              <div style={{fontSize:17,color:C.textMid,lineHeight:1.5}}>{cur.answer}</div>
-              {cur.refs && cur.refs!=="—" && (
-                <div style={{fontSize:12,color:C.textFaint,marginTop:8,fontStyle:"italic"}}>{cur.refs}</div>
-              )}
-              {/* ESV verses for the proof-texts */}
-              {splitRefs(cur.refs).length>0 && (
-                <div style={{marginTop:12}}>
-                  {verseCache[cur.refs] ? (
-                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                      {verseCache[cur.refs].map((p,i)=>(
-                        <div key={i} style={{borderLeft:`2px solid ${PU}`,paddingLeft:10,fontSize:14,color:C.textMid,lineHeight:1.5,whiteSpace:"pre-wrap"}}>{p}</div>
-                      ))}
-                      <div style={{fontSize:10,color:C.textFaint,fontStyle:"italic"}}>ESV</div>
-                    </div>
-                  ) : (
-                    <button onClick={()=>fetchVerses(cur.refs)} disabled={verseBusy}
-                      style={{padding:"7px 12px",borderRadius:9,border:`1px solid ${PU}`,background:"transparent",
-                        color:PU,fontSize:12,fontWeight:700,cursor:verseBusy?"default":"pointer",opacity:verseBusy?0.6:1}}>
-                      {verseBusy?"⏳ Loading verses…":"📖 Show verses (ESV)"}
-                    </button>
-                  )}
-                  {verseErr && <div style={{fontSize:11,color:C.red,marginTop:6}}>{verseErr}</div>}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        {!rev.revealed ? (
-          <div style={{display:"flex",gap:8}}>
-            <button onClick={showHint}
-              style={{flex:"0 0 auto",padding:"12px 14px",borderRadius:12,border:`1.5px solid ${GD}`,
-                background:"rgba(212,160,23,0.12)",color:GD,fontSize:15,fontWeight:800,cursor:"pointer"}}>
-              💡 Hint
-            </button>
-            <button onClick={()=>setRev(r=>({...r,revealed:true}))}
-              style={{flex:1,padding:"12px",borderRadius:12,border:`1.5px solid ${PU}`,
-                background:"rgba(127,119,221,0.12)",color:PU,fontSize:15,fontWeight:800,cursor:"pointer"}}>
-              Show answer
-            </button>
-          </div>
-        ) : (
-          <div style={{display:"flex",gap:8}}>
-            <button onClick={()=>revGrade(false)}
-              style={{flex:1,padding:"12px",borderRadius:12,border:"1px solid #c06060",
-                background:"rgba(192,96,96,0.12)",color:"#f87171",fontSize:15,fontWeight:800,cursor:"pointer"}}>
-              ✗ Revisit Soon
-            </button>
-            <button onClick={()=>revGrade(true)}
-              style={{flex:1,padding:"12px",borderRadius:12,border:"1px solid #3a8a3a",
-                background:"rgba(96,160,96,0.15)",color:"#80c080",fontSize:15,fontWeight:800,cursor:"pointer"}}>
-              ✓ Revisit Later
-            </button>
+        )}
+        {!rev.revealed && !(rev.hintWords>0) && (
+          <div style={{marginTop:20,fontSize:13,fontStyle:"italic",color:C.textFaint,pointerEvents:"none"}}>tap screen for menu</div>
+        )}
+        {revMenu && (
+          <div onClick={e=>e.stopPropagation()}
+            style={{position:"fixed",left:0,right:0,bottom:0,zIndex:1,display:"flex",alignItems:"center",gap:6,
+              padding:`8px calc(8px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left))`,
+              background:"rgba(0,0,0,0.6)",borderTop:`1px solid ${C.border}`,boxSizing:"border-box"}}>
+            <span style={{fontSize:13,fontWeight:800,color:PU,flexShrink:0,whiteSpace:"nowrap"}}>⏱{fmtEl(revElapsed())}</span>
+            {!rev.revealed ? (
+              <>
+                <button onClick={showHint} title="Hint" style={{flexShrink:0,padding:"9px 12px",borderRadius:10,border:`1px solid ${GD}`,background:"transparent",color:GD,fontSize:15,fontWeight:800,cursor:"pointer"}}>💡</button>
+                <button onClick={()=>setRev(r=>({...r,revealed:true}))} style={{flex:1,padding:"9px",borderRadius:10,border:`1px solid ${PU}`,background:"rgba(127,119,221,0.18)",color:PU,fontSize:14,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>Show answer</button>
+              </>
+            ) : (
+              <>
+                <button onClick={()=>revGrade(false)} style={{flex:1,padding:"9px",borderRadius:10,border:"1px solid #c06060",background:"rgba(192,96,96,0.16)",color:"#f87171",fontSize:14,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✗ Soon</button>
+                <button onClick={()=>revGrade(true)} style={{flex:1,padding:"9px",borderRadius:10,border:"1px solid #3a8a3a",background:"rgba(96,160,96,0.18)",color:"#80c080",fontSize:14,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✓ Later</button>
+              </>
+            )}
+            <button onClick={cycleColor} title="Text color" style={{flexShrink:0,width:38,height:38,borderRadius:10,border:`1px solid ${revColor}`,background:"transparent",fontSize:16,cursor:"pointer",lineHeight:1}}>🎨</button>
+            <button onClick={()=>finishReview(false)} style={{flexShrink:0,padding:"9px 11px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:13,fontWeight:700,cursor:"pointer"}}>End</button>
           </div>
         )}
       </div>
