@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v109";
+const APP_VERSION = "v111";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10849,7 +10849,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     borderRadius: fs?0:12, border: fs?"none":`1px solid ${C.border}`, overflow:"hidden" };
   const curMode = activePane==="top"?topMode:botMode;
   const iconBtn = (m,icon) => { const on=curMode===m;
-    return <button key={m} onClick={m==="book"?()=>setShowBooks(s=>!s):m==="bible"?()=>setBibleChoose(activePane):()=>setMode(m)}
+    return <button key={m} onClick={m==="book"?()=>setShowBooks(s=>!s):m==="bible"?(e)=>{ const r=e.currentTarget.getBoundingClientRect(); setBibleChoose({pane:activePane,x:r.left+r.width/2,y:r.top}); }:()=>setMode(m)}
       style={{padding:"4px 9px",borderRadius:8,border:"none",cursor:"pointer",background:on?C.buttonActive:"transparent",color:on?C.gold:C.textFaint,fontSize:21,lineHeight:1,display:"inline-flex",alignItems:"center",gap:2}}>
       {icon}{m==="book"&&<span style={{fontSize:11}}>▾</span>}</button>;
   };
@@ -10858,15 +10858,16 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   return (
     <div style={shell}>
       {editKey==="mycatechism" && <CatechismEditor C={C} onClose={()=>setEditKey(null)} />}
-      {bibleChoose && (
-        <div onClick={()=>setBibleChoose(null)} style={{position:"absolute",inset:0,zIndex:120,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"min(300px,100%)",background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:16,boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
-            <div style={{fontSize:12,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",marginBottom:11,textAlign:"center"}}>OPEN BIBLE</div>
-            <button onClick={()=>{ setPaneMode(bibleChoose,"bible"); setBibleChoose(null); }} style={{width:"100%",padding:"14px 0",borderRadius:12,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",marginBottom:9,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><span style={{fontSize:20}}>📖</span> ESV</button>
-            <button onClick={()=>openGreekInPane(bibleChoose)} style={{width:"100%",padding:"14px 0",borderRadius:12,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><span style={{fontSize:20}}>🏛️</span> Greek Bible</button>
+      {bibleChoose && (() => { const bw=176, bh=108; const W=(typeof window!=="undefined"?window.innerWidth:360); const left=Math.max(8,Math.min(bibleChoose.x-bw/2,W-bw-8)); const top=Math.max(8,bibleChoose.y-bh-8); return (
+        <>
+          <div onClick={()=>setBibleChoose(null)} style={{position:"fixed",inset:0,zIndex:100079}}/>
+          <div style={{position:"fixed",left,top,width:bw,zIndex:100080,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:8,boxShadow:"0 8px 28px rgba(0,0,0,0.6)"}}>
+            <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",textAlign:"center",margin:"2px 0 7px"}}>OPEN BIBLE</div>
+            <button onClick={()=>{ setPaneMode(bibleChoose.pane,"bible"); setBibleChoose(null); }} style={{width:"100%",padding:"10px 0",borderRadius:9,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:7,display:"flex",alignItems:"center",justifyContent:"center",gap:7}}><span style={{fontSize:18}}>📖</span> ESV</button>
+            <button onClick={()=>openGreekInPane(bibleChoose.pane)} style={{width:"100%",padding:"10px 0",borderRadius:9,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:7}}><span style={{fontSize:18}}>🏛️</span> Greek</button>
           </div>
-        </div>
-      )}
+        </>
+      ); })()}
       {refSelOpen && (
         <div onClick={()=>setRefSelOpen(false)} style={{position:"absolute",inset:0,zIndex:60,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",padding:12}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"min(460px,100%)",maxHeight:"100%",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,boxShadow:"0 14px 40px rgba(0,0,0,0.55)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
@@ -10961,7 +10962,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                   <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",fontSize:12,padding:"0 2px 5px"}}>{pane==="top"?"TOP":"BOTTOM"} PANE</div>
                   <div style={{display:"flex",gap:4,alignItems:"stretch"}}>
                     {[["book","📕","Book"],["bible","📖","Bible"],["notes","📝","Notes"],["off","⊘","Off"]].map(o=>{ const m=o[0],ic=o[1],lb=o[2]; const on=pm===m;
-                      return <button key={m} onClick={()=>{ if(m==="bible") setBibleChoose(pane); else setPaneMode(pane,m); }}
+                      return <button key={m} onClick={(e)=>{ if(m==="bible"){ const r=e.currentTarget.getBoundingClientRect(); setBibleChoose({pane,x:r.left+r.width/2,y:r.top}); } else setPaneMode(pane,m); }}
                         style={{flex:"1 1 0",padding:"19px 0 18px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:(m==="off"?C.textFaint:C.text),cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,lineHeight:1}}><span style={{fontSize:22}}>{ic}</span><span style={{fontSize:12,fontWeight:700}}>{lb}</span></button>;
                     })}
                     <button onClick={()=>toggleFlip(pane)} title={flipPane[pane]?"Page-turn mode — tap for scroll":"Scroll mode — tap for pages"}
@@ -11222,7 +11223,7 @@ export default function App() {
   useEffect(() => {
     if (typeof window === "undefined" || !window.visualViewport) return;
     const vv = window.visualViewport;
-    const setH = () => { try { document.documentElement.style.setProperty("--jt-app-h", Math.round(vv.height) + "px"); const kb = Math.max(0, Math.round(window.innerHeight - vv.height - (vv.offsetTop||0))); document.documentElement.style.setProperty("--jt-kb", kb + "px"); } catch(e){} };
+    const setH = () => { try { document.documentElement.style.setProperty("--jt-app-h", Math.round(vv.height) + "px"); const ae=document.activeElement; const typing = ae && (/^(INPUT|TEXTAREA)$/.test(ae.tagName||"") || ae.isContentEditable); const kb = typing ? Math.max(0, Math.round(window.innerHeight - vv.height - (vv.offsetTop||0))) : 0; document.documentElement.style.setProperty("--jt-kb", kb + "px"); } catch(e){} };
     setH();
     vv.addEventListener("resize", setH);
     vv.addEventListener("scroll", setH);
@@ -11289,14 +11290,15 @@ export default function App() {
       else if (w >= 820) z = 1.15;
       try {
         const de = document.documentElement;
-        if (z === 1) { de.style.zoom = ""; de.style.removeProperty("--jt-vh"); }
+        if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", window.innerHeight + "px"); }
         else { de.style.zoom = String(z); de.style.setProperty("--jt-vh", `calc(100dvh / ${z})`); }
       } catch(e){}
     };
     apply();
+    const applyLater = () => { apply(); setTimeout(apply, 300); };
     window.addEventListener("resize", apply);
-    window.addEventListener("orientationchange", apply);
-    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", apply); };
+    window.addEventListener("orientationchange", applyLater);
+    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); };
   }, []);
 
   const [userInitials, setUserInitials] = useState(() => localStorage.getItem("ofInitials")||"");
