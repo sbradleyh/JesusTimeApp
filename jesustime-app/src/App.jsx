@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v127";
+const APP_VERSION = "v128";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10353,7 +10353,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [topMode, setTopMode] = React.useState(ibKey ? "bible" : (PREF.top||"book"));
   const [botMode, setBotMode] = React.useState(ibKey ? "notes" : (PREF.bot||"bible"));
   const [frac, setFrac] = React.useState(typeof PREF.frac==="number"?PREF.frac:0.5);
-  const [active, setActive] = React.useState(ibKey ? {l:`${initialBible.book} ${initialBible.chapter}${initialBible.jumpV?":"+initialBible.jumpV:""}`, q:ibKey, k:ibKey, b:initialBible.book, c:initialBible.chapter, whole:true, jumpV:initialBible.jumpV||null} : null);
+  const [active, setActive] = React.useState(ibKey ? {l:`${initialBible.book} ${initialBible.chapter}${initialBible.jumpV?":"+initialBible.jumpV:""}`, q:ibKey, k:ibKey, b:initialBible.book, c:initialBible.chapter, whole:true, jumpV:initialBible.jumpV||null} : (()=>{ try{ const l=JSON.parse(localStorage.getItem("jtEsvLast")||"null"); if(l&&l.b&&l.c){ const k=l.b+" "+l.c; return {l:k,q:k,k:k,b:l.b,c:l.c,whole:true,jumpV:null}; } }catch(e){} return null; })());
   const [activePane, setActivePane] = React.useState("top");
   const [topFont, setTopFont] = React.useState(()=>{ try{ const v=parseInt(localStorage.getItem("jtReaderFontTop")); return v>=11&&v<=30?v:16; }catch(e){ return 16; } });
   const [botFont, setBotFont] = React.useState(()=>{ try{ const v=parseInt(localStorage.getItem("jtReaderFontBot")); return v>=11&&v<=30?v:16; }catch(e){ return 16; } });
@@ -10381,6 +10381,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkRate",String(gkRate)); }catch(_){} },[gkRate]);
   const [gkGlossOv,setGkGlossOv]=React.useState(()=>{ try{ return JSON.parse(localStorage.getItem("jtGkGlossOv")||"{}")||{}; }catch(_){ return {}; } });
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkGlossOv",JSON.stringify(gkGlossOv)); }catch(_){} },[gkGlossOv]);
+  React.useEffect(()=>{ try{ if(active&&active.whole&&active.b&&active.c) localStorage.setItem("jtEsvLast", JSON.stringify({b:active.b,c:active.c})); }catch(e){} },[active]);
+  React.useEffect(()=>{ if(active&&active.whole&&active.k){ const cur=esvChapCache[active.k]; const has=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k)); if(!has) loadEsvPassage(active.q,active.k,false); } },[]); // eslint-disable-line
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkShow",JSON.stringify(gkShow)); }catch(_){} },[gkShow]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkFont",JSON.stringify(gkFont)); }catch(_){} },[gkFont]);
   React.useEffect(()=>{ try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){} },[]);
@@ -10402,7 +10404,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [bookLogPop, setBookLogPop] = React.useState(false);
   const [hdrBookPop, setHdrBookPop] = React.useState(false);
   const [bibleChoose, setBibleChoose] = React.useState(null);
-  const openGreekInPane = (pane) => { recordBookOpen("greekbible"); setBookId("greekbible"); try{localStorage.setItem("jtReaderBook","greekbible");}catch(e){} setPaneMode(pane,"book"); setBibleChoose(null); };
+  const openGreekInPane = (pane) => { recordBookOpen("greekbible"); setBookId("greekbible"); try{localStorage.setItem("jtReaderBook","greekbible");}catch(e){} setPaneMode(pane,"book"); setBibleChoose(null); try{ const last=JSON.parse(localStorage.getItem("jtGkLast")||"null"); if(last&&last.f){ const bk=GREEK_CANON.find(b=>b.f===last.f&&b.src===last.src); if(bk){ gkOpenBookIn(pane,bk); if(last.ch!=null) gkSetNav(pane,{ch:last.ch}); } } }catch(e){} };
   const [refSelOpen, setRefSelOpen] = React.useState(false);
   const [refSelBook, setRefSelBook] = React.useState(null);
   const toggleFlip = pane => setFlipPane(p=>{ const nv={...p,[pane]:!p[pane]}; try{ localStorage.setItem(pane==="top"?"jtReaderFlipTop":"jtReaderFlipBot", nv[pane]?"1":"0"); }catch(e){} return nv; });
@@ -10618,7 +10620,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const gkEsvShown = () => topMode==="bible" || botMode==="bible";
   const gkGreekShown = () => bookId==="greekbible" && (topMode==="book" || botMode==="book");
   const gkSyncEsv = (b,ch) => { if(gkLink && gkEsvShown() && b && ch!=null) goChapter(gkEsvName(b), b==="Psalms"?lxxPsToEsv(ch):ch); };
-  const gkSetCh = (pane,n) => { gkSetNav(pane,{ch:n}); const nav=gkOf(pane); if(n!=null && nav.book) gkSyncEsv(nav.book.b, n); };
+  const gkSetCh = (pane,n) => { gkSetNav(pane,{ch:n}); const nav=gkOf(pane); if(n!=null && nav.book){ gkSyncEsv(nav.book.b, n); try{ localStorage.setItem("jtGkLast", JSON.stringify({src:nav.book.src, f:nav.book.f, ch:n})); }catch(e){} } };
   const gkConcord = (lemma, gloss, pane) => {
     const nk=gkNorm(lemma); const pn=pane||activePane||"top";
     const run=(c)=>{ const e=c[nk]; setGkFindN(25); setGkFind({lemma,gloss,total:e?e[0]:0,list:e?e[1]:[],err:"",pane:pn}); };
