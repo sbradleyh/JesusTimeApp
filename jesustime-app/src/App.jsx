@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v122";
+const APP_VERSION = "v123";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10700,7 +10700,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             {verseKeys.map(vk=>{ const vs=vk.split(":")[1];
               const words=(<>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
-                {data.v[vk].map((wd,i)=>{ const nl=gkNorm(wd[1]); const le=lex&&lex[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?ov:(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); const any=gkShow.greek||gkShow.translit||gkShow.english; return (
+                {data.v[vk].map((wd,i)=>{ const nl=gkNorm(wd[1]); const le=lex&&lex[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?("("+ov.trim()+")"):(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); const any=gkShow.greek||gkShow.translit||gkShow.english; return (
                   <button key={i} onClick={(e)=>tap(e,wd[0],wd[1],vs)}
                     style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:200}}>
                     {(gkShow.greek||!any) && <span style={{fontSize:gkFont.greek,color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
@@ -11094,7 +11094,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                 <div key={i} style={{padding:"9px 16px",borderBottom:`1px solid rgba(${C.ink},0.06)`}}>
                   <button onClick={()=>gkJump(o)} style={{background:"transparent",border:"none",color:C.gold,fontSize:13,fontWeight:800,padding:0,cursor:"pointer"}}>{b?b.b:"?"} {o[2]}:{o[3]} <span style={{fontSize:10,color:C.textFaint,fontWeight:600}}>{o[0]?"NT":"OT"} ›</span></button>
                   <div style={{marginTop:4,lineHeight:1.7}}>
-                    {words ? words.map((wd,j)=>{ const nl=gkNorm(wd[1]); const le=lx&&lx[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?ov:(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); return (
+                    {words ? words.map((wd,j)=>{ const nl=gkNorm(wd[1]); const le=lx&&lx[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?("("+ov.trim()+")"):(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); return (
                       <span key={j} style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",padding:"0 4px 4px"}}>
                         {(gkShow.greek||!any) && <span style={{fontSize:Math.min(gkFont.greek,16),color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
                         {gkShow.translit && <span style={{fontSize:Math.min(gkFont.translit,14),color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>}
