@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v97";
+const APP_VERSION = "v99";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10266,6 +10266,9 @@ const GREEK_BOOKS = [
  {f:"25-3john.json",b:"3 John",c:1},{f:"26-jude.json",b:"Jude",c:1},{f:"27-revelation.json",b:"Revelation",c:22},
 ];
 const GREEK_CANON = [...LXX_BOOKS.map(b=>({...b,src:"lxx"})), ...GREEK_BOOKS.map(b=>({...b,src:"nt"}))];
+// LXX (Rahlfs) Psalm number -> Hebrew/ESV Psalm number, and reverse. Other books align at chapter level.
+function lxxPsToEsv(n){ if(n<=8) return n; if(n===9) return 9; if(n<=112) return n+1; if(n===113) return 114; if(n===114||n===115) return 116; if(n<=145) return n+1; if(n===146||n===147) return 147; return n; }
+function esvPsToLxx(m){ if(m<=8) return m; if(m===9||m===10) return 9; if(m<=113) return m-1; if(m===114||m===115) return 113; if(m===116) return 114; if(m<=146) return m-1; if(m===147) return 146; return m; }
 function gkNorm(s){ return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ"); }
 function gkTranslit(word){
   if(!word) return "";
@@ -10366,6 +10369,11 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [,setGkVer]=React.useState(0);
   const gkCacheRef=React.useRef({});
   const gkLexRef=React.useRef({});
+  const gkConcRef=React.useRef(null);
+  const [gkFind,setGkFind]=React.useState(null);
+  const [gkFindBusy,setGkFindBusy]=React.useState(false);
+  const [gkLink,setGkLink]=React.useState(()=>{ try{ return localStorage.getItem("jtGkLink")==="1"; }catch(_){ return false; } });
+  React.useEffect(()=>{ try{ localStorage.setItem("jtGkLink", gkLink?"1":"0"); }catch(_){} },[gkLink]);
   const [showBooks, setShowBooks] = React.useState(false);
   const [showBookList, setShowBookList] = React.useState(false);
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
@@ -10496,6 +10504,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     setActive({ l:`${fb} ${c}`, q:key, k:key, b:fb, c:c, whole:true, jumpV:null });
     const cur = esvChapCache[key]; const hasVerses = cur && Object.keys(cur).some(k=>/^\d+$/.test(k));
     if(!hasVerses) loadEsvPassage(key, key, false);
+    if(gkLink && gkGreekShown()){ const ent=GREEK_CANON.find(e=>fullBook(gkEsvName(e.b))===fb); if(ent){ if(!gkBook||gkBook.f!==ent.f||gkBook.src!==ent.src) gkOpenBook(ent); setGkCh(ent.b==="Psalms"?esvPsToLxx(c):c); } }
   };
   const stepChapter = (dir) => {
     if(!active||!active.b) return; const fb = fullBook(active.b); const ci = BIBLE_CANON.indexOf(fb); if(ci<0) return;
@@ -10579,6 +10588,20 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const base=gkBaseOf(bk); gkLoadLex(base); const url=base+bk.f;
     if(!gkCacheRef.current[url]){ setGkBusy(true); fetch(url).then(r=>{if(!r.ok)throw new Error("x");return r.json();}).then(j=>{gkCacheRef.current[url]=j; setGkVer(v=>v+1);}).catch(()=>setGkErr("Couldn’t load "+bk.b+" — is "+base+" deployed?")).finally(()=>setGkBusy(false)); }
   };
+  const gkEsvName = (b) => b==="Song of Songs" ? "Song of Solomon" : b;
+  const gkEsvShown = () => topMode==="bible" || botMode==="bible";
+  const gkGreekShown = () => bookId==="greekbible" && (topMode==="book" || botMode==="book");
+  const gkSyncEsv = (b,ch) => { if(gkLink && gkEsvShown() && b && ch!=null) goChapter(gkEsvName(b), b==="Psalms"?lxxPsToEsv(ch):ch); };
+  const gkSetCh = (n) => { setGkCh(n); if(n!=null && gkBook) gkSyncEsv(gkBook.b, n); };
+  const gkConcord = (lemma, gloss) => {
+    const nk=gkNorm(lemma);
+    const run=(c)=>{ const e=c[nk]; setGkFind({lemma,gloss,total:e?e[0]:0,list:e?e[1]:[]}); };
+    if(gkConcRef.current){ run(gkConcRef.current); return; }
+    setGkFindBusy(true);
+    fetch(GREEK_BASE+"concordance.json").then(r=>r.ok?r.json():null).then(j=>{ if(j){ gkConcRef.current=j; run(j);} else setGkFind({lemma,gloss,total:0,list:[]}); }).catch(()=>setGkFind({lemma,gloss,total:0,list:[]})).finally(()=>setGkFindBusy(false));
+  };
+  const gkOccBook = (o) => { const [sf,num]=o; const list=sf?GREEK_BOOKS:LXX_BOOKS; return list[num-1]||null; };
+  const gkJump = (o) => { const b=gkOccBook(o); if(!b) return; const ent={...b, src:o[0]?"nt":"lxx"}; if(!gkBook||gkBook.f!==ent.f||gkBook.src!==ent.src) gkOpenBook(ent); gkSetCh(o[2]); setGkFind(null); setGkSel(null); };
   const renderGreekBody = (fp, lh=2.0) => {
     const base = gkBaseOf(gkBook);
     const lex = gkBook ? (gkLexRef.current[base]||null) : null;
@@ -10593,13 +10616,14 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     return (
       <div>
         {(gkBook || gkCh!=null) && (
-          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,flexWrap:"wrap"}}>
             <button onClick={()=>{ if(gkCh!=null) setGkCh(null); else setGkBook(null); }} style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:700,padding:"4px 10px",cursor:"pointer"}}>‹ {gkCh!=null?"Chapters":"Books"}</button>
             <span style={{fontSize:14,fontWeight:800,color:C.gold}}>{gkBook?gkBook.b:""}{gkCh!=null?` ${gkCh}`:""}</span>
+            {gkEsvShown() && <button onClick={()=>setGkLink(v=>!v)} title="Sync ESV pane to this passage" style={{background:gkLink?C.gold:"transparent",border:`1px solid ${gkLink?C.gold:C.border}`,borderRadius:8,color:gkLink?"#1a1107":C.textFaint,fontSize:12,fontWeight:800,padding:"3px 8px",cursor:"pointer"}}>{gkLink?"🔗 Linked":"🔗 Link ESV"}</button>}
             {gkCh!=null && gkBook && (
               <span style={{marginLeft:"auto",display:"flex",gap:6}}>
-                <button onClick={()=>setGkCh(c=>Math.max(1,c-1))} disabled={gkCh<=1} style={{...arrow,opacity:gkCh<=1?0.4:1}}>‹</button>
-                <button onClick={()=>setGkCh(c=>Math.min(gkBook.c,c+1))} disabled={gkCh>=gkBook.c} style={{...arrow,opacity:gkCh>=gkBook.c?0.4:1}}>›</button>
+                <button onClick={()=>gkSetCh(Math.max(1,gkCh-1))} disabled={gkCh<=1} style={{...arrow,opacity:gkCh<=1?0.4:1}}>‹</button>
+                <button onClick={()=>gkSetCh(Math.min(gkBook.c,gkCh+1))} disabled={gkCh>=gkBook.c} style={{...arrow,opacity:gkCh>=gkBook.c?0.4:1}}>›</button>
               </span>
             )}
           </div>
@@ -10614,7 +10638,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           {gkBusy && <div style={{color:C.textFaint,fontSize:13,padding:"6px 2px"}}>Loading {gkBook.b}…</div>}
           {gkErr && <div style={{color:"#e0786a",fontSize:13,padding:"6px 2px"}}>{gkErr}</div>}
           <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:8}}>
-            {Array.from({length:gkBook.c},(_,i)=>i+1).map(n=>(<button key={n} onClick={()=>setGkCh(n)} disabled={!data} style={{...tile,textAlign:"center",opacity:data?1:0.5}}>{n}</button>))}
+            {Array.from({length:gkBook.c},(_,i)=>i+1).map(n=>(<button key={n} onClick={()=>gkSetCh(n)} disabled={!data} style={{...tile,textAlign:"center",opacity:data?1:0.5}}>{n}</button>))}
           </div>
         </>)}
         {gkBook && gkCh!=null && data && (
@@ -10961,6 +10985,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
             <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
+            <button onClick={()=>gkConcord(gkSel.lemma,gkSel.gloss)} disabled={gkFindBusy} style={{marginTop:10,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>{gkFindBusy?"Searching…":"🔍 Find in Greek Bible"}</button>
             <div style={{borderTop:`1px solid ${C.border}`,margin:"11px 0 7px"}}/>
             <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",marginBottom:4}}>DISPLAY IN TEXT</div>
             {[["greek","Greek"],["translit","Translit"],["english","English"]].map(([k,label])=>(
@@ -10973,6 +10998,28 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+      {gkFind && (
+        <div onClick={()=>setGkFind(null)} style={{position:"fixed",inset:0,zIndex:100060,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:560,maxHeight:"80vh",background:C.card,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,display:"flex",flexDirection:"column",paddingBottom:"env(safe-area-inset-bottom)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
+              <div style={{flex:1}}>
+                <div style={{fontSize:16,fontWeight:800,color:C.text}}>{gkFind.lemma}</div>
+                <div style={{fontSize:12,color:C.textFaint}}>{gkFind.gloss} · {gkFind.total} verse{gkFind.total===1?"":"s"}{gkFind.list.length<gkFind.total?` (showing first ${gkFind.list.length})`:""}</div>
+              </div>
+              <button onClick={()=>setGkFind(null)} style={{background:"transparent",border:"none",color:C.textFaint,fontSize:22,cursor:"pointer",lineHeight:1}}>×</button>
+            </div>
+            <div style={{overflowY:"auto",padding:"6px 0"}}>
+              {gkFind.total===0 && <div style={{padding:"18px 16px",color:C.textFaint,fontSize:14}}>No occurrences found.</div>}
+              {gkFind.list.map((o,i)=>{ const b=gkOccBook(o); return (
+                <button key={i} onClick={()=>gkJump(o)} style={{display:"flex",width:"100%",textAlign:"left",gap:8,alignItems:"baseline",background:"transparent",border:"none",borderBottom:`1px solid rgba(${C.ink},0.06)`,color:C.text,fontSize:14,padding:"9px 16px",cursor:"pointer"}}>
+                  <span style={{color:C.gold,fontWeight:700}}>{b?b.b:"?"} {o[2]}:{o[3]}</span>
+                  <span style={{marginLeft:"auto",fontSize:11,color:C.textFaint}}>{o[0]?"NT":"OT"}</span>
+                </button>
+              );})}
+            </div>
           </div>
         </div>
       )}
