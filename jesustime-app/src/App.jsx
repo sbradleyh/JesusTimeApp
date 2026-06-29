@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v99";
+const APP_VERSION = "v100";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10358,8 +10358,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [gkBusy,setGkBusy]=React.useState(false);
   const [gkErr,setGkErr]=React.useState("");
   const [gkSel,setGkSel]=React.useState(null);
-  const [gkShow,setGkShow]=React.useState(()=>{ try{ return {greek:false,translit:true,english:true, ...(JSON.parse(localStorage.getItem("jtGkShow")||"null")||{})}; }catch(_){ return {greek:false,translit:true,english:true}; } });
-  const [gkFont,setGkFont]=React.useState(()=>{ try{ return {greek:18,translit:15,english:13, ...(JSON.parse(localStorage.getItem("jtGkFont")||"null")||{})}; }catch(_){ return {greek:18,translit:15,english:13}; } });
+  const [gkShow,setGkShow]=React.useState(()=>{ try{ return {greek:false,translit:true,english:true,esv:false, ...(JSON.parse(localStorage.getItem("jtGkShow")||"null")||{})}; }catch(_){ return {greek:false,translit:true,english:true,esv:false}; } });
+  const [gkFont,setGkFont]=React.useState(()=>{ try{ return {greek:18,translit:15,english:13,esv:15, ...(JSON.parse(localStorage.getItem("jtGkFont")||"null")||{})}; }catch(_){ return {greek:18,translit:15,english:13,esv:15}; } });
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkShow",JSON.stringify(gkShow)); }catch(_){} },[gkShow]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkFont",JSON.stringify(gkFont)); }catch(_){} },[gkFont]);
   React.useEffect(()=>{ try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){} },[]);
@@ -10602,10 +10602,13 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   };
   const gkOccBook = (o) => { const [sf,num]=o; const list=sf?GREEK_BOOKS:LXX_BOOKS; return list[num-1]||null; };
   const gkJump = (o) => { const b=gkOccBook(o); if(!b) return; const ent={...b, src:o[0]?"nt":"lxx"}; if(!gkBook||gkBook.f!==ent.f||gkBook.src!==ent.src) gkOpenBook(ent); gkSetCh(o[2]); setGkFind(null); setGkSel(null); };
+  const gkEsvKey = (bk,ch) => bk && ch!=null ? `${fullBook(gkEsvName(bk.b))} ${bk.b==="Psalms"?lxxPsToEsv(ch):ch}` : null;
+  React.useEffect(()=>{ if(!gkShow.esv || !gkBook || gkCh==null) return; const key=gkEsvKey(gkBook,gkCh); if(!key) return; const cur=esvChapCache[key]; const has=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k)); if(!has) loadEsvPassage(key,key,false); }, [gkShow.esv, gkBook&&gkBook.f, gkCh, esvChapCache]); // eslint-disable-line
   const renderGreekBody = (fp, lh=2.0) => {
     const base = gkBaseOf(gkBook);
     const lex = gkBook ? (gkLexRef.current[base]||null) : null;
     const data = gkBook ? gkCacheRef.current[base+gkBook.f] : null;
+    const esvEntry = (gkShow.esv && gkBook && gkCh!=null) ? (esvChapCache[gkEsvKey(gkBook,gkCh)]||null) : null;
     const tap = (e,g,lm) => { const r=e.currentTarget.getBoundingClientRect(); const le=lex&&lex[gkNorm(lm)]; setGkSel({w:g,t:gkTranslit(g),lemma:lm,gloss:le?le.g:"(definition not found)",strongs:(le&&le.s)?le.s:"",x:r.left+r.width/2,y:r.bottom}); };
     const tSize=Math.round(fp*0.9), gSize=Math.round(fp*0.75), vSize=Math.round(fp*0.62);
     const tile={padding:"11px 8px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
@@ -10643,8 +10646,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
         </>)}
         {gkBook && gkCh!=null && data && (
           <div style={{lineHeight:lh}}>
-            {verseKeys.map(vk=>{ const vs=vk.split(":")[1]; return (
-              <span key={vk}>
+            {verseKeys.map(vk=>{ const vs=vk.split(":")[1];
+              const words=(<>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
                 {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
                   <button key={i} onClick={(e)=>tap(e,wd[0],wd[1])}
@@ -10654,9 +10657,15 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                     {gkShow.english && <span style={{fontSize:gkFont.english,color:C.textMid,lineHeight:1.25,maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{sg||"·"}</span>}
                   </button>
                 );})}
-                {" "}
-              </span>
-            );})}
+              </>);
+              if(gkShow.esv){ const et=esvEntry?esvEntry[vs]:null; return (
+                <div key={vk} style={{marginBottom:10}}>
+                  <div>{words}</div>
+                  <div style={{fontFamily:serif,fontSize:gkFont.esv,color:C.textMid,lineHeight:1.5,marginTop:1,paddingLeft:2}}>{et||(esvEntry?"":"…")}</div>
+                </div>
+              ); }
+              return <span key={vk}>{words}{" "}</span>;
+            })}
           </div>
         )}
       </div>
@@ -10988,7 +10997,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <button onClick={()=>gkConcord(gkSel.lemma,gkSel.gloss)} disabled={gkFindBusy} style={{marginTop:10,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>{gkFindBusy?"Searching…":"🔍 Find in Greek Bible"}</button>
             <div style={{borderTop:`1px solid ${C.border}`,margin:"11px 0 7px"}}/>
             <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",marginBottom:4}}>DISPLAY IN TEXT</div>
-            {[["greek","Greek"],["translit","Translit"],["english","English"]].map(([k,label])=>(
+            {[["greek","Greek"],["translit","Translit"],["english","English"],["esv","ESV"]].map(([k,label])=>(
               <div key={k} style={{display:"flex",alignItems:"center",gap:6,marginTop:5}}>
                 <button onClick={()=>setGkShow(s=>({...s,[k]:!s[k]}))} style={{width:78,textAlign:"left",background:"transparent",border:"none",color:gkShow[k]?C.gold:C.textFaint,fontSize:13,fontWeight:700,cursor:"pointer",padding:0}}>{gkShow[k]?"●":"○"} {label}</button>
                 <span style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:5,opacity:gkShow[k]?1:0.35}}>
