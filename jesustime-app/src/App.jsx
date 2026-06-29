@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v124";
+const APP_VERSION = "v125";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8636,6 +8636,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [srcP, setSrcP] = React.useState(() => { try { const v=localStorage.getItem("jtSrcP"); return v===null?true:v==="1"; } catch(e){ return true; } });
   const [srcC, setSrcC] = React.useState(() => { try { const v=localStorage.getItem("jtSrcC"); return v===null?true:v==="1"; } catch(e){ return true; } });
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [editCat, setEditCat] = React.useState(false);
   const [titleScale, setTitleScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtTitleScale")); return v>0?v:1; } catch(e){ return 1; } });
   const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v));}catch(e){} return v; });
   React.useEffect(() => {
@@ -8835,6 +8836,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <button onClick={()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }}
                 style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🌅 Slideshow</button>
+              <button onClick={()=>{ setMenuOpen(false); setEditCat(true); }}
+                style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",borderLeft:`1px solid ${C.border}`,
+                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>✏️ Teaching</button>
             </div>
             <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:6}}>Show</div>
@@ -8889,6 +8893,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           </div>
         </>)}
       </div>
+      {editCat && <CatechismEditor C={C} onClose={()=>setEditCat(false)} />}
       {present && (
         <div onPointerDown={wakeControls} onClick={wakeControls} onTouchStart={wakeControls} style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
           <div onClick={wakeControls}
