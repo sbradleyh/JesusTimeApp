@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v113";
+const APP_VERSION = "v114";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11040,7 +11040,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={{fontSize:24,fontWeight:800,color:C.text,flex:1,wordBreak:"break-word"}}>{gkSel.w}</div>
               {gkCanSpeak && <button onClick={()=>gkSpeak(gkSel.w)} title="Hear (device voice)" style={{flex:"0 0 auto",width:36,height:36,borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:18,cursor:"pointer",lineHeight:1}}>🔊</button>}
-              {gkCanSpeak && <button onClick={()=>{ const opts=[0.5,0.6,0.75,1]; const i=opts.indexOf(gkRate); const nr=opts[(i+1)%opts.length]; setGkRate(nr); try{ if(window.speechSynthesis){ const u=new SpeechSynthesisUtterance(gkSel.w); u.lang="el-GR"; u.rate=nr; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } }catch(_){} }} title="Playback speed (tap to change)" style={{flex:"0 0 auto",height:36,padding:"0 9px",borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",lineHeight:1}}>{gkRate}×</button>}
+              {gkCanSpeak && <button onClick={()=>{ const opts=[0.5,0.6,0.7,0.8,0.9,1]; const i=opts.indexOf(gkRate); const nr=opts[(i+1)%opts.length]; setGkRate(nr); try{ if(window.speechSynthesis){ const u=new SpeechSynthesisUtterance(gkSel.w); u.lang="el-GR"; u.rate=nr; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } }catch(_){} }} title="Playback speed (tap to change)" style={{flex:"0 0 auto",height:36,padding:"0 9px",borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",lineHeight:1}}>{gkRate}×</button>}
             </div>
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
