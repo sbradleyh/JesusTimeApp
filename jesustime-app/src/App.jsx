@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v108";
+const APP_VERSION = "v109";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10390,6 +10390,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
   const [bookLogPop, setBookLogPop] = React.useState(false);
   const [hdrBookPop, setHdrBookPop] = React.useState(false);
+  const [bibleChoose, setBibleChoose] = React.useState(null);
+  const openGreekInPane = (pane) => { recordBookOpen("greekbible"); setBookId("greekbible"); try{localStorage.setItem("jtReaderBook","greekbible");}catch(e){} setPaneMode(pane,"book"); setBibleChoose(null); };
   const [refSelOpen, setRefSelOpen] = React.useState(false);
   const [refSelBook, setRefSelBook] = React.useState(null);
   const toggleFlip = pane => setFlipPane(p=>{ const nv={...p,[pane]:!p[pane]}; try{ localStorage.setItem(pane==="top"?"jtReaderFlipTop":"jtReaderFlipBot", nv[pane]?"1":"0"); }catch(e){} return nv; });
@@ -10722,7 +10724,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             {hdrBookPop && (<>
               <div onClick={()=>setHdrBookPop(false)} style={{position:"fixed",inset:0,zIndex:13}}/>
               <div style={{position:"absolute",left:0,top:"calc(100% + 6px)",zIndex:14,minWidth:230,maxWidth:"80vw",maxHeight:"50vh",overflowY:"auto",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:10,padding:6,display:"flex",flexDirection:"column",gap:4,boxShadow:"0 8px 22px rgba(0,0,0,0.45)"}}>
-                {BOOKS.map(b=>{ const on=b.id===bookId;
+                {BOOKS.filter(b=>b.id!=="greekbible").map(b=>{ const on=b.id===bookId;
                   return <button key={b.id} onClick={()=>{ pickBook(b.id); setHdrBookPop(false); }}
                     style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{bookIcon(b.id)} {b.title}</button>;
                 })}
@@ -10847,7 +10849,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     borderRadius: fs?0:12, border: fs?"none":`1px solid ${C.border}`, overflow:"hidden" };
   const curMode = activePane==="top"?topMode:botMode;
   const iconBtn = (m,icon) => { const on=curMode===m;
-    return <button key={m} onClick={m==="book"?()=>setShowBooks(s=>!s):()=>setMode(m)}
+    return <button key={m} onClick={m==="book"?()=>setShowBooks(s=>!s):m==="bible"?()=>setBibleChoose(activePane):()=>setMode(m)}
       style={{padding:"4px 9px",borderRadius:8,border:"none",cursor:"pointer",background:on?C.buttonActive:"transparent",color:on?C.gold:C.textFaint,fontSize:21,lineHeight:1,display:"inline-flex",alignItems:"center",gap:2}}>
       {icon}{m==="book"&&<span style={{fontSize:11}}>▾</span>}</button>;
   };
@@ -10856,6 +10858,15 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   return (
     <div style={shell}>
       {editKey==="mycatechism" && <CatechismEditor C={C} onClose={()=>setEditKey(null)} />}
+      {bibleChoose && (
+        <div onClick={()=>setBibleChoose(null)} style={{position:"absolute",inset:0,zIndex:120,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"min(300px,100%)",background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:16,boxShadow:"0 10px 30px rgba(0,0,0,0.5)"}}>
+            <div style={{fontSize:12,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",marginBottom:11,textAlign:"center"}}>OPEN BIBLE</div>
+            <button onClick={()=>{ setPaneMode(bibleChoose,"bible"); setBibleChoose(null); }} style={{width:"100%",padding:"14px 0",borderRadius:12,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",marginBottom:9,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><span style={{fontSize:20}}>📖</span> ESV</button>
+            <button onClick={()=>openGreekInPane(bibleChoose)} style={{width:"100%",padding:"14px 0",borderRadius:12,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}><span style={{fontSize:20}}>🏛️</span> Greek Bible</button>
+          </div>
+        </div>
+      )}
       {refSelOpen && (
         <div onClick={()=>setRefSelOpen(false)} style={{position:"absolute",inset:0,zIndex:60,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",padding:12}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"min(460px,100%)",maxHeight:"100%",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:12,boxShadow:"0 14px 40px rgba(0,0,0,0.55)",display:"flex",flexDirection:"column",overflow:"hidden"}}>
@@ -10918,7 +10929,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           {showPaneMenu && (<>
             <div onClick={()=>setShowPaneMenu(false)} style={{position:"fixed",inset:0,zIndex:410}}/>
             <div style={{position:"absolute",bottom:"100%",left:0,marginBottom:4,zIndex:411,minWidth:360,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:10,padding:7,boxShadow:"0 -8px 24px rgba(0,0,0,0.5)",display:"flex",flexDirection:"column",gap:7}}>
-              {(()=>{ const weekAgo=Date.now()-7*864e5; const sortedBooks=[...BOOKS].sort((a,b)=>bookOpens(b.id,weekAgo)-bookOpens(a.id,weekAgo));
+              {(()=>{ const weekAgo=Date.now()-7*864e5; const sortedBooks=[...BOOKS].filter(b=>b.id!=="greekbible").sort((a,b)=>bookOpens(b.id,weekAgo)-bookOpens(a.id,weekAgo));
                 return <div>
                   <div style={{width:"100%",display:"flex",alignItems:"center",gap:8,padding:"8px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:C.card}}>
                     <button onClick={()=>setShowBookList(s=>!s)}
@@ -10950,7 +10961,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                   <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",fontSize:12,padding:"0 2px 5px"}}>{pane==="top"?"TOP":"BOTTOM"} PANE</div>
                   <div style={{display:"flex",gap:4,alignItems:"stretch"}}>
                     {[["book","📕","Book"],["bible","📖","Bible"],["notes","📝","Notes"],["off","⊘","Off"]].map(o=>{ const m=o[0],ic=o[1],lb=o[2]; const on=pm===m;
-                      return <button key={m} onClick={()=>{ setPaneMode(pane,m); }}
+                      return <button key={m} onClick={()=>{ if(m==="bible") setBibleChoose(pane); else setPaneMode(pane,m); }}
                         style={{flex:"1 1 0",padding:"19px 0 18px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:(m==="off"?C.textFaint:C.text),cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,lineHeight:1}}><span style={{fontSize:22}}>{ic}</span><span style={{fontSize:12,fontWeight:700}}>{lb}</span></button>;
                     })}
                     <button onClick={()=>toggleFlip(pane)} title={flipPane[pane]?"Page-turn mode — tap for scroll":"Scroll mode — tap for pages"}
@@ -11010,7 +11021,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           <div onClick={()=>setShowBooks(false)} style={{position:"fixed",inset:0,zIndex:410}}/>
           <div style={{position:"absolute",bottom:"100%",right:0,marginBottom:6,zIndex:411,minWidth:190,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:12,padding:6,boxShadow:"0 -8px 24px rgba(0,0,0,0.5)",display:"flex",flexDirection:"column",gap:4}}>
             <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",padding:"2px 6px 4px"}}>BOOK → {activePane==="top"?"TOP":"BOTTOM"} PANE</div>
-            {BOOKS.map(b=>(
+            {BOOKS.filter(b=>b.id!=="greekbible").map(b=>(
               <button key={b.id} onClick={()=>pickBook(b.id)}
                 style={{textAlign:"left",padding:"9px 12px",borderRadius:9,border:`1px solid ${b.id===bookId?C.gold:C.border}`,background:b.id===bookId?C.buttonActive:"transparent",color:b.id===bookId?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>{bookIcon(b.id)} {b.title}</button>
             ))}
