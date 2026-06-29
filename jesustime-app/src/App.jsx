@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v126";
+const APP_VERSION = "v127";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11064,7 +11064,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
             <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}{(gkGlossOv[gkNorm(gkSel.lemma)]||"").trim()?<span style={{color:C.gold,fontWeight:700}}> ({gkGlossOv[gkNorm(gkSel.lemma)]})</span>:null}</div>
             <div style={{display:"flex",alignItems:"center",gap:6,marginTop:8}}>
-              <input value={gkGlossOv[gkNorm(gkSel.lemma)]||""} onChange={e=>{ const nl=gkNorm(gkSel.lemma); const v=e.target.value; setGkGlossOv(o=>{ const n={...o}; if(v.trim()) n[nl]=v; else delete n[nl]; return n; }); }} placeholder="Custom gloss — shown under word everywhere" className="qa-ph" style={{flex:1,minWidth:0,background:C.inputBg,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:13,padding:"7px 9px",outline:"none"}}/>
+              <input value={gkGlossOv[gkNorm(gkSel.lemma)]||""} onChange={e=>{ const nl=gkNorm(gkSel.lemma); let v=e.target.value; if(v) v=v.charAt(0).toLowerCase()+v.slice(1); setGkGlossOv(o=>{ const n={...o}; if(v.trim()) n[nl]=v; else delete n[nl]; return n; }); }} placeholder="Custom gloss — shown under word everywhere" className="qa-ph" style={{flex:1,minWidth:0,background:C.inputBg,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:13,padding:"7px 9px",outline:"none"}}/>
               {(gkGlossOv[gkNorm(gkSel.lemma)]||"") && <button onClick={()=>{ const nl=gkNorm(gkSel.lemma); setGkGlossOv(o=>{ const n={...o}; delete n[nl]; return n; }); }} title="Clear custom gloss" style={{flex:"0 0 auto",width:30,height:30,borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:15,cursor:"pointer",lineHeight:1}}>×</button>}
             </div>
             <button onClick={()=>gkConcord(gkSel.lemma,gkSel.gloss,gkSel.pane)} disabled={gkFindBusy} style={{marginTop:10,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>{gkFindBusy?"Searching…":"🔍 Find in Greek Bible"}</button>
