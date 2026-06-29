@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v111";
+const APP_VERSION = "v113";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10371,11 +10371,13 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [gkSel,setGkSel]=React.useState(null);
   const [gkShow,setGkShow]=React.useState(()=>{ try{ return {greek:false,translit:true,english:true,esv:false, ...(JSON.parse(localStorage.getItem("jtGkShow")||"null")||{})}; }catch(_){ return {greek:false,translit:true,english:true,esv:false}; } });
   const [gkFont,setGkFont]=React.useState(()=>{ try{ return {greek:18,translit:15,english:13,esv:15, ...(JSON.parse(localStorage.getItem("jtGkFont")||"null")||{})}; }catch(_){ return {greek:18,translit:15,english:13,esv:15}; } });
+  const [gkRate,setGkRate]=React.useState(()=>{ try{ const v=parseFloat(localStorage.getItem("jtGkRate")); return (v>=0.3&&v<=1.5)?v:0.6; }catch(_){ return 0.6; } });
+  React.useEffect(()=>{ try{ localStorage.setItem("jtGkRate",String(gkRate)); }catch(_){} },[gkRate]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkShow",JSON.stringify(gkShow)); }catch(_){} },[gkShow]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkFont",JSON.stringify(gkFont)); }catch(_){} },[gkFont]);
   React.useEffect(()=>{ try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){} },[]);
   const gkCanSpeak = typeof window!=="undefined" && !!window.speechSynthesis;
-  const gkSpeak=(t)=>{ try{ if(!window.speechSynthesis||!t) return; const u=new SpeechSynthesisUtterance(t); u.lang="el-GR"; u.rate=0.9; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(_){} };
+  const gkSpeak=(t)=>{ try{ if(!window.speechSynthesis||!t) return; const u=new SpeechSynthesisUtterance(t); u.lang="el-GR"; u.rate=gkRate; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); }catch(_){} };
   const gkStep={width:22,height:22,borderRadius:6,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:14,fontWeight:800,lineHeight:1,cursor:"pointer",padding:0};
   const [,setGkVer]=React.useState(0);
   const gkCacheRef=React.useRef({});
@@ -11038,6 +11040,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <div style={{fontSize:24,fontWeight:800,color:C.text,flex:1,wordBreak:"break-word"}}>{gkSel.w}</div>
               {gkCanSpeak && <button onClick={()=>gkSpeak(gkSel.w)} title="Hear (device voice)" style={{flex:"0 0 auto",width:36,height:36,borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:18,cursor:"pointer",lineHeight:1}}>🔊</button>}
+              {gkCanSpeak && <button onClick={()=>{ const opts=[0.5,0.6,0.75,1]; const i=opts.indexOf(gkRate); const nr=opts[(i+1)%opts.length]; setGkRate(nr); try{ if(window.speechSynthesis){ const u=new SpeechSynthesisUtterance(gkSel.w); u.lang="el-GR"; u.rate=nr; const vs=window.speechSynthesis.getVoices()||[]; const gv=vs.find(v=>/(^|[^a-z])el([-_]|$)|greek/i.test((v.lang||"")+" "+(v.name||""))); if(gv) u.voice=gv; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } }catch(_){} }} title="Playback speed (tap to change)" style={{flex:"0 0 auto",height:36,padding:"0 9px",borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",lineHeight:1}}>{gkRate}×</button>}
             </div>
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
