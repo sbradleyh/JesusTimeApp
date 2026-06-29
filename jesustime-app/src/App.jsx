@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v106";
+const APP_VERSION = "v108";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -2100,7 +2100,7 @@ function TagTimeEntry({tag, onAdd, defaultTime=null, onHide=null, hidden=false})
 function ChipPopupCard({tag, label, icon, iconFilter="none", entries={}, today, computeStreak=()=>0,
     starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{},
     userInitials="", saveInitials=()=>{}, hiddenTags=[], setHiddenTags=null,
-    addEntry=()=>{}, onClose=()=>{}}) {
+    addEntry=()=>{}, onClose=()=>{}, onGoToPage=null, goToLabel="Open page"}) {
   const matchTag = tag.replace(/ /g,"_");
   const streak = computeStreak(matchTag, entries, today);
   const inCircle = starredTags.includes(tag);
@@ -2155,6 +2155,14 @@ function ChipPopupCard({tag, label, icon, iconFilter="none", entries={}, today, 
               background:`rgba(${C.ink},0.04)`,
               color:hiddenTags.includes(tag)?C.textMid:"#f87171",fontSize:16,fontWeight:800}}>
             {hiddenTags.includes(tag)?"↩ Restore":"🗑 Hide"}
+          </button>
+        )}
+        {/* Go to page */}
+        {onGoToPage && (
+          <button onClick={onGoToPage}
+            style={{width:"100%",padding:"12px 0",borderRadius:12,cursor:"pointer",marginBottom:10,
+              border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:16,fontWeight:800}}>
+            {goToLabel} →
           </button>
         )}
         {/* Presets */}
@@ -13049,14 +13057,25 @@ export default function App() {
       )}
 
       {/* Activity-chip popup card (Prayer/Names/Look/Bible/Teaching) */}
-      {chipPopup && (
+      {chipPopup && (() => {
+        const t=(chipPopup.tag||"").replace(/ /g,"_");
+        const close=setChipPopup; let fn=null,label="";
+        if(/^Bible_Memory/i.test(t)){ label="Go to Bible Memory"; fn=()=>{ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); close(null); }; }
+        else if(/^Bible_Read/i.test(t)){ label="Go to Bible Reading"; fn=()=>{ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); close(null); }; }
+        else if(/^Bible_Books/i.test(t)){ label="Go to Memory Drill"; fn=()=>{ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); close(null); }; }
+        else if(/^(Prayed|Prayer)/i.test(t)){ label="Go to Prayer"; fn=()=>{ saveMainTab("prayer"); close(null); }; }
+        else if(/^Names_Review/i.test(t)){ label="Go to Names"; fn=()=>{ saveMainTab("names"); close(null); }; }
+        else if(/^(Catechism|Teaching)/i.test(t)){ label="Go to Teaching"; fn=()=>{ saveMainTab("catechism"); close(null); }; }
+        return (
         <ChipPopupCard tag={chipPopup.tag} label={chipPopup.label} icon={chipPopup.icon} iconFilter={chipPopup.iconFilter||"none"}
           entries={entries} today={today} computeStreak={computeStreak}
           starredTags={starredTags} onToggleStar={tag=>setStarredTags(prev=>prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag])}
           sharedTags={sharedTags} toggleSharedTag={toggleSharedTag}
           userInitials={userInitials} saveInitials={saveInitials}
-          addEntry={addEntry} onClose={()=>setChipPopup(null)}/>
-      )}
+          addEntry={addEntry} onClose={()=>setChipPopup(null)}
+          goToLabel={label} onGoToPage={fn}/>
+        );
+      })()}
 
       {editEntry && (
         <ModalShell title="Edit Session" canSave={true} onSave={saveEdit} onClose={()=>setEditEntry(null)}
