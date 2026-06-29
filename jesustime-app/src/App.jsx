@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v118";
+const APP_VERSION = "v119";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10597,7 +10597,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     if(!hasVerses) loadEsvPassage(ibKey, ibKey, false);
   }, [ibKey]); // eslint-disable-line
   const gkBaseOf = (bk) => bk && bk.src==="lxx" ? LXX_BASE : GREEK_BASE;
-  const gkLoadLex = (base) => { if(gkLexRef.current[base]) return; fetch(base+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{ if(j){ gkLexRef.current[base]=j; setGkVer(v=>v+1);} }).catch(()=>{}); };
+  const gkLoadLex = (base) => { if(gkLexRef.current.C) return; fetch(GREEK_BASE+"lexicon.json").then(r=>r.ok?r.json():null).then(j=>{ if(j){ gkLexRef.current.C=j; setGkVer(v=>v+1);} }).catch(()=>{}); };
   const gkOf = (pane) => gkNav[pane] || {book:null,ch:null};
   const gkSetNav = (pane, patch) => setGkNav(n=>({...n,[pane]:{...(n[pane]||{book:null,ch:null}),...patch}}));
   const gkOpenBookIn = (pane, bk) => {
@@ -10648,7 +10648,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const renderGreekBody = (pane, fp, lh=2.0) => {
     const nav = gkOf(pane); const gkBook = nav.book, gkCh = nav.ch;
     const base = gkBaseOf(gkBook);
-    const lex = gkBook ? (gkLexRef.current[base]||null) : null;
+    const lex = gkBook ? (gkLexRef.current.C||null) : null;
     const data = gkBook ? gkCacheRef.current[base+gkBook.f] : null;
     const esvEntry = (gkShow.esv && gkBook && gkCh!=null) ? (esvChapCache[gkEsvKey(gkBook,gkCh)]||null) : null;
     const openBook = (bk)=>gkOpenBookIn(pane,bk);
@@ -11080,7 +11080,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{overflowY:"auto",padding:"6px 0"}}>
               {gkFind.err && <div style={{padding:"18px 16px",color:"#e0786a",fontSize:14,lineHeight:1.5}}>{gkFind.err}</div>}
               {!gkFind.err && gkFind.total===0 && <div style={{padding:"18px 16px",color:C.textFaint,fontSize:14}}>No occurrences found.</div>}
-              {gkFind.list.slice(0,gkFindN).map((o,i)=>{ const b=gkOccBook(o); const data=gkLoadBookData(o[0],o[1]); const lx=gkLexRef.current[o[0]?GREEK_BASE:LXX_BASE]||null; const words=(data&&data.v)?data.v[o[2]+":"+o[3]]:null; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
+              {gkFind.list.slice(0,gkFindN).map((o,i)=>{ const b=gkOccBook(o); const data=gkLoadBookData(o[0],o[1]); const lx=gkLexRef.current.C||null; const words=(data&&data.v)?data.v[o[2]+":"+o[3]]:null; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
                 <div key={i} style={{padding:"9px 16px",borderBottom:`1px solid rgba(${C.ink},0.06)`}}>
                   <button onClick={()=>gkJump(o)} style={{background:"transparent",border:"none",color:C.gold,fontSize:13,fontWeight:800,padding:0,cursor:"pointer"}}>{b?b.b:"?"} {o[2]}:{o[3]} <span style={{fontSize:10,color:C.textFaint,fontWeight:600}}>{o[0]?"NT":"OT"} ›</span></button>
                   <div style={{marginTop:4,lineHeight:1.7}}>
