@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v119";
+const APP_VERSION = "v122";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10181,7 +10181,7 @@ function CatechismEditor({ C, onClose=()=>{} }) {
         <div style={{padding:"6px 16px 0",fontSize:11,color:C.textFaint}}>{items.length} total · {reviewCount} in review · tap a card’s button to add/remove it from review</div>
         <div style={{overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"10px 16px 16px",display:"flex",flexDirection:"column",gap:14}}>
           {items.length===0 && <div style={{color:C.textFaint,fontSize:14,textAlign:"center",lineHeight:1.5,padding:"22px 8px"}}>Nothing here yet. Tap “+ Add” to create your first entry. Fill in a question and answer, or leave the question blank and enter just an answer/statement to memorize.</div>}
-          {items.map((it,i)=>{
+          {items.map((_,k)=>{ const i=items.length-1-k; const it=items[i];
             const inReview = it.review!==false;
             return (
               <div key={it.q} style={{border:`1px solid ${C.border}`,borderRadius:12,padding:"10px 11px",display:"flex",flexDirection:"column",gap:7}}>
@@ -10372,6 +10372,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [gkFont,setGkFont]=React.useState(()=>{ try{ return {greek:18,translit:15,english:13,esv:15, ...(JSON.parse(localStorage.getItem("jtGkFont")||"null")||{})}; }catch(_){ return {greek:18,translit:15,english:13,esv:15}; } });
   const [gkRate,setGkRate]=React.useState(()=>{ try{ const v=parseFloat(localStorage.getItem("jtGkRate")); return (v>=0.3&&v<=1.5)?v:0.6; }catch(_){ return 0.6; } });
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkRate",String(gkRate)); }catch(_){} },[gkRate]);
+  const [gkGlossOv,setGkGlossOv]=React.useState(()=>{ try{ return JSON.parse(localStorage.getItem("jtGkGlossOv")||"{}")||{}; }catch(_){ return {}; } });
+  React.useEffect(()=>{ try{ localStorage.setItem("jtGkGlossOv",JSON.stringify(gkGlossOv)); }catch(_){} },[gkGlossOv]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkShow",JSON.stringify(gkShow)); }catch(_){} },[gkShow]);
   React.useEffect(()=>{ try{ localStorage.setItem("jtGkFont",JSON.stringify(gkFont)); }catch(_){} },[gkFont]);
   React.useEffect(()=>{ try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){} },[]);
@@ -10660,7 +10662,11 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const arrow={width:30,height:26,borderRadius:7,border:`1px solid rgba(${C.ink},0.22)`,background:"transparent",color:C.gold,fontSize:16,fontWeight:800,lineHeight:1,cursor:"pointer"};
     const hdr={fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",margin:"4px 2px 8px"};
     const verseKeys=(data&&gkCh!=null)?Object.keys(data.v).filter(k=>k.slice(0,k.indexOf(":"))===String(gkCh)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])):[];
-    const grid=(items)=>(<div style={{marginBottom:14,borderTop:`1px solid ${C.border}`}}>{items.map(bk=>(<button key={bk.src+bk.f} onClick={()=>openBook(bk)} style={{display:"block",width:"100%",textAlign:"left",padding:"10px 11px",borderRadius:0,borderBottom:`1px solid rgba(${C.ink},0.06)`,borderLeft:"none",borderRight:"none",borderTop:"none",background:"transparent",color:C.text,fontSize:15,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{bk.b}</button>))}</div>);
+    const grid=(items)=>(<div style={{display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:3,marginBottom:14}}>{items.map(bk=>(
+      <div key={bk.src+bk.f} onClick={()=>openBook(bk)} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:54,padding:"2px 1px",background:C.inputBg,border:`0.5px solid ${C.border}`,overflow:"hidden"}}>
+        <span style={{fontSize:17,fontWeight:800,color:C.text,lineHeight:1,whiteSpace:"nowrap"}}>{bookAbbr3(bk.b)}</span>
+        <span style={{fontSize:12,fontWeight:700,color:C.textFaint,marginTop:2}}>{bk.c}</span>
+      </div>))}</div>);
     return (
       <div>
         {(gkBook || gkCh!=null) && (
@@ -10694,7 +10700,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             {verseKeys.map(vk=>{ const vs=vk.split(":")[1];
               const words=(<>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
-                {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
+                {data.v[vk].map((wd,i)=>{ const nl=gkNorm(wd[1]); const le=lex&&lex[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?ov:(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); const any=gkShow.greek||gkShow.translit||gkShow.english; return (
                   <button key={i} onClick={(e)=>tap(e,wd[0],wd[1],vs)}
                     style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:200}}>
                     {(gkShow.greek||!any) && <span style={{fontSize:gkFont.greek,color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
@@ -11049,7 +11055,11 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             </div>
             <div style={{fontSize:14,color:C.gold,marginTop:2}}>{gkSel.t}</div>
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
-            <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
+            <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}{(gkGlossOv[gkNorm(gkSel.lemma)]||"").trim()?<span style={{color:C.gold,fontWeight:700}}> ({gkGlossOv[gkNorm(gkSel.lemma)]})</span>:null}</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginTop:8}}>
+              <input value={gkGlossOv[gkNorm(gkSel.lemma)]||""} onChange={e=>{ const nl=gkNorm(gkSel.lemma); const v=e.target.value; setGkGlossOv(o=>{ const n={...o}; if(v.trim()) n[nl]=v; else delete n[nl]; return n; }); }} placeholder="Custom gloss — shown under word everywhere" className="qa-ph" style={{flex:1,minWidth:0,background:C.inputBg,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:13,padding:"7px 9px",outline:"none"}}/>
+              {(gkGlossOv[gkNorm(gkSel.lemma)]||"") && <button onClick={()=>{ const nl=gkNorm(gkSel.lemma); setGkGlossOv(o=>{ const n={...o}; delete n[nl]; return n; }); }} title="Clear custom gloss" style={{flex:"0 0 auto",width:30,height:30,borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:15,cursor:"pointer",lineHeight:1}}>×</button>}
+            </div>
             <button onClick={()=>gkConcord(gkSel.lemma,gkSel.gloss,gkSel.pane)} disabled={gkFindBusy} style={{marginTop:10,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>{gkFindBusy?"Searching…":"🔍 Find in Greek Bible"}</button>
             {gkSel.vs && <button onClick={()=>gkOpenEsvVerse(gkSel.pane,gkSel.vs)} style={{marginTop:7,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>📖 Open verse in ESV</button>}
             <div style={{borderTop:`1px solid ${C.border}`,margin:"11px 0 7px"}}/>
@@ -11084,7 +11094,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
                 <div key={i} style={{padding:"9px 16px",borderBottom:`1px solid rgba(${C.ink},0.06)`}}>
                   <button onClick={()=>gkJump(o)} style={{background:"transparent",border:"none",color:C.gold,fontSize:13,fontWeight:800,padding:0,cursor:"pointer"}}>{b?b.b:"?"} {o[2]}:{o[3]} <span style={{fontSize:10,color:C.textFaint,fontWeight:600}}>{o[0]?"NT":"OT"} ›</span></button>
                   <div style={{marginTop:4,lineHeight:1.7}}>
-                    {words ? words.map((wd,j)=>{ const le=lx&&lx[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; return (
+                    {words ? words.map((wd,j)=>{ const nl=gkNorm(wd[1]); const le=lx&&lx[nl]; const ov=gkGlossOv[nl]; const sg=(ov&&ov.trim())?ov:(le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""); return (
                       <span key={j} style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",padding:"0 4px 4px"}}>
                         {(gkShow.greek||!any) && <span style={{fontSize:Math.min(gkFont.greek,16),color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
                         {gkShow.translit && <span style={{fontSize:Math.min(gkFont.translit,14),color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>}
@@ -11766,7 +11776,7 @@ export default function App() {
     // user-created data that isn't otherwise backed up or re-downloadable
     "jtPersonalCatechism","jtPersonalCatechismTs","jtCatechismVerses","jtCatechismBox","jtCatechismSelected",
     "jtPersonalNames","jtPersonalNamesTs","jtRemovedNames","jtNameCat","jtNameColor","jtNameColorsRecent",
-    "jtDrillRecords","jtMemoryStats","jtL4JLiked",
+    "jtDrillRecords","jtMemoryStats","jtL4JLiked","jtGkGlossOv",
   ];
   const handleExport = () => {
     const settings = {};
