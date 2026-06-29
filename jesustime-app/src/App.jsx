@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v125";
+const APP_VERSION = "v126";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10670,10 +10670,10 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const hdr={fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",margin:"4px 2px 8px"};
     const verseKeys=(data&&gkCh!=null)?Object.keys(data.v).filter(k=>k.slice(0,k.indexOf(":"))===String(gkCh)).sort((a,b)=>(+a.split(":")[1])-(+b.split(":")[1])):[];
     const grid=(items)=>(<div style={{display:"grid",gridTemplateColumns:"repeat(7, minmax(0,1fr))",gap:3,marginBottom:14}}>{items.map(bk=>(
-      <div key={bk.src+bk.f} onClick={()=>openBook(bk)} style={{borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:54,padding:"2px 1px",background:C.inputBg,border:`0.5px solid ${C.border}`,overflow:"hidden"}}>
+      <button key={bk.src+bk.f} onClick={()=>openBook(bk)} style={{appearance:"none",font:"inherit",borderRadius:7,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",minHeight:54,padding:"2px 1px",background:C.inputBg,border:`0.5px solid ${C.border}`,overflow:"hidden"}}>
         <span style={{fontSize:17,fontWeight:800,color:C.text,lineHeight:1,whiteSpace:"nowrap"}}>{bookAbbr3(bk.b)}</span>
         <span style={{fontSize:12,fontWeight:700,color:C.textFaint,marginTop:2}}>{bk.c}</span>
-      </div>))}</div>);
+      </button>))}</div>);
     return (
       <div>
         {(gkBook || gkCh!=null) && (
