@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v100";
+const APP_VERSION = "v101";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10595,10 +10595,24 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const gkSetCh = (n) => { setGkCh(n); if(n!=null && gkBook) gkSyncEsv(gkBook.b, n); };
   const gkConcord = (lemma, gloss) => {
     const nk=gkNorm(lemma);
-    const run=(c)=>{ const e=c[nk]; setGkFind({lemma,gloss,total:e?e[0]:0,list:e?e[1]:[]}); };
+    const run=(c)=>{ const e=c[nk]; setGkFind({lemma,gloss,total:e?e[0]:0,list:e?e[1]:[],err:""}); };
     if(gkConcRef.current){ run(gkConcRef.current); return; }
     setGkFindBusy(true);
-    fetch(GREEK_BASE+"concordance.json").then(r=>r.ok?r.json():null).then(j=>{ if(j){ gkConcRef.current=j; run(j);} else setGkFind({lemma,gloss,total:0,list:[]}); }).catch(()=>setGkFind({lemma,gloss,total:0,list:[]})).finally(()=>setGkFindBusy(false));
+    fetch(GREEK_BASE+"concordance.json").then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(j=>{ if(j&&typeof j==="object"&&!Array.isArray(j)){ gkConcRef.current=j; run(j);} else throw 0; }).catch(()=>setGkFind({lemma,gloss,total:0,list:[],err:"Couldn’t load the concordance — deploy /greek/concordance.json, then try again."})).finally(()=>setGkFindBusy(false));
+  };
+  const gkScrollRef=React.useRef(null);
+  const gkMirrorScroll=(fromPane)=>{
+    if(!gkLink) return;
+    const gT=topMode==="book"&&bookId==="greekbible", gB=botMode==="book"&&bookId==="greekbible";
+    if(!((gT&&botMode==="bible")||(gB&&topMode==="bible"))) return;
+    const g=gkScrollRef.current; if(g&&g.pane===fromPane&&Date.now()-g.t<140) return; // echo of a programmatic scroll
+    const from=fromPane==="top"?topScrollRef.current:botScrollRef.current;
+    const to=fromPane==="top"?botScrollRef.current:topScrollRef.current;
+    if(!from||!to) return;
+    const dF=from.scrollHeight-from.clientHeight, dT=to.scrollHeight-to.clientHeight;
+    const frac=dF>0?from.scrollTop/dF:0;
+    gkScrollRef.current={pane:fromPane==="top"?"bottom":"top",t:Date.now()};
+    to.scrollTop=dT*frac;
   };
   const gkOccBook = (o) => { const [sf,num]=o; const list=sf?GREEK_BOOKS:LXX_BOOKS; return list[num-1]||null; };
   const gkJump = (o) => { const b=gkOccBook(o); if(!b) return; const ent={...b, src:o[0]?"nt":"lxx"}; if(!gkBook||gkBook.f!==ent.f||gkBook.src!==ent.src) gkOpenBook(ent); gkSetCh(o[2]); setGkFind(null); setGkSel(null); };
@@ -10847,7 +10861,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
       <div ref={splitRef} style={{flex:"1 1 auto",display:"flex",flexDirection:"column",minHeight:0,paddingTop: (fs||immersive)?"env(safe-area-inset-top)":undefined,paddingBottom: immersive?"env(safe-area-inset-bottom)":undefined}}>
         {topMode!=="off" && (
         <div style={{flexBasis: botMode==="off"?0:`${frac*100}%`,flexGrow: botMode==="off"?1:0,flexShrink: botMode==="off"?1:0,display:"flex",flexDirection:"column",minHeight:0,position:"relative",borderTop:`2px solid ${activePane==="top"?C.gold:"transparent"}`}}>
-          <div ref={topScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("top")} onScroll={e=>{ if(topMode==="book") bookPosRef.current=e.target.scrollTop; setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(topMode,"top")}</div>
+          <div ref={topScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("top")} onScroll={e=>{ if(topMode==="book") bookPosRef.current=e.target.scrollTop; gkMirrorScroll("top"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(topMode,"top")}</div>
           {flipPane.top && (<>
             <button onClick={()=>turnPage("top",-1)} title="Previous page" style={{position:"absolute",left:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>‹</button>
             <button onClick={()=>turnPage("top",1)} title="Next page" style={{position:"absolute",right:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>›</button>
@@ -10866,7 +10880,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
         </div>)}
         {botMode!=="off" && (
         <div style={{flex:"1 1 0",display:"flex",flexDirection:"column",minHeight:0,position:"relative",borderTop:`2px solid ${activePane==="bottom"?C.gold:"transparent"}`}}>
-          <div ref={botScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("bottom")} onScroll={e=>{ if(botMode==="book") bookPosRef.current=e.target.scrollTop; setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(botMode,"bottom")}</div>
+          <div ref={botScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("bottom")} onScroll={e=>{ if(botMode==="book") bookPosRef.current=e.target.scrollTop; gkMirrorScroll("bottom"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(botMode,"bottom")}</div>
           {flipPane.bottom && (<>
             <button onClick={()=>turnPage("bottom",-1)} title="Previous page" style={{position:"absolute",left:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>‹</button>
             <button onClick={()=>turnPage("bottom",1)} title="Next page" style={{position:"absolute",right:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>›</button>
@@ -11021,7 +11035,8 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               <button onClick={()=>setGkFind(null)} style={{background:"transparent",border:"none",color:C.textFaint,fontSize:22,cursor:"pointer",lineHeight:1}}>×</button>
             </div>
             <div style={{overflowY:"auto",padding:"6px 0"}}>
-              {gkFind.total===0 && <div style={{padding:"18px 16px",color:C.textFaint,fontSize:14}}>No occurrences found.</div>}
+              {gkFind.err && <div style={{padding:"18px 16px",color:"#e0786a",fontSize:14,lineHeight:1.5}}>{gkFind.err}</div>}
+              {!gkFind.err && gkFind.total===0 && <div style={{padding:"18px 16px",color:C.textFaint,fontSize:14}}>No occurrences found.</div>}
               {gkFind.list.map((o,i)=>{ const b=gkOccBook(o); return (
                 <button key={i} onClick={()=>gkJump(o)} style={{display:"flex",width:"100%",textAlign:"left",gap:8,alignItems:"baseline",background:"transparent",border:"none",borderBottom:`1px solid rgba(${C.ink},0.06)`,color:C.text,fontSize:14,padding:"9px 16px",cursor:"pointer"}}>
                   <span style={{color:C.gold,fontWeight:700}}>{b?b.b:"?"} {o[2]}:{o[3]}</span>
