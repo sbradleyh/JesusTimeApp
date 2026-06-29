@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v101";
+const APP_VERSION = "v102";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10618,12 +10618,23 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const gkJump = (o) => { const b=gkOccBook(o); if(!b) return; const ent={...b, src:o[0]?"nt":"lxx"}; if(!gkBook||gkBook.f!==ent.f||gkBook.src!==ent.src) gkOpenBook(ent); gkSetCh(o[2]); setGkFind(null); setGkSel(null); };
   const gkEsvKey = (bk,ch) => bk && ch!=null ? `${fullBook(gkEsvName(bk.b))} ${bk.b==="Psalms"?lxxPsToEsv(ch):ch}` : null;
   React.useEffect(()=>{ if(!gkShow.esv || !gkBook || gkCh==null) return; const key=gkEsvKey(gkBook,gkCh); if(!key) return; const cur=esvChapCache[key]; const has=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k)); if(!has) loadEsvPassage(key,key,false); }, [gkShow.esv, gkBook&&gkBook.f, gkCh, esvChapCache]); // eslint-disable-line
+  const gkOpenEsvVerse = (vs) => {
+    if(!gkBook || gkCh==null) return;
+    const fb=fullBook(gkEsvName(gkBook.b)); const c=gkBook.b==="Psalms"?lxxPsToEsv(gkCh):gkCh; const key=`${fb} ${c}`;
+    setActive({ l:`${fb} ${c}${vs?":"+vs:""}`, q:key, k:key, b:fb, c, whole:true, jumpV:vs||null });
+    if(topMode==="book"){ setBot("bible"); setActivePane("bottom"); }
+    else if(botMode==="book"){ setTop("bible"); setActivePane("top"); }
+    else { setBot("bible"); setActivePane("bottom"); }
+    const cur=esvChapCache[key]; const has=cur&&Object.keys(cur).some(k=>/^\d+$/.test(k));
+    if(!has) loadEsvPassage(key,key,false);
+    setGkSel(null);
+  };
   const renderGreekBody = (fp, lh=2.0) => {
     const base = gkBaseOf(gkBook);
     const lex = gkBook ? (gkLexRef.current[base]||null) : null;
     const data = gkBook ? gkCacheRef.current[base+gkBook.f] : null;
     const esvEntry = (gkShow.esv && gkBook && gkCh!=null) ? (esvChapCache[gkEsvKey(gkBook,gkCh)]||null) : null;
-    const tap = (e,g,lm) => { const r=e.currentTarget.getBoundingClientRect(); const le=lex&&lex[gkNorm(lm)]; setGkSel({w:g,t:gkTranslit(g),lemma:lm,gloss:le?le.g:"(definition not found)",strongs:(le&&le.s)?le.s:"",x:r.left+r.width/2,y:r.bottom}); };
+    const tap = (e,g,lm,vs) => { const r=e.currentTarget.getBoundingClientRect(); const le=lex&&lex[gkNorm(lm)]; setGkSel({w:g,t:gkTranslit(g),lemma:lm,gloss:le?le.g:"(definition not found)",strongs:(le&&le.s)?le.s:"",vs:vs,x:r.left+r.width/2,y:r.bottom}); };
     const tSize=Math.round(fp*0.9), gSize=Math.round(fp*0.75), vSize=Math.round(fp*0.62);
     const tile={padding:"11px 8px",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer"};
     const arrow={width:30,height:26,borderRadius:7,border:`1px solid rgba(${C.ink},0.22)`,background:"transparent",color:C.gold,fontSize:16,fontWeight:800,lineHeight:1,cursor:"pointer"};
@@ -10664,7 +10675,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               const words=(<>
                 <span style={{fontSize:vSize,fontWeight:800,color:C.gold,verticalAlign:"super",marginRight:3}}>{vs}</span>
                 {data.v[vk].map((wd,i)=>{ const le=lex&&lex[gkNorm(wd[1])]; const sg=le&&le.g?le.g.replace(/\([^)]*\)/g,"").split(/[;,]/)[0].replace(/\s+/g," ").trim():""; const any=gkShow.greek||gkShow.translit||gkShow.english; return (
-                  <button key={i} onClick={(e)=>tap(e,wd[0],wd[1])}
+                  <button key={i} onClick={(e)=>tap(e,wd[0],wd[1],vs)}
                     style={{display:"inline-flex",flexDirection:"column",alignItems:"center",verticalAlign:"top",background:"transparent",border:"none",cursor:"pointer",padding:"0 4px 6px",margin:0,maxWidth:200}}>
                     {(gkShow.greek||!any) && <span style={{fontSize:gkFont.greek,color:C.text,fontWeight:700,lineHeight:1.2}}>{wd[0]}</span>}
                     {gkShow.translit && <span style={{fontSize:gkFont.translit,color:C.gold,lineHeight:1.2}}>{gkTranslit(wd[0])}</span>}
@@ -11009,6 +11020,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             <div style={{fontSize:12,color:C.textFaint,marginTop:2,fontStyle:"italic"}}>lemma · {gkSel.lemma}{gkSel.strongs?`  ·  ${gkSel.strongs}`:""}</div>
             <div style={{fontSize:14,color:C.textMid,marginTop:8,lineHeight:1.45}}>{gkSel.gloss}</div>
             <button onClick={()=>gkConcord(gkSel.lemma,gkSel.gloss)} disabled={gkFindBusy} style={{marginTop:10,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>{gkFindBusy?"Searching…":"🔍 Find in Greek Bible"}</button>
+            {gkSel.vs && <button onClick={()=>gkOpenEsvVerse(gkSel.vs)} style={{marginTop:7,width:"100%",background:"transparent",border:`1px solid ${C.borderHi}`,borderRadius:9,color:C.gold,fontSize:13,fontWeight:700,padding:"7px 0",cursor:"pointer"}}>📖 Open verse in ESV</button>}
             <div style={{borderTop:`1px solid ${C.border}`,margin:"11px 0 7px"}}/>
             <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.07em",marginBottom:4}}>DISPLAY IN TEXT</div>
             {[["greek","Greek"],["translit","Translit"],["english","English"],["esv","ESV"]].map(([k,label])=>(
