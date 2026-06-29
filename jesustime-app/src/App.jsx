@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v102";
+const APP_VERSION = "v106";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -9245,9 +9245,12 @@ function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persis
   const sortedNames = [...namesWithRandom].sort((a,b) => {
     const aToday = reviewedTodaySet.has(String(a.ts));
     const bToday = reviewedTodaySet.has(String(b.ts));
-    // Reviewed → push to bottom
+    // Reviewed today → push to bottom
     if (aToday !== bToday) return aToday ? 1 : -1;
-    // Both same state → use persistent random order
+    // Least-reviewed (all-time) first
+    const ac = reviewCounts[String(a.ts)]||0, bc = reviewCounts[String(b.ts)]||0;
+    if (ac !== bc) return ac - bc;
+    // Equal counts → persistent daily random order
     return a.rand - b.rand;
   });
 
@@ -11142,8 +11145,8 @@ export default function App() {
         return DEFAULT_BOTTOM_TABS;
       }
       const saved = JSON.parse(localStorage.getItem("jtTabOrder")||"null") || DEFAULT_BOTTOM_TABS;
-      // Remove any theme/sync that crept in, and streaks (now reached via the Today screen buttons)
-      let s = saved.filter(id => id!=="theme" && id!=="sync");
+      // Remove any theme/sync that crept in, the old "looking" tab, and streaks (now reached via the Today screen buttons)
+      let s = saved.filter(id => id!=="theme" && id!=="sync" && id!=="looking");
       // First time seeing the Abide group → adopt the new default layout (preserves visibility prefs)
       if (!s.includes("ABIDE")) return DEFAULT_BOTTOM_TABS;
       // Ensure catechism tab exists
