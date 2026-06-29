@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v123";
+const APP_VERSION = "v124";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -4729,6 +4729,8 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
                 style={{width:40,height:40,borderRadius:10,border:`1px solid ${C.border}`,background:C.bg,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1}}>A−</button>
               <button onClick={e=>{e.stopPropagation();bumpSsFont(3);}} onTouchEnd={e=>e.stopPropagation()}
                 style={{width:40,height:40,borderRadius:10,border:`1px solid ${C.border}`,background:C.bg,color:C.gold,fontSize:20,fontWeight:800,cursor:"pointer",lineHeight:1}}>A+</button>
+              <button onClick={e=>{e.stopPropagation();setSs(null);setEditCat(true);}} onTouchEnd={e=>e.stopPropagation()} title="Edit My Teaching"
+                style={{width:40,height:40,borderRadius:10,border:`1px solid ${C.border}`,background:C.bg,color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1}}>✏️</button>
             </div>
             <div style={{position:"fixed",top:"calc(14px + env(safe-area-inset-top))",left:0,right:0,fontSize:12,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",color:C.textFaint,pointerEvents:"none"}}>
               {(CATECHISMS[cur.cat]||{}).name||"Teaching"} · Q{cur.q}{ss.solo?"":` · ${ss.idx+1}/${ssList.length}`}
