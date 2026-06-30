@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v153";
+const APP_VERSION = "v156";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3482,6 +3482,13 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
                           <span style={{fontSize:22}}>✝️</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Names Slideshow</span>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
+                          <input type="checkbox" checked={bottomTabVisible["MENU"]!==false}
+                            onChange={e=>{const next={...bottomTabVisible,MENU:e.target.checked};saveBottomTabVisible(next);}}
+                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
+                          <span style={{fontSize:22}}>☰</span>
+                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Menu</span>
                         </div>
                       </div>
                       {mainTabs.includes("streaks") && bubble("streaks")}
@@ -10019,7 +10026,7 @@ function NamesChip({tabStarMap,entries,today}) {
   return <TabChip tag="Names_Review" starKey="names" short="👤" label="Names Review" filter="sepia(1) saturate(3) hue-rotate(80deg)" tabStarMap={tabStarMap} entries={entries} today={today}/>;
 }
 
-function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{} }) {
+function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
   const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
@@ -10086,18 +10093,18 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:8,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
-          <span style={{fontSize:13,fontWeight:800,color:C.textMid}}>{lb}</span>
-          <span style={{fontSize:vertical?20:18,lineHeight:1}}>{ic}</span>
+          <span style={{fontSize:15,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:vertical?24:20,lineHeight:1}}>{ic}</span>
         </div>
-        <span style={{fontSize:14,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:10,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
-        <span style={{fontSize:11,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
+        <span style={{fontSize:17,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:12,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
+        <span style={{fontSize:13,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
       </div>
     </div>);
   };
   const BAR_W=58,BAR_H=50,AMTS=[5,10,15,20,30,45,60];
   return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
     <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8,flex:1,minHeight:0}}>
-      <div style={{display:"flex",gap:8,height:74,flexShrink:0}}>
+      <div style={{display:"flex",gap:8,height:88,flexShrink:0}}>
         <div style={{flex:1}}><Bar slot="morning" vertical/></div>
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
@@ -10110,7 +10117,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 2px 6px"}}>
         <span style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></span>
-        <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{marginLeft:"auto",width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
+        <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
       </div>
       {adding && (
         <div style={{display:"flex",gap:6,margin:"0 2px 8px"}}>
@@ -12163,7 +12170,7 @@ export default function App() {
         </div>
         {/* Right: hamburger */}
         <div style={{marginLeft:"auto",flexShrink:0}}>
-          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={true} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
         </div>
       </div>
 
@@ -12638,7 +12645,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
-                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} />}
+                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
                               {selectedFilterTags.length > 0 && (
@@ -12875,7 +12882,7 @@ export default function App() {
             .filter(id => id!=="today");   // Day reached via the Today popup, not its own tab
           if (bottomTabVisible["chart"]===true && !_barCore.includes("chart")) _barCore.push("chart");
           if (bottomTabVisible["names"]!==false && !_barCore.includes("names")) _barCore.push("names");
-          const barIds = ["MENU"].concat(_barCore)
+          const barIds = (bottomTabVisible["MENU"]===false ? [] : ["MENU"]).concat(_barCore)
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
           return barIds
             .map((id, tabIdx) => {
