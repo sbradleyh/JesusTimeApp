@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v148";
+const APP_VERSION = "v151";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8638,7 +8638,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [editCat, setEditCat] = React.useState(false);
   const [titleScale, setTitleScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtTitleScale")); return v>0?v:1; } catch(e){ return 1; } });
-  const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v));}catch(e){} return v; });
+  const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   React.useEffect(() => {
     const open = () => setMenuOpen(true);
     window.addEventListener("jtOpenNamesMenu", open);
@@ -8679,9 +8679,11 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [cIdx, setCIdx] = React.useState(() => Math.floor(Math.random()*Math.max(1,IN_CHRIST.length)));
   const [nameColor, setNameColor] = React.useState(() => { try { return localStorage.getItem("jtNameColor")||"#4ade80"; } catch(e){ return "#4ade80"; } });
   const [titleFont, setTitleFont] = React.useState(() => { try { return localStorage.getItem("jtTitleFont")||""; } catch(e){ return ""; } });
-  const setTitleF = f => { setTitleFont(f); try{ localStorage.setItem("jtTitleFont", f); }catch(e){} };
+  const setTitleF = f => { setTitleFont(f); try{ localStorage.setItem("jtTitleFont", f); window.dispatchEvent(new Event("jtNameStyle")); }catch(e){} };
+  const [hideAuthor, setHideAuthor] = React.useState(() => { try { return localStorage.getItem("jtHideAuthor")==="1"; } catch(e){ return false; } });
+  const toggleHideAuthor = () => setHideAuthor(v=>{ const n=!v; try{localStorage.setItem("jtHideAuthor", n?"1":"0"); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return n; });
   const [recentColors, setRecentColors] = React.useState(() => { try { const v=JSON.parse(localStorage.getItem("jtNameColorsRecent")||"null"); return (Array.isArray(v)&&v.length)?v:["#4ade80","#d4a017","#f5f5f5","#60a5fa","#f9a8d4","#fb923c"]; } catch(e){ return ["#4ade80","#d4a017","#f5f5f5","#60a5fa","#f9a8d4","#fb923c"]; } });
-  const pickColor = c => { c=String(c).toLowerCase(); setNameColor(c); try{ localStorage.setItem("jtNameColor", c); }catch(e){} setRecentColors(prev => { const next=[c, ...prev.filter(x=>String(x).toLowerCase()!==c)].slice(0,6); try{ localStorage.setItem("jtNameColorsRecent", JSON.stringify(next)); }catch(e){} return next; }); };
+  const pickColor = c => { c=String(c).toLowerCase(); setNameColor(c); try{ localStorage.setItem("jtNameColor", c); window.dispatchEvent(new Event("jtNameStyle")); }catch(e){} setRecentColors(prev => { const next=[c, ...prev.filter(x=>String(x).toLowerCase()!==c)].slice(0,6); try{ localStorage.setItem("jtNameColorsRecent", JSON.stringify(next)); }catch(e){} return next; }); };
   const [slideColor, setSlideColor] = React.useState(() => { try { return localStorage.getItem("jtSlideColor")||localStorage.getItem("jtNameColor")||"#4ade80"; } catch(e){ return "#4ade80"; } });
   const pickSlideColor = c => { c=String(c).toLowerCase(); setSlideColor(c); try{ localStorage.setItem("jtSlideColor", c); }catch(e){} setRecentColors(prev => { const next=[c, ...prev.filter(x=>String(x).toLowerCase()!==c)].slice(0,6); try{ localStorage.setItem("jtNameColorsRecent", JSON.stringify(next)); }catch(e){} return next; }); };
   const effCat = (cat==="christ" && christItems.length) ? "christ" : (nameItems.length ? "name" : "christ");
@@ -8710,7 +8712,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [paused, setPaused] = React.useState(false);
   const [delaySec, setDelaySec] = React.useState(() => { try { return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8; } catch(e){ return 8; } });
   const [pFont, setPFont] = React.useState(() => { try { return parseInt(localStorage.getItem("jtPresentFont")||"30",10)||30; } catch(e){ return 30; } });
-  const setDelay = v => { const n=Math.max(2,Math.min(28800,v)); setDelaySec(n); try{localStorage.setItem("jtPresentDelay",String(n));}catch(e){} };
+  const setDelay = v => { const n=Math.max(2,Math.min(28800,v)); setDelaySec(n); try{localStorage.setItem("jtPresentDelay",String(n)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} };
   const setFont = v => { const n=Math.max(16,Math.min(220,v)); setPFont(n); try{localStorage.setItem("jtPresentFont",String(n));}catch(e){} };
   const [transMs, setTransMs] = React.useState(() => { try { return parseInt(localStorage.getItem("jtPresentTrans")||"1100",10)||1100; } catch(e){ return 1100; } });
   const setTrans = v => { setTransMs(v); try{localStorage.setItem("jtPresentTrans",String(v));}catch(e){} };
@@ -8830,20 +8832,16 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           <div style={{position:"fixed",top:"auto",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",maxHeight:"44vh",zIndex:200001,
             background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderTopLeftRadius:16,borderTopRightRadius:16,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
-            <div style={{padding:"8px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"flex-end"}}>
-                <button onClick={another} title="Another name"
-                  style={{flexShrink:0,padding:"5px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",lineHeight:1}}>🔄 New name</button>
-            </div>
             <div style={{display:"flex",borderBottom:`1px solid ${C.border}`}}>
-              <button onClick={()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames"); }}
+              <button onClick={another} title="New name"
+                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
+                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🔄 New</button>
+              <button onClick={()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames", cur&&cur.n); }}
                 style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>📖 Reader</button>
               <button onClick={()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }}
                 style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🌅 Slideshow</button>
-              <button onClick={()=>{ setMenuOpen(false); setEditCat(true); }}
-                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderLeft:`1px solid ${C.border}`,
-                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>✏️ Teaching</button>
             </div>
             <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:4}}>Show</div>
@@ -8877,6 +8875,15 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 ))}
               </div>
             </div>
+            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Rotate</span>
+              <PDrop C={C} value={delaySec} onChange={v=>setDelay(v)}
+                wrapStyle={{flexShrink:0,minWidth:72}} btnStyle={{height:32,borderRadius:9,cursor:"pointer",padding:"0 10px"}}
+                options={[3,5,8,10,15,20,30,45,60,90,120,300,600].map(s=>[s, s<60?s+"s":(s/60)+"m"])}/>
+              <button onClick={toggleHideAuthor}
+                style={{marginLeft:"auto",flexShrink:0,padding:"7px 12px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",
+                  border:`1px solid ${hideAuthor?C.gold:C.border}`,background:hideAuthor?"rgba(212,160,23,0.15)":"transparent",color:hideAuthor?C.gold:C.textMid}}>{hideAuthor?"Author hidden":"Hide author"}</button>
+            </div>
             <div style={{display:"flex",gap:6,padding:"6px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
               <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
                 placeholder="Add a name of Jesus…"
@@ -8899,7 +8906,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:`calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom) + ${ctrlVis?(landscape?80:175):0}px) calc(20px + env(safe-area-inset-left))`,textAlign:"center",overflow:"auto",cursor:"pointer",transition:"padding .3s"}}>
             <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
               <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{pItem&&pItem.n}</div>
-              {(ctrlVis || vKey) && pItem && pItem.a && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
+              {(ctrlVis || vKey) && pItem && pItem.a && !hideAuthor && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
               {(vLoading || vBlock || vErr) && <div style={{fontSize:Math.max(15,Math.round(pFont*0.42)),color:C.gold,fontStyle:"italic",marginTop:16,maxWidth:760,whiteSpace:"pre-wrap",lineHeight:1.5,opacity:0.95}}>{vLoading ? "…" : (vBlock || vErr)}</div>}
             </div>
           </div>
@@ -10023,6 +10030,13 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const [pick,setPick]=React.useState(null);
   React.useEffect(()=>{ const f=()=>{ if(window.innerWidth>window.innerHeight*1.2) onSlideshow(); }; window.addEventListener("resize",f); window.addEventListener("orientationchange",f); return ()=>{window.removeEventListener("resize",f);window.removeEventListener("orientationchange",f);}; },[]); // eslint-disable-line
   const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
+  const [styleTick,setStyleTick]=React.useState(0); void styleTick;
+  React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
+  const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
+  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
+  const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
+  const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
   const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
   const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
     if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
@@ -10030,7 +10044,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     while(rem>0){const k=gi%g.length; const arr=g[k]; if(idx[k]<arr.length){out.push(arr[idx[k]]); idx[k]++; rem--;} gi++;}
     return out.length?out:[{n:"",a:""}]; })();
   const [si,setSi]=React.useState(0);
-  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),5000); return ()=>clearInterval(t); },[slides.length]); // eslint-disable-line
+  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),Math.max(2,rotateSec)*1000); return ()=>clearInterval(t); },[slides.length,rotateSec]); // eslint-disable-line
   const curSlide=slides[si%Math.max(1,slides.length)]||{n:"",a:""};
   const todayMins={morning:0,midday:0,evening:0};
   (entries[today]||[]).forEach(e=>{const s=getTimeSlot(e.ts); if(s in todayMins) todayMins[s]+=(e.minutes||0);});
@@ -10081,8 +10095,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
       <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
-        <span style={{fontSize:"clamp(22px,6.5vw,36px)",fontWeight:800,color:C.text,lineHeight:1.22,fontFamily:"Georgia, serif"}}>{curSlide.n}</span>
-        {curSlide.a && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+        <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
@@ -10603,6 +10617,14 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const noteHits = sq.length>=2 ? (()=>{ const out=[]; Object.keys(entries).forEach(iso=>(entries[iso]||[]).forEach(en=>{ const nt=en.notes||""; if(/#Note_/.test(nt) && nt.toLowerCase().includes(lowq)){ const tagm=nt.match(/#Note_(\S+)/); out.push({ts:en.ts, text:nt.replace(/\s*#Note_\S+/,"").trim(), tag:tagm?tagm[1]:""}); } })); return out.slice(0,8); })() : [];
   const hasResults = searchOpen && sq.length>=2 && (refHit||bookHits.length||noteHits.length);
   const goScene = (si) => { showInPane("book"); setSearchOpen(false); setTimeout(()=>{ const el=document.getElementById("rdsc-"+bookId+"-"+si); if(el&&el.scrollIntoView) el.scrollIntoView({block:"start"}); }, 60); };
+  React.useEffect(()=>{ let nm=""; try{ nm=localStorage.getItem("jtReaderTargetName")||""; }catch(e){}
+    if(!nm) return;
+    const bk=BOOKS.find(b=>b.id===bookId); if(!bk||!bk.scenes||!bk.scenes.length){ return; }
+    const key=nm.trim().toLowerCase();
+    const idx=bk.scenes.findIndex(sc=>{ const p=String(bk.paras[sc.s]||"").replace(/^[§\u00a7\s]+/,"").trim().toLowerCase(); return p===key || p.startsWith(key); });
+    try{ localStorage.removeItem("jtReaderTargetName"); }catch(e){}
+    if(idx>=0){ setTimeout(()=>goScene(idx), 140); }
+  }, [bookId]); // eslint-disable-line
   const loadRef = (r) => { setActive(r); showInPane("bible"); if(!esvChapCache[r.k]) loadEsvPassage(r.q, r.k, true); setSearchOpen(false); setSearchQ(""); };
   const BIBLE_CANON = Object.keys(BOOK_ABBR);
   const BOOK_ALIAS = {jn:"John",mt:"Matthew",mk:"Mark",lk:"Luke",jas:"James",php:"Philippians",phm:"Philemon",sos:"Song of Solomon"};
@@ -12951,7 +12973,7 @@ export default function App() {
 
       {/* Names-of-Jesus slideshow host (chip hidden off-screen; opened via the ✝️ tab) */}
       <div style={{position:"fixed",left:-9999,top:0,width:1,height:1,overflow:"hidden",zIndex:300000}}>
-        <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid)=>{ try{localStorage.setItem("jtReaderBook", bid);}catch(e){} saveMainTab("reader"); }}/>
+        <NameOfJesusChip count={titleStats.count} initials={userInitials} workerUrl={workerUrl||""} appToken={appToken||""} loadEsvPassage={loadEsvPassage} esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} onAddLook={(text)=>addEntry(1,{dur:"1m",notes:`#Look4Jesus ${text}`,time:nowTimeStr()},today)} onOpenReader={(bid,nm)=>{ try{localStorage.setItem("jtReaderBook", bid); if(nm) localStorage.setItem("jtReaderTargetName", String(nm)); else localStorage.removeItem("jtReaderTargetName");}catch(e){} saveMainTab("reader"); }}/>
       </div>
       {showAbideMenu && (
         <>
