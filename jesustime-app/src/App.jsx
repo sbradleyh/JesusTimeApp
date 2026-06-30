@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v130";
+const APP_VERSION = "v136";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8916,6 +8916,10 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           <div ref={darkRef} style={{position:"absolute",inset:0,background:"#000",opacity:0,pointerEvents:"none"}}/>
           {ctrlVis && (<div style={{position:"absolute",left:0,right:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",gap:landscape?5:8,flexWrap:landscape?"nowrap":"wrap",
             padding:"12px calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))",borderTop:`1px solid ${C.border}`,background:C.bg}}>
+            {[["Names",srcH,setSrcH,"jtSrcH","h"],["Teaching",srcP,setSrcP,"jtSrcP","p"],["In Christ",srcC,setSrcC,"jtSrcC","c"]].map(([l,on,setter,lk,key])=>(
+              <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
+                style={{flexShrink:0,padding:landscape?"0 9px":"7px 10px",height:landscape?38:undefined,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
+            ))}
             <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
             <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
             <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
@@ -10028,6 +10032,16 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const [sel,setSel]=React.useState(cur);
   const [pick,setPick]=React.useState(null);
   React.useEffect(()=>{ const f=()=>{ if(window.innerWidth>window.innerHeight*1.2) onSlideshow(); }; window.addEventListener("resize",f); window.addEventListener("orientationchange",f); return ()=>{window.removeEventListener("resize",f);window.removeEventListener("orientationchange",f);}; },[]); // eslint-disable-line
+  const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
+  const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
+  const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
+    if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
+    const out=[]; const idx=g.map(()=>0); let rem=g.reduce((s,x)=>s+x.length,0); let gi=0;
+    while(rem>0){const k=gi%g.length; const arr=g[k]; if(idx[k]<arr.length){out.push(arr[idx[k]]); idx[k]++; rem--;} gi++;}
+    return out.length?out:[{n:"",a:""}]; })();
+  const [si,setSi]=React.useState(0);
+  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),5000); return ()=>clearInterval(t); },[slides.length]); // eslint-disable-line
+  const curSlide=slides[si%Math.max(1,slides.length)]||{n:"",a:""};
   const todayMins={morning:0,midday:0,evening:0};
   (entries[today]||[]).forEach(e=>{const s=getTimeSlot(e.ts); if(s in todayMins) todayMins[s]+=(e.minutes||0);});
   const slotPct={}; Object.keys(todayMins).forEach(s=>slotPct[s]=Math.round(todayMins[s]/(SLOT_HRS[s]*60)*100));
@@ -10036,7 +10050,19 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   let nAll=1; if(keys.length){const srt=keys.slice().sort(); const span=Math.round((new Date(today)-new Date(srt[0]))/86400000)+1; nAll=Math.max(keys.length,span>0?span:1);}
   const slotAvg={}; Object.keys(allMins).forEach(s=>slotAvg[s]=Math.round(allMins[s]/(SLOT_HRS[s]*60*nAll)*100));
   const fmt=m=>m>0?(m>=60?`${Math.floor(m/60)}h${m%60?` ${m%60}m`:""}`:`${m}m`):"—";
-  const usedToday=new Set(); (entries[today]||[]).forEach(e=>{ (e.notes||"").split(/\s+/).forEach(w=>{ if(w[0]==="#") usedToday.add(w.slice(1).replace(/_/g," ")); }); });
+  const ciTag=s=>String(s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const normS=(raw)=>{ const t=raw.slice(1).replace(/Prayed_\d+/,"Prayed");
+    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory_/i.test(t))return "Bible_Memory";
+    if(/^Names_Review_\d+/i.test(t))return "Names_Review"; if(/^Prayer_Request_Answered/i.test(t))return "Prayer_Request_Answered";
+    if(/^Prayer_Request/i.test(t))return "Prayer_Request"; if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
+    if(/^Look4Jesus/i.test(t))return "Look4Jesus"; if(/_\d{8,}$/.test(t))return null;
+    return ciTag(t.split("-")[0].replace(/_/g," ")); };
+  const deletedT=(()=>{try{return JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){return [];}})();
+  const tagSet=new Set(["Bible_Read","Bible_Memory","Prayed","Names_Review"]);
+  Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)tagSet.add(t);})));
+  (tags||[]).forEach(t=>tagSet.add(t));
+  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>computeStreak(b,entries,today)-computeStreak(a,entries,today));
+  const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
   const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[sel]},today); setPick(null); };
   const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot;
     const fillS=vertical?{left:0,right:0,bottom:0,height:`${Math.min(100,pct)}%`}:{top:0,bottom:0,left:0,width:`${Math.min(100,pct)}%`};
@@ -10044,32 +10070,35 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?C.gold:has?col:C.border}`,boxShadow:seld?`0 0 0 2px ${C.gold}`:"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
-      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?3:8,padding:vertical?"6px 2px":"0 8px",textAlign:"center"}}>
-        <span style={{fontSize:vertical?20:18,lineHeight:1}}>{ic}</span>
-        <span style={{fontSize:11,fontWeight:800,color:C.textMid}}>{lb}</span>
+      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:4}}>
+          <span style={{fontSize:11,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:vertical?20:18,lineHeight:1}}>{ic}</span>
+        </div>
         <span style={{fontSize:14,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:10,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
         <span style={{fontSize:11,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
       </div>
     </div>);
   };
   const BAR_W=58,BAR_H=50,AMTS=[5,10,15,20,30,45,60];
-  return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6,gap:14}}>
-    <div style={{position:"relative",width:"100%",maxWidth:380,aspectRatio:"1 / 1"}}>
-      <div style={{position:"absolute",top:0,left:0,right:0,height:BAR_H}}><Bar slot="midday" vertical={false}/></div>
-      <div style={{position:"absolute",top:BAR_H+6,left:0,bottom:0,width:BAR_W}}><Bar slot="morning" vertical/></div>
-      <div style={{position:"absolute",top:BAR_H+6,right:0,bottom:0,width:BAR_W}}><Bar slot="evening" vertical/></div>
-      <div onClick={onSlideshow} style={{position:"absolute",top:BAR_H+6,left:BAR_W+6,right:BAR_W+6,bottom:0,cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:14,textAlign:"center"}}>
-        <span style={{fontSize:30}}>🌅</span>
-        <span style={{fontSize:15,fontWeight:800,color:C.textMid}}>Tap for slideshow</span>
-        <span style={{fontSize:11,color:C.textFaint}}>or turn to landscape</span>
+  return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8}}>
+    <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{display:"flex",gap:8,height:74}}>
+        <div style={{flex:1}}><Bar slot="morning" vertical/></div>
+        <div style={{flex:1}}><Bar slot="midday" vertical/></div>
+        <div style={{flex:1}}><Bar slot="evening" vertical/></div>
+      </div>
+      <div onClick={onSlideshow} style={{minHeight:180,cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:9,padding:16,textAlign:"center"}}>
+        <span style={{fontSize:21,fontWeight:800,color:C.text,lineHeight:1.25,fontFamily:"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && <span style={{fontSize:13,fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380}}>
       <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 8px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-        {(tags||[]).map(tag=>{ const done=usedToday.has(tag); const st=computeStreak(tag, entries, today); return (
+        {allStreaks.map(tag=>{ const done=usedToday.has(tag); return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 11px",borderRadius:11,cursor:"pointer",background:done?`rgba(${C.ink},0.16)`:"transparent",border:`1px solid ${done?C.borderHi:C.border}`,color:C.text,fontSize:13.5,fontWeight:700}}>
-            <span>{tag}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,color:C.textFaint}}>{st}</span>}<span style={{fontSize:14,fontWeight:800,color:done?"#4ade80":C.textFaint}}>{done?"✓":"+"}</span>
+            <span>{tag.replace(/_/g," ")}</span><span style={{fontSize:14,fontWeight:800,color:done?"#4ade80":C.textFaint}}>{done?"✓":"+"}</span>
           </button>
         );})}
       </div>
@@ -10077,7 +10106,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     {pick && (<>
       <div onClick={()=>setPick(null)} style={{position:"fixed",inset:0,zIndex:100079}}/>
       <div style={{position:"fixed",left:"50%",bottom:"calc(var(--jt-tab-h,70px) + 12px)",transform:"translateX(-50%)",zIndex:100080,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:12,width:"min(320px,92vw)",boxShadow:"0 8px 28px rgba(0,0,0,0.6)"}}>
-        <div style={{fontSize:13,fontWeight:800,color:C.gold,textAlign:"center",marginBottom:9}}>{pick} · {META[sel][1]}</div>
+        <div style={{fontSize:13,fontWeight:800,color:C.gold,textAlign:"center",marginBottom:9}}>{pick.replace(/_/g," ")} · {META[sel][1]}</div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7}}>
           {AMTS.map(m=>(<button key={m} onClick={()=>logTag(pick,m)} style={{padding:"11px 0",borderRadius:10,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer"}}>{m}m</button>))}
         </div>
@@ -11239,7 +11268,7 @@ export default function App() {
   const [viewDay,setViewDay]     = useState(todayKey());
   const [viewOffset,setViewOffset] = useState(0);
   const [streakSearch, setStreakSearch] = useState("");
-  const [activeMainTab, setActiveMainTab] = useState(() => localStorage.getItem("jtMainTab")||"today");
+  const [activeMainTab, setActiveMainTab] = useState("today");
   const [bibleView, setBibleViewState] = useState(() => localStorage.getItem("jtBibleView")||"read");
   const saveBibleView = v => { setBibleViewState(v); localStorage.setItem("jtBibleView", v); };
   const [showBibleMenu, setShowBibleMenu] = useState(false);
@@ -11700,7 +11729,7 @@ export default function App() {
   const today = todayKey();
   // Completion moment: all three slots lit today → one-time celebration
   const [celebrate, setCelebrate] = useState(false);
-  const [todayView, setTodayView] = useState(()=>localStorage.getItem("jtTodayView")||"today");
+  const [todayView, setTodayView] = useState("today");
   const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
   React.useEffect(() => {
     // On each app open, land on the Today chart, rotating between the day circle and the year heatmap.
@@ -12520,13 +12549,13 @@ export default function App() {
                       {celebrate && <CelebrationBurst/>}
                       {activeMainTab === "today" && (
                         <div style={{overflowX:"hidden",width:"100%",position:"relative"}}>
-                          <button onClick={()=>setShowGraphFilter(s=>!s)}
+                          {todayView!=="square" && <button onClick={()=>setShowGraphFilter(s=>!s)}
                             style={{position:"absolute",top:0,right:2,zIndex:5,padding:"4px 10px",borderRadius:8,
                               border:`1px solid ${selectedFilterTags.length?C.gold:C.borderHi}`,
                               background:selectedFilterTags.length?C.buttonActive:C.buttonFill,
                               color:selectedFilterTags.length?C.gold:C.textMid,fontSize:12,fontWeight:800,cursor:"pointer"}}>
                             + Filter{selectedFilterTags.length?` (${selectedFilterTags.length})`:""}
-                          </button>
+                          </button>}
                           {todayView==="year" && (
                             <select value={heatZoom} onChange={e=>setHeatZoomP(parseInt(e.target.value,10))}
                               style={{position:"absolute",top:0,right:78,zIndex:5,height:27,borderRadius:8,
@@ -12845,7 +12874,7 @@ export default function App() {
                   onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
                   onClick={()=>{
                   if(suppressTabClick.current) return;
-                  if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); saveMainTab("today"); setShowTodayMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } const next = (activeMainTab==="today" && todayView==="today") ? "year" : "today"; pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="names"){ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} return; }
