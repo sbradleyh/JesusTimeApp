@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v136";
+const APP_VERSION = "v138";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10061,8 +10061,10 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const tagSet=new Set(["Bible_Read","Bible_Memory","Prayed","Names_Review"]);
   Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)tagSet.add(t);})));
   (tags||[]).forEach(t=>tagSet.add(t));
-  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>computeStreak(b,entries,today)-computeStreak(a,entries,today));
   const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
+  const yest=(()=>{const d=new Date(today+"T00:00:00"); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10);})();
+  const sortVal=t=>usedToday.has(t)?computeStreak(t,entries,today):computeStreak(t,entries,yest);
+  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>sortVal(b)-sortVal(a));
   const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[sel]},today); setPick(null); };
   const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot;
     const fillS=vertical?{left:0,right:0,bottom:0,height:`${Math.min(100,pct)}%`}:{top:0,bottom:0,left:0,width:`${Math.min(100,pct)}%`};
@@ -10081,20 +10083,20 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     </div>);
   };
   const BAR_W=58,BAR_H=50,AMTS=[5,10,15,20,30,45,60];
-  return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8}}>
-    <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8}}>
-      <div style={{display:"flex",gap:8,height:74}}>
+  return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
+    <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8,flex:1,minHeight:0}}>
+      <div style={{display:"flex",gap:8,height:74,flexShrink:0}}>
         <div style={{flex:1}}><Bar slot="morning" vertical/></div>
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
-      <div onClick={onSlideshow} style={{minHeight:180,cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:9,padding:16,textAlign:"center"}}>
-        <span style={{fontSize:21,fontWeight:800,color:C.text,lineHeight:1.25,fontFamily:"Georgia, serif"}}>{curSlide.n}</span>
-        {curSlide.a && <span style={{fontSize:13,fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+      <div onClick={onSlideshow} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
+        <span style={{fontSize:"clamp(22px,6.5vw,36px)",fontWeight:800,color:C.text,lineHeight:1.22,fontFamily:"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
     </div>
-    <div style={{width:"100%",maxWidth:380}}>
-      <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 8px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
+    <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
+      <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 6px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 11px",borderRadius:11,cursor:"pointer",background:done?`rgba(${C.ink},0.16)`:"transparent",border:`1px solid ${done?C.borderHi:C.border}`,color:C.text,fontSize:13.5,fontWeight:700}}>
@@ -12874,9 +12876,9 @@ export default function App() {
                   onPointerCancel={()=>{ barDrag.current=null; setBarDragId(null); setBarDropIdx(null); }}
                   onClick={()=>{
                   if(suppressTabClick.current) return;
-                  if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } const next = (activeMainTab==="today" && todayView==="today") ? "year" : "today"; pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="today"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("today"); setChartTab("day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="streaks"){ if(!userInitials){ setShowSetupPopup(true); return; } saveMainTab("streaks"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
-                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } const onToday=activeMainTab==="today"; const next = onToday ? (todayView==="year"?"today":"year") : ((todayView==="today"||todayView==="year")?todayView:"year"); pickTodayView(next); setChartTab(next==="year"?"year":"day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
+                  if(id==="chart"){ if(!userInitials){ setShowSetupPopup(true); return; } pickTodayView("square"); setChartTab("day"); saveMainTab("today"); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); return; }
                   if(id==="names"){ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} return; }
                   if(id==="abide"){ setShowAbideMenu(m=>!m); setShowFriendsMenu(false); setShowBibleMenu(false); saveMainTab("prayer"); return; }
                   if(id==="friends"){ setShowFriendsMenu(m=>!m); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab("friends"); return; }
