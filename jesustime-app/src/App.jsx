@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v159";
+const APP_VERSION = "v162";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10104,7 +10104,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:8,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
-          <span style={{fontSize:15,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:17,fontWeight:800,color:C.textMid}}>{lb}</span>
           <span style={{fontSize:vertical?24:20,lineHeight:1}}>{ic}</span>
         </div>
         <span style={{fontSize:17,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:12,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
@@ -11788,16 +11788,13 @@ export default function App() {
   const today = todayKey();
   // Completion moment: all three slots lit today → one-time celebration
   const [celebrate, setCelebrate] = useState(false);
-  const [todayView, setTodayView] = useState("today");
+  const [todayView, setTodayView] = useState("square");
   const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
   React.useEffect(() => {
-    // On each app open, land on the Today chart, rotating between the day circle and the year heatmap.
-    let rot = "today";
-    try { rot = localStorage.getItem("jtOpenRot")==="year" ? "year" : "today"; } catch(e){}
-    setTodayView(rot); try{ localStorage.setItem("jtTodayView", rot); }catch(e){}
-    setChartTab(rot==="year" ? "year" : "day");
+    // On each app open, land on the Square Graph.
+    setTodayView("square"); try{ localStorage.setItem("jtTodayView","square"); }catch(e){}
+    setChartTab("day");
     setActiveMainTab("today"); try{ localStorage.setItem("jtMainTab","today"); }catch(e){}
-    try { localStorage.setItem("jtOpenRot", rot==="year" ? "today" : "year"); } catch(e){}
   }, []);
   // Shared top selector used on both the Today screen and the Streaks screen.
   const renderTodayNav = (activeKey) => {
