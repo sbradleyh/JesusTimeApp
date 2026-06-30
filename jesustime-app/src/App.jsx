@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v176";
+const APP_VERSION = "v177";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5352,8 +5352,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     // on-screen keyboard opens, so the panel shrinks above it. iOS ignores this.
     try {
       const mv = document.querySelector('meta[name="viewport"]');
-      if (mv && !/interactive-widget/.test(mv.getAttribute("content")||"")) {
-        mv.setAttribute("content", (mv.getAttribute("content")||"") + ", interactive-widget=resizes-content");
+      if (mv) {
+        let c = mv.getAttribute("content")||"";
+        if (!/interactive-widget/.test(c)) c += ", interactive-widget=resizes-content";
+        if (!/viewport-fit/.test(c)) c += ", viewport-fit=cover";
+        mv.setAttribute("content", c);
       }
     } catch(e){}
     const compute = () => {
@@ -10197,7 +10200,7 @@ function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bot
     </div>
   );};
   return (
-    <div style={{position:"fixed",inset:0,zIndex:100090,background:C.bg,display:"flex",flexDirection:"column",paddingTop:"env(safe-area-inset-top)",paddingBottom:"env(safe-area-inset-bottom)"}}
+    <div style={{position:"fixed",inset:0,zIndex:100090,background:C.bg,display:"flex",flexDirection:"column",paddingTop:"env(safe-area-inset-top)",paddingBottom:"env(safe-area-inset-bottom)",paddingLeft:"env(safe-area-inset-left)",paddingRight:"env(safe-area-inset-right)"}}
       onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
       <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
         <span style={{fontSize:18,fontWeight:800,color:C.gold,flex:1}}>Edit Tab Icons</span>
@@ -12188,7 +12191,7 @@ export default function App() {
 
   return (
     <div className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
-      overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,padding:0}}>
+      overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,paddingTop:0,paddingBottom:0,paddingLeft:"env(safe-area-inset-left)",paddingRight:"env(safe-area-inset-right)"}}>
       {/* Title/stats row */}
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
         style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",padding:"4px 0px",paddingTop:"calc(env(safe-area-inset-top) - 22px)",marginTop:"0px",gap:0,borderBottom:`1px solid ${C.border}`,background:C.bg,position:"relative",zIndex:30}}>
