@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v142";
+const APP_VERSION = "v144";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8827,8 +8827,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
         </div>
         {menuOpen && (<>
           <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000,touchAction:"none",overscrollBehavior:"none"}}/>
-          <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",zIndex:200001,
-            background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderBottom:`1px solid ${C.borderHi}`,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
+          <div style={{position:"fixed",top:"auto",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",maxHeight:"44vh",zIndex:200001,
+            background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderTopLeftRadius:16,borderTopRightRadius:16,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
             <div style={{padding:"8px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"flex-end"}}>
                 <button onClick={another} title="Another name"
@@ -8836,17 +8836,17 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             </div>
             <div style={{display:"flex",borderBottom:`1px solid ${C.border}`}}>
               <button onClick={()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames"); }}
-                style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
+                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>📖 Reader</button>
               <button onClick={()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }}
-                style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",
+                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🌅 Slideshow</button>
               <button onClick={()=>{ setMenuOpen(false); setEditCat(true); }}
-                style={{flex:1,padding:"11px 10px",background:"transparent",border:"none",borderLeft:`1px solid ${C.border}`,
+                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderLeft:`1px solid ${C.border}`,
                   color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>✏️ Teaching</button>
             </div>
-            <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`}}>
-              <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:6}}>Show</div>
+            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`}}>
+              <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:4}}>Show</div>
               <div style={{display:"flex",gap:6}}>
                 {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","My Teaching",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
                   <button key={key} onClick={()=>{
@@ -8854,14 +8854,14 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                     if (on && !othersOn) return; // keep at least one source on
                     const v=!on; setter(v); setNIdx(0); setCIdx(0); try{ localStorage.setItem(lk, v?"1":"0"); }catch(e){}
                   }}
-                    style={{flex:1,minWidth:0,padding:"7px 4px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",textAlign:"center",lineHeight:1.15,
+                    style={{flex:1,minWidth:0,padding:"6px 4px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",textAlign:"center",lineHeight:1.15,
                       border:`1px solid ${on?C.gold:C.border}`,
                       background:on?"rgba(212,160,23,0.15)":"transparent",
                       color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
                 ))}
               </div>
             </div>
-            <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
               <span style={{fontSize:12,fontWeight:700,color:C.textFaint}}>Title</span>
               <button onClick={()=>bumpTitle(-0.1)} title="Smaller"
                 style={{width:36,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer"}}>A−</button>
@@ -8876,13 +8876,13 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer"}}/>
               </div>
             </div>
-            <div style={{padding:"8px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
+            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Font</span>
               <PDrop C={C} value={titleFont} onChange={setTitleF}
                 wrapStyle={{flex:1,minWidth:0}} btnStyle={{height:38,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
                 options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
             </div>
-            <div style={{display:"flex",gap:6,padding:"8px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
+            <div style={{display:"flex",gap:6,padding:"6px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
               <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
                 placeholder="Add a name of Jesus…"
                 onKeyDown={e=>{ if(e.key==="Enter") addPersonal(); }}
