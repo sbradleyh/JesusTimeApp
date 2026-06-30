@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v138";
+const APP_VERSION = "v139";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10099,8 +10099,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 6px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); return (
-          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 11px",borderRadius:11,cursor:"pointer",background:done?`rgba(${C.ink},0.16)`:"transparent",border:`1px solid ${done?C.borderHi:C.border}`,color:C.text,fontSize:13.5,fontWeight:700}}>
-            <span>{tag.replace(/_/g," ")}</span><span style={{fontSize:14,fontWeight:800,color:done?"#4ade80":C.textFaint}}>{done?"✓":"+"}</span>
+          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 11px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":"transparent",border:`1px solid ${done?"rgba(74,222,128,0.45)":C.border}`,color:done?C.textFaint:C.text,fontSize:13.5,fontWeight:700}}>
+            <span>{tag.replace(/_/g," ")}</span>{!done && <span style={{fontSize:14,fontWeight:800,color:C.textFaint}}>+</span>}
           </button>
         );})}
       </div>
