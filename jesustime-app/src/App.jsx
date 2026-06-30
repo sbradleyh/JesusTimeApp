@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v140";
+const APP_VERSION = "v141";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10090,7 +10090,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
-      <div onClick={onSlideshow} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
         <span style={{fontSize:"clamp(22px,6.5vw,36px)",fontWeight:800,color:C.text,lineHeight:1.22,fontFamily:"Georgia, serif"}}>{curSlide.n}</span>
         {curSlide.a && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
