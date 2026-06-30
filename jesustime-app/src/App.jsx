@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v156";
+const APP_VERSION = "v159";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3146,6 +3146,10 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
             style={{position:"sticky",top:0,zIndex:6,display:"flex",alignItems:"center",justifyContent:"center",gap:6,
               padding:"7px 12px",borderBottom:`1px solid ${C.border}`,background:C.bg,
               cursor:syncCode?"pointer":"default"}}>
+            <button onClick={e=>{e.stopPropagation();setMenuOpen(false);}} aria-label="Close"
+              style={{position:"absolute",right:6,top:"50%",transform:"translateY(-50%)",width:30,height:30,borderRadius:8,
+                border:`1px solid ${C.borderHi}`,background:"transparent",color:C.gold,fontSize:18,fontWeight:800,
+                lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:8}}>✕</button>
             <span style={{fontSize:14}}>{syncStatus==="syncing"?"↻":syncStatus==="error"?"⚠":"☁"}</span>
             <span style={{fontSize:12,fontWeight:700,color:syncStatus==="error"?"#c06060":(syncStatus==="synced"?"#60a060":C.textFaint)}}>
               {!syncCode ? "Not syncing"
@@ -3489,6 +3493,13 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                             style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
                           <span style={{fontSize:22}}>☰</span>
                           <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Menu</span>
+                        </div>
+                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
+                          <input type="checkbox" checked={bottomTabVisible["BAR"]!==false}
+                            onChange={e=>{const next={...bottomTabVisible,BAR:e.target.checked};saveBottomTabVisible(next);}}
+                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
+                          <span style={{fontSize:22}}>⬇️</span>
+                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Tab bar (whole row)</span>
                         </div>
                       </div>
                       {mainTabs.includes("streaks") && bubble("streaks")}
@@ -12126,8 +12137,8 @@ export default function App() {
           <span style={{fontSize:"clamp(24px,7.5vw,40px)",fontWeight:800,color:"#d4a017"}}>Jesus</span>
         </div>
         {/* Stats — flex:1, shifts right as date expands */}
-        <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1}}>
-          <div style={{display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
+        <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
+          <div style={{flex:1,display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
                 style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
@@ -12167,10 +12178,9 @@ export default function App() {
               {titleStats.pctVal}%<span style={{fontSize:12,fontWeight:600,color:C.textFaint}}>of awake</span>
             </span>
           </div>
-        </div>
-        {/* Right: hamburger */}
-        <div style={{marginLeft:"auto",flexShrink:0}}>
+          <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
           <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          </div>
         </div>
       </div>
 
@@ -12851,6 +12861,9 @@ export default function App() {
       </>)}
 
       {/* Bottom tab bar */}
+      {bottomTabVisible["BAR"]===false ? (
+      <div ref={el=>{ if(el && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h","0px"); }} />
+      ) : (
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h", h+"px"); } }} style={{flexShrink:0,background:C.card,borderTop:`1px solid ${C.border}`,
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
         <div ref={barRef} style={{display:"flex",width:"100%"}}>
@@ -12876,7 +12889,7 @@ export default function App() {
           const barOrdKey = (a) => { const i = bottomBarOrder.indexOf(a); if (i>=0) return i; if (a==="MENU") return -1; const f = forcedBar.indexOf(a); return 1000 + (f<0?99:f); };
           const _barCore = bottomTabOrder
             .filter(id => !["LOCK","ABIDE","TODAY","BIBLE","friends"].includes(id))
-            .filter(id => id==="today" || id==="abide" || id==="bible" || bottomTabVisible[id]!==false)
+            .filter(id => id==="today" || bottomTabVisible[id]!==false)
             .filter(id => !lockedTabIds.includes(id) || lockVerified)
             .filter(id => !groupedIds.includes(id))   // grouped tabs live in their container popup
             .filter(id => id!=="today");   // Day reached via the Today popup, not its own tab
@@ -12960,6 +12973,7 @@ export default function App() {
         })()}
         </div>
       </div>
+      )}
 
 
       {/* Abide tab popup menu — the tabs grouped under Abide */}
