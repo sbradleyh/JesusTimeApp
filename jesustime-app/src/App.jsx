@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v152";
+const APP_VERSION = "v153";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10019,7 +10019,7 @@ function NamesChip({tabStarMap,entries,today}) {
   return <TabChip tag="Names_Review" starKey="names" short="👤" label="Names Review" filter="sepia(1) saturate(3) hue-rotate(80deg)" tabStarMap={tabStarMap} entries={entries} today={today}/>;
 }
 
-function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{} }) {
+function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
   const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
@@ -10028,6 +10028,9 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const cur=(()=>{const h=new Date().getHours();return h<11?"morning":h<16?"midday":"evening";})();
   const [sel,setSel]=React.useState(cur);
   const [pick,setPick]=React.useState(null);
+  const [adding,setAdding]=React.useState(false);
+  const [newStreak,setNewStreak]=React.useState("");
+  const tagHasPage=t=>/^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching)/i.test(String(t).replace(/ /g,"_"));
   React.useEffect(()=>{ const f=()=>{ if(window.innerWidth>window.innerHeight*1.2) onSlideshow(); }; window.addEventListener("resize",f); window.addEventListener("orientationchange",f); return ()=>{window.removeEventListener("resize",f);window.removeEventListener("orientationchange",f);}; },[]); // eslint-disable-line
   const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
   const [styleTick,setStyleTick]=React.useState(0); void styleTick;
@@ -10083,7 +10086,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:8,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
-          <span style={{fontSize:11,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:13,fontWeight:800,color:C.textMid}}>{lb}</span>
           <span style={{fontSize:vertical?20:18,lineHeight:1}}>{ic}</span>
         </div>
         <span style={{fontSize:14,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:10,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
@@ -10105,7 +10108,20 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
-      <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 6px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
+      <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 2px 6px"}}>
+        <span style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></span>
+        <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{marginLeft:"auto",width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
+      </div>
+      {adding && (
+        <div style={{display:"flex",gap:6,margin:"0 2px 8px"}}>
+          <input value={newStreak} onChange={e=>setNewStreak(e.target.value)} maxLength={40} autoFocus
+            onKeyDown={e=>{ if(e.key==="Enter" && newStreak.trim()){ setPick(newStreak.trim()); setAdding(false); setNewStreak(""); } }}
+            placeholder="New streak name…"
+            style={{flex:1,minWidth:0,padding:"7px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:C.inputBg||C.bg,color:C.text,fontSize:13,outline:"none"}}/>
+          <button onClick={()=>{ if(newStreak.trim()){ setPick(newStreak.trim()); setAdding(false); setNewStreak(""); } }}
+            style={{flexShrink:0,padding:"7px 12px",borderRadius:8,border:"none",background:C.gold,color:C.onAccent,fontSize:13,fontWeight:800,cursor:"pointer"}}>Add</button>
+        </div>
+      )}
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":"transparent",border:`1px solid ${done?"rgba(74,222,128,0.45)":C.border}`,color:done?"#fff":C.textFaint,fontSize:13.5,fontWeight:700}}>
@@ -10116,11 +10132,17 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     </div>
     {pick && (<>
       <div onClick={()=>setPick(null)} style={{position:"fixed",inset:0,zIndex:100079}}/>
-      <div style={{position:"fixed",left:"50%",bottom:"calc(var(--jt-tab-h,70px) + 12px)",transform:"translateX(-50%)",zIndex:100080,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:12,width:"min(320px,92vw)",boxShadow:"0 8px 28px rgba(0,0,0,0.6)"}}>
-        <div style={{fontSize:13,fontWeight:800,color:C.gold,textAlign:"center",marginBottom:9}}>{pick.replace(/_/g," ")} · {META[sel][1]}</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7}}>
-          {AMTS.map(m=>(<button key={m} onClick={()=>logTag(pick,m)} style={{padding:"11px 0",borderRadius:10,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer"}}>{m}m</button>))}
+      <div style={{position:"fixed",left:"50%",bottom:"calc(var(--jt-tab-h,70px) + 12px)",transform:"translateX(-50%)",zIndex:100080,background:C.bg,border:`1px solid ${C.gold}`,borderRadius:14,padding:12,width:"min(340px,92vw)",boxShadow:"0 8px 28px rgba(0,0,0,0.6)",display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{fontSize:13,fontWeight:800,color:C.gold,textAlign:"center"}}>{pick.replace(/_/g," ")} · {META[sel][1]}</div>
+        {tagHasPage(pick) && <button onClick={()=>{ onOpenTag(pick); setPick(null); }}
+          style={{padding:"11px 4px",borderRadius:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.18)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>Open →</button>}
+        <div style={{display:"flex",gap:6}}>
+          {[["1m",1],["5m",5],["15m",15],["30m",30],["1h",60]].map(([lbl,m])=>(
+            <button key={lbl} onClick={()=>logTag(pick,m)} style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>{lbl}</button>
+          ))}
         </div>
+        <button onClick={()=>{ onDeleteToday(pick); setPick(null); }}
+          style={{padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>🗑 Delete today's time</button>
       </div>
     </>)}
   </div>);
@@ -12616,7 +12638,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
-                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} />}
+                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} />}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
                               {selectedFilterTags.length > 0 && (
