@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v151";
+const APP_VERSION = "v152";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10070,12 +10070,17 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const sortVal=t=>usedToday.has(t)?computeStreak(t,entries,today):computeStreak(t,entries,yest);
   const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>sortVal(b)-sortVal(a));
   const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[sel]},today); setPick(null); };
-  const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot;
+  const nowFracOf=(slot)=>{ const d=new Date(); const h=d.getHours()+d.getMinutes()/60; if(slot==="morning") return Math.min(1,Math.max(0,h/11)); if(slot==="midday") return Math.min(1,Math.max(0,(h-11)/5)); return Math.min(1,Math.max(0,(h-16)/8)); };
+  const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot; const isNow=slot===cur; const nowF=nowFracOf(slot);
     const fillS=vertical?{left:0,right:0,bottom:0,height:`${Math.min(100,pct)}%`}:{top:0,bottom:0,left:0,width:`${Math.min(100,pct)}%`};
-    const avgS=vertical?{left:0,right:0,bottom:`${Math.min(100,avg)}%`,borderTop:`2px dashed rgba(${C.ink},0.4)`}:{top:0,bottom:0,left:`${Math.min(100,avg)}%`,borderLeft:`2px dashed rgba(${C.ink},0.4)`};
+    const avgS=vertical?{left:0,right:0,bottom:`${Math.min(100,avg)}%`,borderTop:`2px dashed rgba(${C.ink},0.55)`}:{top:0,bottom:0,left:`${Math.min(100,avg)}%`,borderLeft:`2px dashed rgba(${C.ink},0.55)`};
+    const nowS=vertical?{left:0,right:0,bottom:`${Math.min(100,nowF*100)}%`,borderTop:`2px solid rgba(255,255,255,0.85)`}:{top:0,bottom:0,left:`${Math.min(100,nowF*100)}%`,borderLeft:`2px solid rgba(255,255,255,0.85)`};
     return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?C.gold:has?col:C.border}`,boxShadow:seld?`0 0 0 2px ${C.gold}`:"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
+      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:9,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}%</div>
+      {isNow && <div style={{position:"absolute",zIndex:1,...nowS}}/>}
+      {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:8,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
           <span style={{fontSize:11,fontWeight:800,color:C.textMid}}>{lb}</span>
@@ -10103,8 +10108,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       <div style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em",margin:"0 2px 6px"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); return (
-          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 11px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":"transparent",border:`1px solid ${done?"rgba(74,222,128,0.45)":C.border}`,color:done?"#fff":C.textFaint,fontSize:13.5,fontWeight:700}}>
-            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.8}}>{st}</span>}
+          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":"transparent",border:`1px solid ${done?"rgba(74,222,128,0.45)":C.border}`,color:done?"#fff":C.textFaint,fontSize:13.5,fontWeight:700}}>
+            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.8}}>{st}d</span>}
           </button>
         );})}
       </div>
