@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v171";
+const APP_VERSION = "v176";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3476,11 +3476,11 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                   <div key="cols" style={{display:"flex",flexDirection:"column",gap:10}}>
                     <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                       <label style={{..._uBtn,cursor:"pointer"}}>
-                        <span style={{fontSize:18}}>☁⬆</span><span>Import</span>
+                        <span style={{fontSize:18}}>⬆️</span><span>Restore</span>
                         <input type="file" accept=".json" onChange={e=>{handleImport(e);setMenuOpen(false);}} style={{display:"none"}}/>
                       </label>
                       <button onClick={()=>{setMenuOpen(false);handleExport();}} style={_uBtn}>
-                        <span style={{fontSize:18}}>☁⬇</span><span>Export</span>
+                        <span style={{fontSize:18}}>⬇️</span><span>Backup</span>
                       </button>
                       <button onClick={()=>{ setMenuOpen(false); onEditLayout && onEditLayout(); }} style={{..._uBtn,color:C.gold,borderColor:C.gold}}>
                         <span style={{fontSize:18}}>✏️</span><span>Edit Tabs</span>
@@ -10165,6 +10165,10 @@ function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bot
   const [drag,setDrag]=React.useState(null);
   const [overZone,setOverZone]=React.useState(null);
   const dragRef=React.useRef(null);
+  const [labels,setLabels]=React.useState(()=>{try{return JSON.parse(localStorage.getItem("jtTabLabels")||"{}")||{};}catch(e){return {};}});
+  const saveLabel=(id,name)=>{ const nx={...labels}; if(name&&name.trim())nx[id]=name.trim(); else delete nx[id]; setLabels(nx); try{localStorage.setItem("jtTabLabels",JSON.stringify(nx));}catch(e){} };
+  const [editId,setEditId]=React.useState(null);
+  const [editVal,setEditVal]=React.useState("");
   const placed=new Set(); layout.forEach(s=>{ if(s.main)placed.add(s.main); (s.sub||[]).forEach(x=>placed.add(x)); });
   const pool=CANDIDATES.filter(id=>!placed.has(id));
   const clone=(l)=>l.map(s=>({main:s.main,sub:[...(s.sub||[])]}));
@@ -10173,10 +10177,12 @@ function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bot
   const onDown=(id,e)=>{ e.preventDefault(); e.stopPropagation(); dragRef.current=id; setDrag(id); try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} };
   const onMove=(e)=>{ if(!dragRef.current)return; const el=document.elementFromPoint(e.clientX,e.clientY); const z=el&&el.closest&&el.closest("[data-zone]"); setOverZone(z?z.getAttribute("data-zone"):null); };
   const onUp=(e)=>{ const id=dragRef.current; dragRef.current=null; if(!id){setDrag(null);setOverZone(null);return;} const el=document.elementFromPoint(e.clientX,e.clientY); const z=el&&el.closest&&el.closest("[data-zone]"); const zone=z?z.getAttribute("data-zone"):null; if(zone) place(id,zone); setDrag(null); setOverZone(null); };
-  const chip=(id)=>{ const m=TAB_META[id]||["•",id]; return (
+  const chip=(id)=>{ const m=TAB_META[id]||["•",id]; const lbl=labels[id]||m[1]; return (
     <div key={id} data-tabid={id} onPointerDown={(e)=>onDown(id,e)}
-      style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"5px 7px",borderRadius:10,border:`1px solid ${drag===id?C.gold:C.border}`,background:drag===id?C.buttonActive:C.card,color:C.text,minWidth:54,cursor:"grab",touchAction:"none",userSelect:"none",opacity:drag===id?0.55:1}}>
-      <span style={{fontSize:22}}>{m[0]}</span><span style={{fontSize:10,fontWeight:700}}>{m[1]}</span>
+      style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"5px 7px",borderRadius:10,border:`1px solid ${drag===id?C.gold:C.border}`,background:drag===id?C.buttonActive:C.card,color:C.text,minWidth:54,cursor:"grab",touchAction:"none",userSelect:"none",opacity:drag===id?0.55:1}}>
+      <span style={{fontSize:22}}>{m[0]}</span><span style={{fontSize:10,fontWeight:700,maxWidth:72,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{lbl}</span>
+      <span onPointerDown={(e)=>e.stopPropagation()} onClick={(e)=>{ e.stopPropagation(); setEditId(id); setEditVal(labels[id]||m[1]); }}
+        style={{position:"absolute",top:-7,right:-7,fontSize:10,lineHeight:1,background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:"2px 4px",cursor:"pointer"}}>✏️</span>
     </div>
   );};
   const mainSlot=(i)=>{ const z="main:"+i; const id=layout[i].main; const hot=overZone===z; return (
@@ -10191,7 +10197,7 @@ function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bot
     </div>
   );};
   return (
-    <div style={{position:"fixed",inset:0,zIndex:100090,background:C.bg,display:"flex",flexDirection:"column"}}
+    <div style={{position:"fixed",inset:0,zIndex:100090,background:C.bg,display:"flex",flexDirection:"column",paddingTop:"env(safe-area-inset-top)",paddingBottom:"env(safe-area-inset-bottom)"}}
       onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
       <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
         <span style={{fontSize:18,fontWeight:800,color:C.gold,flex:1}}>Edit Tab Icons</span>
@@ -10214,6 +10220,19 @@ function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bot
           <span style={{fontSize:20}}>⬇️</span><span style={{fontSize:15,color:C.text,fontWeight:700}}>Hide bottom tab bar</span>
         </label>
       </div>
+      {editId && (
+        <div onClick={()=>setEditId(null)} style={{position:"fixed",inset:0,zIndex:100096,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:C.bg,border:`1px solid ${C.gold}`,borderRadius:12,padding:14,width:"min(330px,92vw)",display:"flex",flexDirection:"column",gap:10}}>
+            <div style={{fontSize:14,fontWeight:800,color:C.gold}}>Rename {(TAB_META[editId]||["",editId])[1]}</div>
+            <input value={editVal} onChange={e=>setEditVal(e.target.value)} maxLength={18} autoFocus
+              style={{padding:"10px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:C.inputBg||C.card,color:C.text,fontSize:15,outline:"none"}}/>
+            <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+              <button onClick={()=>{ saveLabel(editId,""); setEditId(null); }} style={{padding:"7px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:13,fontWeight:700,cursor:"pointer"}}>Default</button>
+              <button onClick={()=>{ saveLabel(editId,editVal); setEditId(null); }} style={{padding:"7px 14px",borderRadius:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.18)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -12180,7 +12199,7 @@ export default function App() {
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
         </div>
         {/* Times with Jesus header (tap to open the names menu) */}
-        <div onClick={()=>{ try{ window.dispatchEvent(new Event("jtOpenNamesMenu")); }catch(e){} }}
+        <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("square"); setChartTab("day"); saveMainTab("today"); }}
           style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
             border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
             alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
