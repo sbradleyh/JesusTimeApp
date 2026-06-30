@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v162";
+const APP_VERSION = "v171";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -2940,7 +2940,7 @@ function LegendPopup({onClose}) {
 }
 
 
-function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setViewDay, viewOffset, setViewOffset, today, handleExport, handleImport, visible={}, setVisible=()=>{}, widgetOrder=[], setWidgetOrder=()=>{}, userInitials="", saveInitials=()=>{}, groups=[], addGroup=()=>{}, removeGroup=()=>{}, updateGroup=()=>{}, regenGroupCode=()=>{}, appToken="", saveAppToken=()=>{}, workerUrl="", saveWorkerUrl=()=>{}, esvToken="", saveEsvToken=()=>{}, syncCode="", saveSyncCode=()=>{}, generateSyncCode=()=>{}, syncStatus="idle", lastSync=null, pullSync=()=>{}, themeName="dark", saveTheme=()=>{}, bottomTabOrder=[], saveBottomTabOrder=()=>{}, bottomTabVisible={}, saveBottomTabVisible=()=>{}, bibleViewHidden={}, saveBibleViewHidden=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, tabStarMap={}, lockVerified=false, setLockVerified=()=>{}, onSelectTab=()=>{}, open=undefined, setOpen=null, hideTrigger=false, onQuickAdd=null}) {
+function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setViewDay, viewOffset, setViewOffset, today, handleExport, handleImport, visible={}, setVisible=()=>{}, widgetOrder=[], setWidgetOrder=()=>{}, userInitials="", saveInitials=()=>{}, groups=[], addGroup=()=>{}, removeGroup=()=>{}, updateGroup=()=>{}, regenGroupCode=()=>{}, appToken="", saveAppToken=()=>{}, workerUrl="", saveWorkerUrl=()=>{}, esvToken="", saveEsvToken=()=>{}, syncCode="", saveSyncCode=()=>{}, generateSyncCode=()=>{}, syncStatus="idle", lastSync=null, pullSync=()=>{}, themeName="dark", saveTheme=()=>{}, bottomTabOrder=[], saveBottomTabOrder=()=>{}, bottomTabVisible={}, saveBottomTabVisible=()=>{}, bibleViewHidden={}, saveBibleViewHidden=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, tabStarMap={}, lockVerified=false, setLockVerified=()=>{}, onSelectTab=()=>{}, onEditLayout=null, open=undefined, setOpen=null, hideTrigger=false, onQuickAdd=null}) {
   const [menuOpenInternal, setMenuOpenInternal] = React.useState(false);
   const menuOpen = open!==undefined ? open : menuOpenInternal;
   const setMenuOpen = setOpen || setMenuOpenInternal;
@@ -2951,6 +2951,9 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
   const [dragIdx, setDragIdx] = React.useState(null);
   const [overIdx, setOverIdx] = React.useState(null);
   const [resetArmed, setResetArmed] = React.useState(false);
+  const [menuTabOrder, setMenuTabOrder] = React.useState(()=>{try{return JSON.parse(localStorage.getItem("jtMenuTabOrder")||"null");}catch(e){return null;}});
+  const saveMenuTabOrder = (arr)=>{ setMenuTabOrder(arr); try{localStorage.setItem("jtMenuTabOrder",JSON.stringify(arr));}catch(e){} };
+  const [dragTab, setDragTab] = React.useState(null);
   const [showContact, setShowContact] = React.useState(false);
   const [contactMsg, setContactMsg] = React.useState("");
   const sendContact = () => {
@@ -3453,61 +3456,47 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                     </div>
                   );
                 };
+                const alphaTabs = [...new Set(bottomTabOrder.filter(id=>!TAB_SENTINELS.includes(id) && TAB_META[id]))]
+                  .sort((a,b)=>((TAB_META[a]||["",a])[1]).localeCompare((TAB_META[b]||["",b])[1]));
                 const out = [];
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
+                const _graphs = [["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
+                const _navItems = [
+                  ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
+                  ..._graphs.map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}))
+                ].sort((a,b)=>a.label.localeCompare(b.label));
+                const navRow = (it)=>(
+                  <div key={it.key} onClick={it.tap} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 6px",borderRadius:8,cursor:"pointer",minWidth:0}}>
+                    <span style={{fontSize:22,flexShrink:0}}>{it.icon}</span>
+                    <span style={{fontSize:16,color:C.text,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{it.label}</span>
+                  </div>
+                );
+                const _uBtn = {boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",flex:"1 1 30%"};
                 out.push(
-                  <div key="cols" style={{display:"flex",gap:8,alignItems:"stretch"}}>
-                    <div style={{flex:1,display:"flex",flexDirection:"column",gap:8}}>
-                      <label style={{...ctrlBtn,cursor:"pointer"}}>
-                        <span style={{fontSize:20}}>☁⬆</span><span>Import</span>
+                  <div key="cols" style={{display:"flex",flexDirection:"column",gap:10}}>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                      <label style={{..._uBtn,cursor:"pointer"}}>
+                        <span style={{fontSize:18}}>☁⬆</span><span>Import</span>
                         <input type="file" accept=".json" onChange={e=>{handleImport(e);setMenuOpen(false);}} style={{display:"none"}}/>
                       </label>
-                      <button onClick={()=>{setMenuOpen(false);handleExport();}} style={ctrlBtn}>
-                        <span style={{fontSize:20}}>☁⬇</span><span>Export</span>
+                      <button onClick={()=>{setMenuOpen(false);handleExport();}} style={_uBtn}>
+                        <span style={{fontSize:18}}>☁⬇</span><span>Export</span>
                       </button>
-                      <button onClick={()=>setShowContact(true)} style={ctrlBtn}>
-                        <span style={{fontSize:20}}>✉️</span><span>Contact</span>
+                      <button onClick={()=>{ setMenuOpen(false); onEditLayout && onEditLayout(); }} style={{..._uBtn,color:C.gold,borderColor:C.gold}}>
+                        <span style={{fontSize:18}}>✏️</span><span>Edit Tabs</span>
                       </button>
-                      <button onClick={()=>{setMenuOpen(false);setLegendOpen(true);}} style={{...ctrlBtn,color:C.gold}}>
-                        <span style={{fontSize:20}}>ℹ</span><span>Help</span>
+                      <button onClick={()=>setShowContact(true)} style={_uBtn}>
+                        <span style={{fontSize:18}}>✉️</span><span>Contact</span>
                       </button>
-                      <div key="chartgrp" style={{marginTop:"auto",border:`1px solid ${C.border}`,borderRadius:10,padding:"3px 7px",background:`rgba(${C.ink},0.04)`}}>
-                        {[["today","☀️","Day Circle"],["square","🔲","Square Graph"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]].map(([v,ic,lb])=>subviewRow("streaks",v,ic,lb))}
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4,marginTop:3,borderTop:`1px solid ${C.border}`}}>
-                          <input type="checkbox" checked={bottomTabVisible["chart"]===true}
-                            onChange={e=>{const next={...bottomTabVisible,chart:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>☀️</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Today</span>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
-                          <input type="checkbox" checked={bottomTabVisible["names"]!==false}
-                            onChange={e=>{const next={...bottomTabVisible,names:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>✝️</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Names Slideshow</span>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
-                          <input type="checkbox" checked={bottomTabVisible["MENU"]!==false}
-                            onChange={e=>{const next={...bottomTabVisible,MENU:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>☰</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Menu</span>
-                        </div>
-                        <div style={{display:"flex",alignItems:"center",gap:5,padding:"3px 0",marginLeft:-4}}>
-                          <input type="checkbox" checked={bottomTabVisible["BAR"]!==false}
-                            onChange={e=>{const next={...bottomTabVisible,BAR:e.target.checked};saveBottomTabVisible(next);}}
-                            style={{width:20,height:20,accentColor:C.check,cursor:"pointer",flexShrink:0}}/>
-                          <span style={{fontSize:22}}>⬇️</span>
-                          <span style={{fontSize:17,color:C.text,fontWeight:700,flex:1}}>Tab bar (whole row)</span>
-                        </div>
-                      </div>
-                      {mainTabs.includes("streaks") && bubble("streaks")}
+                      <button onClick={()=>{setMenuOpen(false);setLegendOpen(true);}} style={{..._uBtn,color:C.gold}}>
+                        <span style={{fontSize:18}}>ℹ</span><span>Help</span>
+                      </button>
                     </div>
-                    <div style={{flex:1,display:"flex",flexDirection:"column",gap:8}}>
-                      {mainTabs.includes("abide") && bubble("abide")}
-                      {mainTabs.includes("bible") && bubble("bible")}
-                      {mainTabs.includes("log") && bubble("log", {marginTop:"auto"})}
+                    <div>
+                      <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>APPS & GRAPHS · A–Z</div>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",columnGap:10}}>
+                        {_navItems.map(navRow)}
+                      </div>
                     </div>
                   </div>
                 );
@@ -10127,7 +10116,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 2px 6px"}}>
-        <span style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em"}}>ADD TO STREAK · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></span>
+        <span style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em"}}>ADD TO TIME OR ADD A NEW TIME · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></span>
         <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
       </div>
       {adding && (
@@ -10141,8 +10130,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         </div>
       )}
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
-        {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); return (
-          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":"transparent",border:`1px solid ${done?"rgba(74,222,128,0.45)":C.border}`,color:done?"#fff":C.textFaint,fontSize:13.5,fontWeight:700}}>
+        {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); const atRisk=!done && st>0; return (
+          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
             <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.8}}>{st}d</span>}
           </button>
         );})}
@@ -10164,6 +10153,69 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       </div>
     </>)}
   </div>);
+}
+
+function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bottomTabVisible={}, saveBottomTabVisible=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, onClose=()=>{} }) {
+  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
+  const GRAPHS = ["g:today","g:square","g:dayline","g:week","g:month","g:year"];
+  const EXCLUDE = new Set(["abide","today","names","chart"]);
+  const CANDIDATES = [...new Set([...(allTabIds&&allTabIds.length?allTabIds:["streaks","bible","prayer","catechism","reader","log"]), ...GRAPHS])].filter(id=>TAB_META[id] && !EXCLUDE.has(id));
+  const DEFAULT = [{main:"g:square",sub:[]},{main:"streaks",sub:[]},{main:"bible",sub:[]},{main:"prayer",sub:[]},{main:"log",sub:[]}];
+  const layout = (Array.isArray(barLayout)&&barLayout.length===5) ? barLayout : DEFAULT;
+  const [drag,setDrag]=React.useState(null);
+  const [overZone,setOverZone]=React.useState(null);
+  const dragRef=React.useRef(null);
+  const placed=new Set(); layout.forEach(s=>{ if(s.main)placed.add(s.main); (s.sub||[]).forEach(x=>placed.add(x)); });
+  const pool=CANDIDATES.filter(id=>!placed.has(id));
+  const clone=(l)=>l.map(s=>({main:s.main,sub:[...(s.sub||[])]}));
+  const removeAll=(l,id)=>{ l.forEach(s=>{ if(s.main===id)s.main=null; s.sub=(s.sub||[]).filter(x=>x!==id); }); };
+  const place=(id,zone)=>{ const l=clone(layout); removeAll(l,id); if(zone==="pool"){} else if(zone.indexOf("main:")===0){ const i=+zone.slice(5); l[i].main=id; } else if(zone.indexOf("sub:")===0){ const i=+zone.slice(4); l[i].sub.push(id); } saveBarLayout(l); };
+  const onDown=(id,e)=>{ e.preventDefault(); e.stopPropagation(); dragRef.current=id; setDrag(id); try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} };
+  const onMove=(e)=>{ if(!dragRef.current)return; const el=document.elementFromPoint(e.clientX,e.clientY); const z=el&&el.closest&&el.closest("[data-zone]"); setOverZone(z?z.getAttribute("data-zone"):null); };
+  const onUp=(e)=>{ const id=dragRef.current; dragRef.current=null; if(!id){setDrag(null);setOverZone(null);return;} const el=document.elementFromPoint(e.clientX,e.clientY); const z=el&&el.closest&&el.closest("[data-zone]"); const zone=z?z.getAttribute("data-zone"):null; if(zone) place(id,zone); setDrag(null); setOverZone(null); };
+  const chip=(id)=>{ const m=TAB_META[id]||["•",id]; return (
+    <div key={id} data-tabid={id} onPointerDown={(e)=>onDown(id,e)}
+      style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"5px 7px",borderRadius:10,border:`1px solid ${drag===id?C.gold:C.border}`,background:drag===id?C.buttonActive:C.card,color:C.text,minWidth:54,cursor:"grab",touchAction:"none",userSelect:"none",opacity:drag===id?0.55:1}}>
+      <span style={{fontSize:22}}>{m[0]}</span><span style={{fontSize:10,fontWeight:700}}>{m[1]}</span>
+    </div>
+  );};
+  const mainSlot=(i)=>{ const z="main:"+i; const id=layout[i].main; const hot=overZone===z; return (
+    <div key={z} data-zone={z} style={{flex:1,minWidth:0,display:"flex",alignItems:"center",justifyContent:"center",minHeight:62,borderRadius:10,border:`1px ${hot?"solid":"dashed"} ${hot?C.gold:C.border}`,background:hot?`rgba(${C.ink},0.08)`:"transparent"}}>
+      {id?chip(id):<span style={{fontSize:18,color:C.textFaint}}>+</span>}
+    </div>
+  );};
+  const subRow=(i)=>{ const z="sub:"+i; const hot=overZone===z; const m=layout[i].main?TAB_META[layout[i].main]:null; return (
+    <div key={z} data-zone={z} style={{border:`1px ${hot?"solid":"dashed"} ${hot?C.gold:C.border}`,borderRadius:10,padding:7,background:hot?`rgba(${C.ink},0.06)`:"transparent"}}>
+      <div style={{fontSize:10,fontWeight:800,color:C.textFaint,letterSpacing:"0.05em",marginBottom:5}}>POS {i+1} MENU {m?("\u00b7 "+m[1]):""}</div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:5,minHeight:34}}>{layout[i].sub.length?layout[i].sub.map(chip):<span style={{fontSize:11,color:C.textFaint,alignSelf:"center"}}>drop icons here</span>}</div>
+    </div>
+  );};
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:100090,background:C.bg,display:"flex",flexDirection:"column"}}
+      onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+      <div style={{display:"flex",alignItems:"center",gap:8,padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
+        <span style={{fontSize:18,fontWeight:800,color:C.gold,flex:1}}>Edit Tab Icons</span>
+        <button onClick={()=>saveBarLayout(DEFAULT)} style={{padding:"6px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:13,fontWeight:700,cursor:"pointer"}}>Reset</button>
+        <button onClick={onClose} style={{padding:"6px 16px",borderRadius:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.18)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>Done</button>
+      </div>
+      <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{fontSize:12,color:C.textFaint}}>Drag an icon into one of the 5 bottom-bar positions. Drop icons into a position's menu row to make them appear in that icon's pop-up.</div>
+        <div>
+          <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",marginBottom:6}}>BOTTOM BAR \u00b7 5 POSITIONS</div>
+          <div style={{display:"flex",gap:6}}>{[0,1,2,3,4].map(mainSlot)}</div>
+        </div>
+        {[0,1,2,3,4].map(subRow)}
+        <div data-zone="pool" style={{border:`1px ${overZone==="pool"?"solid":"dashed"} ${overZone==="pool"?C.gold:C.border}`,borderRadius:10,padding:8,background:overZone==="pool"?`rgba(${C.ink},0.06)`:"transparent"}}>
+          <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.05em",marginBottom:6}}>UNUSED \u00b7 HIDDEN</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:5,minHeight:34}}>{pool.length?pool.map(chip):<span style={{fontSize:11,color:C.textFaint}}>none</span>}</div>
+        </div>
+        <label style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",border:`1px solid ${C.border}`,borderRadius:10,cursor:"pointer"}}>
+          <input type="checkbox" checked={bottomTabVisible["BAR"]===false} onChange={e=>{ const nx={...bottomTabVisible,BAR:!e.target.checked}; saveBottomTabVisible(nx); }} style={{width:20,height:20,accentColor:C.check,cursor:"pointer"}}/>
+          <span style={{fontSize:20}}>⬇️</span><span style={{fontSize:15,color:C.text,fontWeight:700}}>Hide bottom tab bar</span>
+        </label>
+      </div>
+    </div>
+  );
 }
 
 function JesusTabs({entries, addEntry, deleteEntry, today, chartTab, viewDay, viewOffset, openCollapsible, selectedFilterTags, setSelectedFilterTags, setEntries, persist, starredTags, visibleTabs={}, widgetOrder=[], hideWhenAbove=false, userInitials="", sharedTags=[], toggleSharedTag=()=>{}, saveInitials=()=>{}, groups=[], defaultTab="", hideTabBar=false, tabChip=null, onChipTap=null}) {
@@ -11384,6 +11436,9 @@ export default function App() {
   // the settings list so it never disturbs grouping/visibility. localStorage = per device.
   const [bottomBarOrder, setBottomBarOrder] = useState(() => { try { return JSON.parse(localStorage.getItem("jtBarOrder")||"null") || []; } catch(e){ return []; } });
   const saveBottomBarOrder = (o) => { setBottomBarOrder(o); try{localStorage.setItem("jtBarOrder",JSON.stringify(o));}catch(e){} };
+  const [showTabEditor, setShowTabEditor] = useState(false);
+  const [barLayout, setBarLayout] = useState(()=>{ try{ return JSON.parse(localStorage.getItem("jtBarLayout")||"null"); }catch(e){ return null; } });
+  const saveBarLayout = (l)=>{ setBarLayout(l); try{ localStorage.setItem("jtBarLayout", JSON.stringify(l)); }catch(e){} };
   const barDrag = useRef(null);
   const barRef = useRef(null);
   const suppressTabClick = useRef(false);
@@ -12176,7 +12231,7 @@ export default function App() {
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
-          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
           </div>
         </div>
       </div>
@@ -12892,7 +12947,7 @@ export default function App() {
             .filter(id => id!=="today");   // Day reached via the Today popup, not its own tab
           if (bottomTabVisible["chart"]===true && !_barCore.includes("chart")) _barCore.push("chart");
           if (bottomTabVisible["names"]!==false && !_barCore.includes("names")) _barCore.push("names");
-          const barIds = (bottomTabVisible["MENU"]===false ? [] : ["MENU"]).concat(_barCore)
+          const barIds = _barCore.slice()
             .sort((a,b)=> barOrdKey(a)-barOrdKey(b));
           return barIds
             .map((id, tabIdx) => {
@@ -12972,6 +13027,8 @@ export default function App() {
       </div>
       )}
 
+
+      {showTabEditor && <TabLayoutEditor C={C} barLayout={barLayout} saveBarLayout={saveBarLayout} allTabIds={[...new Set(["chart",...bottomTabOrder.filter(id=>!TAB_SENTINELS.includes(id))])]} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} onClose={()=>setShowTabEditor(false)} />}
 
       {/* Abide tab popup menu — the tabs grouped under Abide */}
       {showTodayMenu && (
