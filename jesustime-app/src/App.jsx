@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v144";
+const APP_VERSION = "v148";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8861,26 +8861,21 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 ))}
               </div>
             </div>
-            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-              <span style={{fontSize:12,fontWeight:700,color:C.textFaint}}>Title</span>
+            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:6,flexWrap:"nowrap"}}>
               <button onClick={()=>bumpTitle(-0.1)} title="Smaller"
-                style={{width:36,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer"}}>A−</button>
-              <span style={{fontSize:11,fontWeight:700,color:C.textMid,minWidth:34,textAlign:"center"}}>{Math.round(titleScale*100)}%</span>
+                style={{width:30,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",flexShrink:0}}>A−</button>
+              <span style={{fontSize:11,fontWeight:700,color:C.textMid,minWidth:28,textAlign:"center",flexShrink:0}}>{Math.round(titleScale*100)}%</span>
               <button onClick={()=>bumpTitle(0.1)} title="Larger"
-                style={{width:36,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,fontWeight:800,cursor:"pointer"}}>A+</button>
-              <span style={{width:1,alignSelf:"stretch",background:C.border,margin:"0 2px"}}/>
-              <div style={{display:"flex",gap:6,flexWrap:"wrap",flex:1,minWidth:0,alignItems:"center",justifyContent:"flex-end"}}>
-                {recentColors.map(c=>(
-                  <button key={c} onClick={()=>pickColor(c)} style={{width:24,height:24,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0}}/>
-                ))}
-                <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer"}}/>
-              </div>
-            </div>
-            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Font</span>
+                style={{width:30,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,fontWeight:800,cursor:"pointer",flexShrink:0}}>A+</button>
               <PDrop C={C} value={titleFont} onChange={setTitleF}
-                wrapStyle={{flex:1,minWidth:0}} btnStyle={{height:38,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
+                wrapStyle={{flex:1,minWidth:48}} btnStyle={{height:34,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
                 options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
+              <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,overflowX:"auto",maxWidth:"50%"}}>
+                <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:26,height:24,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
+                {recentColors.map(c=>(
+                  <button key={c} onClick={()=>pickColor(c)} style={{width:20,height:20,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
+                ))}
+              </div>
             </div>
             <div style={{display:"flex",gap:6,padding:"6px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
               <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
@@ -8891,10 +8886,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <button onClick={addPersonal}
                 style={{flexShrink:0,padding:"8px 12px",borderRadius:8,border:"none",background:C.gold,color:C.onAccent,
                   fontSize:14,fontWeight:800,cursor:"pointer"}}>Add</button>
+              {!inChrist && <button onClick={removeCur} title="Remove from list"
+                style={{flexShrink:0,padding:"8px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:14,fontWeight:700,cursor:"pointer"}}>🗑 Remove</button>}
             </div>
-            {!inChrist && <button onClick={removeCur}
-              style={{display:"block",width:"100%",padding:"11px 14px",background:"transparent",border:"none",
-                color:"#f87171",fontSize:15,fontWeight:700,cursor:"pointer",textAlign:"left"}}>🗑 Remove from list</button>}
           </div>
         </>)}
       </div>
