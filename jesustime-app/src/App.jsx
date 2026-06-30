@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v141";
+const APP_VERSION = "v142";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8830,13 +8830,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           <div style={{position:"fixed",top:"calc(var(--jt-title-h, 120px) + 2px)",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",zIndex:200001,
             background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderBottom:`1px solid ${C.borderHi}`,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
-            <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`}}>
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <div style={{flex:1,fontSize:20,fontWeight:800,color:nameColor,fontFamily:titleFont||undefined,lineHeight:1.3}}>{cur.n}</div>
-                <button onClick={another} title="Another"
-                  style={{flexShrink:0,padding:"4px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,cursor:"pointer",lineHeight:1}}>🔄</button>
-              </div>
-              {cur.a && <div style={{fontSize:14,color:C.textFaint,fontStyle:"italic",marginTop:3,lineHeight:1.3}}>{cur.a}</div>}
+            <div style={{padding:"8px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"flex-end"}}>
+                <button onClick={another} title="Another name"
+                  style={{flexShrink:0,padding:"5px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",lineHeight:1}}>🔄 New name</button>
             </div>
             <div style={{display:"flex",borderBottom:`1px solid ${C.border}`}}>
               <button onClick={()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames"); }}
