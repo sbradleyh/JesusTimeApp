@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v184";
+const APP_VERSION = "v188";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3462,21 +3462,22 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
                 const _graphs = [["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
                 const _bibleExtra = [["bible:mem","🧠","Bible Memory"],["bible:drill","📚","Bible Books"]];
-                const _navItems = [
-                  ...alphaTabs.filter(id=>!["abide","today"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
-                  ..._bibleExtra.map(b=>({key:b[0], icon:b[1], label:b[2], tap:()=>{onSelectTab(b[0]);setMenuOpen(false);}})),
-                  ..._graphs.map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}))
+                const _appItems = [
+                  ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
+                  ..._bibleExtra.map(b=>({key:b[0], icon:b[1], label:b[2], tap:()=>{onSelectTab(b[0]);setMenuOpen(false);}}))
                 ].sort((a,b)=>a.label.localeCompare(b.label));
+                const _graphItems = _graphs.map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}));
                 const navRow = (it)=>(
                   <div key={it.key} onClick={it.tap} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 6px",borderRadius:8,cursor:"pointer",minWidth:0}}>
                     <span style={{fontSize:22,flexShrink:0}}>{it.icon}</span>
                     <span style={{fontSize:16,color:C.text,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{it.label}</span>
                   </div>
                 );
-                const _uBtn = {boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",flex:"1 1 30%"};
+                const _uBtn = {boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:14,fontWeight:700,cursor:"pointer",width:"100%"};
                 out.push(
                   <div key="cols" style={{display:"flex",flexDirection:"column",gap:10}}>
-                    <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                    <div style={{display:"flex",gap:6,alignItems:"flex-start"}}>
+                      <div style={{flex:1,display:"flex",flexDirection:"column",gap:6}}>
                       <label style={{..._uBtn,cursor:"pointer"}}>
                         <span style={{fontSize:18}}>⬆️</span><span>Restore</span>
                         <input type="file" accept=".json" onChange={e=>{handleImport(e);setMenuOpen(false);}} style={{display:"none"}}/>
@@ -3487,17 +3488,24 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                       <button onClick={()=>{ setMenuOpen(false); onEditLayout && onEditLayout(); }} style={{..._uBtn,color:C.gold,borderColor:C.gold}}>
                         <span style={{fontSize:18}}>✏️</span><span>Edit Tabs</span>
                       </button>
-                      <button onClick={()=>setShowContact(true)} style={_uBtn}>
-                        <span style={{fontSize:18}}>✉️</span><span>Contact</span>
-                      </button>
+                      </div>
+                      <div style={{flex:1,display:"flex",flexDirection:"column",gap:6}}>
                       <button onClick={()=>{setMenuOpen(false);setLegendOpen(true);}} style={{..._uBtn,color:C.gold}}>
                         <span style={{fontSize:18}}>ℹ</span><span>Help</span>
                       </button>
+                      <button onClick={()=>setShowContact(true)} style={_uBtn}>
+                        <span style={{fontSize:18}}>✉️</span><span>Contact</span>
+                      </button>
+                      </div>
                     </div>
-                    <div>
-                      <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>APPS & GRAPHS · A–Z</div>
-                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",columnGap:10}}>
-                        {_navItems.map(navRow)}
+                    <div style={{display:"flex",gap:10}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>APPS</div>
+                        {_appItems.map(navRow)}
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>GRAPHS</div>
+                        {_graphItems.map(navRow)}
                       </div>
                     </div>
                   </div>
@@ -8666,8 +8674,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     window.addEventListener("jtSlideshowName", show);
     return () => window.removeEventListener("jtSlideshowName", show);
   }, []);
+  const presentRef = React.useRef(false);
   React.useEffect(() => {
-    const start = () => { setForced(null); setPresentIdx(0); setPaused(false); setMenuOpen(false); setPresent(true); };
+    const start = () => { if(presentRef.current){ setPaused(false); return; } setForced(null); setPresentIdx(0); setPaused(false); setMenuOpen(false); setPresent(true); };
     window.addEventListener("jtStartSlideshow", start);
     return () => window.removeEventListener("jtStartSlideshow", start);
   }, []);
@@ -8719,6 +8728,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     return () => document.removeEventListener("visibilitychange", onVis);
   }, [nameItems.length, christItems.length]);
   const [present, setPresent] = React.useState(false);
+  React.useEffect(()=>{ presentRef.current = present; },[present]);
   const [presentIdx, setPresentIdx] = React.useState(0);
   const [forced, setForced] = React.useState(null);
   const [paused, setPaused] = React.useState(false);
@@ -8787,11 +8797,11 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   React.useEffect(() => {
     if (present && slideRef.current && slideRef.current.animate) {
       // New slide stays hidden through the black peak, then brightens in
-      try { slideRef.current.animate([{opacity:0,transform:"translateY(8px)",offset:0},{opacity:0,transform:"translateY(8px)",offset:0.5},{opacity:1,transform:"translateY(0)",offset:1}], {duration:transMs, easing:"ease"}); } catch(e){}
+      try { slideRef.current.animate([{opacity:0,transform:"translateY(8px)",offset:0},{opacity:0,transform:"translateY(8px)",offset:0.5},{opacity:1,transform:"translateY(0)",offset:1}], {duration:transMs, easing:"ease", fill:"both"}); } catch(e){}
     }
     if (present && darkRef.current && darkRef.current.animate) {
       // Fade to dark, then back to full brightness
-      try { darkRef.current.animate([{opacity:0},{opacity:1},{opacity:0}], {duration:transMs, easing:"ease-in-out"}); } catch(e){}
+      try { darkRef.current.animate([{opacity:0},{opacity:1},{opacity:0}], {duration:transMs, easing:"ease-in-out", fill:"both"}); } catch(e){}
     }
   }, [presentIdx, present, transMs]);
   const isPersonal = (nm) => personal.some(p => p.n === nm.n);
