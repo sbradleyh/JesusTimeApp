@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v214";
+const APP_VERSION = "v217";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8832,8 +8832,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     }
     setNIdx(i => Math.max(0, i-1));
   };
-  const addPersonal = () => {
-    const t = entryVal.trim().slice(0,120);
+  const addPersonal = (tRaw) => {
+    const t = String(tRaw==null?entryVal:tRaw).trim().slice(0,120);
     if (!t) return;
     const cat = readCat();
     const maxQ = cat.reduce((m,it)=>Math.max(m,+it.q||0),0);
@@ -8841,6 +8841,23 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     setPersonal(readPersonalCat());
     try { onAddLook(t); } catch(e){}
     setEntryVal("");
+  };
+  const [taughtPop, setTaughtPop] = React.useState(null); // {orig, val, personal}
+  const openTaughtPop = () => setTaughtPop({ orig: curName.n, val: curName.n, personal: isPersonal(curName) });
+  const savePersonalEdit = () => {
+    if (!taughtPop) return;
+    const t = String(taughtPop.val||"").trim().slice(0,120);
+    if (!t) return;
+    writeCat(readCat().map(it => String(it.answer||it.question||"").trim() === taughtPop.orig ? {...it, answer:t, question:""} : it));
+    setPersonal(readPersonalCat());
+    setTaughtPop(null);
+  };
+  const removePersonalCur = () => {
+    if (!taughtPop) return;
+    writeCat(readCat().filter(it => String(it.answer||it.question||"").trim() !== taughtPop.orig));
+    setPersonal(readPersonalCat());
+    setNIdx(i => Math.max(0, i-1));
+    setTaughtPop(null);
   };
   const bubbleBg = "linear-gradient(135deg, rgba(212,160,23,0.12), rgba(212,160,23,0.04))";
   return (
@@ -8865,77 +8882,95 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
         </div>
         {menuOpen && (<>
           <div onClick={()=>setMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:200000,touchAction:"none",overscrollBehavior:"none"}}/>
-          <div style={{position:"fixed",top:"auto",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",maxHeight:"44vh",zIndex:200001,
-            background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderTopLeftRadius:16,borderTopRightRadius:16,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
-            boxShadow:"0 -4px 24px rgba(0,0,0,0.7)"}}>
-            <div style={{display:"flex",borderBottom:`1px solid ${C.border}`}}>
-              <button onClick={another} title="New name"
-                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
-                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🔄 New</button>
-              <button onClick={()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames", cur&&cur.n); }}
-                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",borderRight:`1px solid ${C.border}`,
-                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>📖 Reader</button>
-              <button onClick={()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }}
-                style={{flex:1,padding:"8px 10px",background:"transparent",border:"none",
-                  color:C.gold,fontSize:14,fontWeight:700,cursor:"pointer",textAlign:"center"}}>🌅 Slideshow</button>
+          <div style={{position:"fixed",top:"auto",left:0,right:0,bottom:"calc(var(--jt-tab-h, 70px) + env(safe-area-inset-bottom) + 6px)",maxHeight:"52vh",zIndex:200001,
+            background:C.bg,borderTop:`1px solid ${C.borderHi}`,borderTopLeftRadius:18,borderTopRightRadius:18,overflowY:"auto",WebkitOverflowScrolling:"touch",overscrollBehavior:"contain",
+            boxShadow:"0 -6px 28px rgba(0,0,0,0.75)",padding:"8px 12px 12px"}}>
+            <div style={{display:"flex",alignItems:"center",marginBottom:8}}>
+              <div style={{width:36,height:4,borderRadius:2,background:C.border,position:"absolute",left:"50%",transform:"translateX(-50%)",top:8}}/>
+              <span style={{fontSize:15,fontWeight:800,color:C.gold,marginTop:6}}>Names of Jesus</span>
+              <button onClick={()=>setMenuOpen(false)} style={{marginLeft:"auto",marginTop:2,background:"transparent",border:"none",color:C.textMid,fontSize:20,fontWeight:800,cursor:"pointer",lineHeight:1,padding:"2px 6px"}}>✕</button>
             </div>
-            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`}}>
-              <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:4}}>Show</div>
-              <div style={{display:"flex",gap:6}}>
-                {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","Taught",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
-                  <button key={key} onClick={()=>{
-                    const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]);
-                    if (on && !othersOn) return; // keep at least one source on
-                    const v=!on; setter(v); setNIdx(0); setCIdx(0); try{ localStorage.setItem(lk, v?"1":"0"); }catch(e){}
-                  }}
-                    style={{flex:1,minWidth:0,padding:"6px 4px",borderRadius:8,fontSize:12,fontWeight:700,cursor:"pointer",textAlign:"center",lineHeight:1.15,
-                      border:`1px solid ${on?C.gold:C.border}`,
-                      background:on?"rgba(212,160,23,0.15)":"transparent",
-                      color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
-                ))}
-              </div>
+            <div style={{display:"flex",gap:8,marginBottom:10}}>
+              {[["🔄","New",another],["📖","Reader",()=>{ setMenuOpen(false); onOpenReader(inChrist?"inchrist":"jesusnames", cur&&cur.n); }],["🌅","Slideshow",()=>{ setMenuOpen(false); setForced(null); setPresentIdx(Math.max(0,list.indexOf(cur))); setPaused(false); setPresent(true); }]].map(([ic,l,fn])=>(
+                <button key={l} onClick={fn}
+                  style={{flex:1,padding:"10px 4px",borderRadius:12,border:`1px solid rgba(212,160,23,0.35)`,background:"linear-gradient(135deg, rgba(212,160,23,0.14), rgba(212,160,23,0.05))",
+                    color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,lineHeight:1}}>
+                  <span style={{fontSize:20}}>{ic}</span>{l}
+                </button>
+              ))}
             </div>
-            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:6,flexWrap:"nowrap"}}>
+            <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>SHOW</div>
+            <div style={{display:"flex",gap:6,marginBottom:10}}>
+              {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","Taught",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
+                <button key={key} onClick={()=>{
+                  const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]);
+                  if (on && !othersOn) return; // keep at least one source on
+                  const v=!on; setter(v); setNIdx(0); setCIdx(0); try{ localStorage.setItem(lk, v?"1":"0"); }catch(e){}
+                }}
+                  style={{flex:1,minWidth:0,padding:"8px 4px",borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",textAlign:"center",lineHeight:1.15,
+                    border:`1px solid ${on?C.gold:C.border}`,
+                    background:on?"rgba(212,160,23,0.15)":"transparent",
+                    color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
+              ))}
+            </div>
+            <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>STYLE</div>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6,flexWrap:"nowrap"}}>
               <button onClick={()=>bumpTitle(-0.1)} title="Smaller"
-                style={{width:30,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",flexShrink:0}}>A−</button>
-              <span style={{fontSize:11,fontWeight:700,color:C.textMid,minWidth:28,textAlign:"center",flexShrink:0}}>{Math.round(titleScale*100)}%</span>
+                style={{width:34,padding:"7px 0",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",flexShrink:0}}>A−</button>
+              <span style={{fontSize:11,fontWeight:700,color:C.textMid,minWidth:32,textAlign:"center",flexShrink:0}}>{Math.round(titleScale*100)}%</span>
               <button onClick={()=>bumpTitle(0.1)} title="Larger"
-                style={{width:30,padding:"6px 0",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,fontWeight:800,cursor:"pointer",flexShrink:0}}>A+</button>
+                style={{width:34,padding:"7px 0",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:18,fontWeight:800,cursor:"pointer",flexShrink:0}}>A+</button>
               <PDrop C={C} value={titleFont} onChange={setTitleF}
-                wrapStyle={{flex:1,minWidth:48}} btnStyle={{height:34,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
+                wrapStyle={{flex:1,minWidth:48}} btnStyle={{height:36,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
                 options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
-              <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:0,overflowX:"auto",maxWidth:"50%"}}>
-                <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:26,height:24,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
-                {recentColors.map(c=>(
-                  <button key={c} onClick={()=>pickColor(c)} style={{width:20,height:20,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
-                ))}
-              </div>
             </div>
-            <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Rotate</span>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10,overflowX:"auto",paddingBottom:2}}>
+              <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:30,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
+              {recentColors.map(c=>(
+                <button key={c} onClick={()=>pickColor(c)} style={{width:22,height:22,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
+              ))}
+            </div>
+            <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>SLIDESHOW</div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+              <span style={{fontSize:12,fontWeight:700,color:C.textMid,flexShrink:0}}>Rotate</span>
               <PDrop C={C} value={delaySec} onChange={v=>setDelay(v)}
-                wrapStyle={{flexShrink:0,minWidth:72}} btnStyle={{height:32,borderRadius:9,cursor:"pointer",padding:"0 10px"}}
+                wrapStyle={{flexShrink:0,minWidth:76}} btnStyle={{height:34,borderRadius:9,cursor:"pointer",padding:"0 10px"}}
                 options={[3,5,8,10,15,20,30,45,60,90,120,300,600].map(s=>[s, s<60?s+"s":(s/60)+"m"])}/>
               <button onClick={toggleHideAuthor}
-                style={{marginLeft:"auto",flexShrink:0,padding:"7px 12px",borderRadius:8,fontSize:13,fontWeight:700,cursor:"pointer",
-                  border:`1px solid ${hideAuthor?C.gold:C.border}`,background:hideAuthor?"rgba(212,160,23,0.15)":"transparent",color:hideAuthor?C.gold:C.textMid}}>{hideAuthor?"Author hidden":"Hide author"}</button>
+                style={{marginLeft:"auto",flexShrink:0,padding:"8px 12px",borderRadius:9,fontSize:13,fontWeight:700,cursor:"pointer",
+                  border:`1px solid ${hideAuthor?C.gold:C.border}`,background:hideAuthor?"rgba(212,160,23,0.15)":"transparent",color:hideAuthor?C.gold:C.textMid}}>{hideAuthor?"✓ Author hidden":"Hide author"}</button>
             </div>
-            <div style={{display:"flex",gap:6,padding:"6px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
-              <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
-                placeholder="Taught by Jesus …"
-                onKeyDown={e=>{ if(e.key==="Enter") addPersonal(); }}
-                style={{flex:1,minWidth:0,padding:"8px 10px",borderRadius:8,border:`1px solid ${C.border}`,
-                  background:C.inputBg,color:C.text,fontSize:14,outline:"none"}}/>
-              <button onClick={addPersonal}
-                style={{flexShrink:0,padding:"8px 12px",borderRadius:8,border:"none",background:C.gold,color:C.onAccent,
-                  fontSize:14,fontWeight:800,cursor:"pointer"}}>Add</button>
-              {!inChrist && <button onClick={removeCur} title="Remove from list"
-                style={{flexShrink:0,padding:"8px 12px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:14,fontWeight:700,cursor:"pointer"}}>🗑 Remove</button>}
-            </div>
+            <button onClick={openTaughtPop}
+              style={{width:"100%",padding:"11px 12px",borderRadius:12,border:`1px solid rgba(212,160,23,0.35)`,
+                background:"linear-gradient(135deg, rgba(212,160,23,0.14), rgba(212,160,23,0.05))",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer",textAlign:"center"}}>✏️ Taught by Jesus …</button>
           </div>
         </>)}
       </div>
       {editCat && <CatechismEditor C={C} onClose={()=>setEditCat(false)} />}
+      {taughtPop && (
+        <>
+          <div onClick={()=>setTaughtPop(null)} style={{position:"fixed",inset:0,zIndex:200020,background:"rgba(0,0,0,0.6)"}}/>
+          <div style={{position:"fixed",left:"50%",top:"38%",transform:"translate(-50%,-50%)",zIndex:200021,width:"min(480px, calc(100vw - 36px))",
+            background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:16,padding:14,boxShadow:"0 12px 40px rgba(0,0,0,0.6)",display:"flex",flexDirection:"column",gap:10}}>
+            <div style={{display:"flex",alignItems:"center"}}>
+              <span style={{fontSize:16,fontWeight:800,color:C.gold}}>Taught by Jesus</span>
+              <button onClick={()=>setTaughtPop(null)} style={{marginLeft:"auto",background:"transparent",border:"none",color:C.textMid,fontSize:20,fontWeight:800,cursor:"pointer",lineHeight:1,padding:"2px 6px"}}>✕</button>
+            </div>
+            <textarea value={taughtPop.val} onChange={e=>setTaughtPop(p=>({...p,val:e.target.value}))} maxLength={120} rows={3} autoFocus
+              style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${C.border}`,
+                background:C.inputBg,color:C.text,fontSize:16,fontWeight:600,outline:"none",resize:"none",lineHeight:1.35}}/>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <button onClick={()=>{ addPersonal(taughtPop.val); setTaughtPop(null); }}
+                style={{flex:1,minWidth:90,padding:"10px 12px",borderRadius:10,border:"none",background:C.gold,color:C.onAccent,fontSize:14,fontWeight:800,cursor:"pointer"}}>＋ Add new</button>
+              {taughtPop.personal && <button onClick={savePersonalEdit}
+                style={{flex:1,minWidth:90,padding:"10px 12px",borderRadius:10,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.15)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>💾 Save edit</button>}
+              {taughtPop.personal && <button onClick={removePersonalCur}
+                style={{flex:1,minWidth:90,padding:"10px 12px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:14,fontWeight:700,cursor:"pointer"}}>🗑 Remove</button>}
+            </div>
+            {!taughtPop.personal && <div style={{fontSize:12,color:C.textFaint,lineHeight:1.4}}>This name isn't in your Taught list — edit the text and tap Add new to save it there.</div>}
+          </div>
+        </>
+      )}
       {present && (
         <div onPointerDown={wakeControls} onClick={wakeControls}
           onTouchStart={(e)=>{ wakeControls(); touchStartX.current = (e.touches&&e.touches[0])?e.touches[0].clientX:null; }}
@@ -8950,31 +8985,63 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             </div>
           </div>
           <div ref={darkRef} style={{position:"absolute",inset:0,background:"#000",opacity:0,pointerEvents:"none"}}/>
-          {ctrlVis && (<div style={{position:"absolute",left:0,right:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",gap:landscape?5:8,flexWrap:landscape?"nowrap":"wrap",
-            padding:"12px calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))",borderTop:`1px solid ${C.border}`,background:C.bg}}>
-            {[["Names",srcH,setSrcH,"jtSrcH","h"],["Teaching",srcP,setSrcP,"jtSrcP","p"],["In Christ",srcC,setSrcC,"jtSrcC","c"]].map(([l,on,setter,lk,key])=>(
-              <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
-                style={{flexShrink:0,padding:landscape?"0 9px":"7px 10px",height:landscape?38:undefined,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
-            ))}
-            <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
-            <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
-            <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
-              wrapStyle={landscape?{flex:"1 1 0",minWidth:0}:{flex:"1 1 calc(20% - 9px)",minWidth:0}} btnStyle={{height:landscape?38:48,borderRadius:10,cursor:"pointer"}}/>
-            <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
-              wrapStyle={{flex:pSelSm.flex,minWidth:pSelSm.minWidth}} btnStyle={pSelSm}
-              options={[...new Set([3,5,8,10,15,20,30,45,60,90,120,300,600,1200,1800,2400,3000,3600,7200,10800,14400,18000,21600,25200,28800,delaySec])].sort((a,b)=>a-b).map(s=>[s, s<60?s+"s":s%3600===0?(s/3600)+"h":s%60===0?(s/60)+"m":s+"s"])}/>
-            <PDrop C={C} value={pFontFam} onChange={v=>{setFontFam(v);wakeControls();}} onWake={wakeControls}
-              wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
-              options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
-            <PDrop C={C} value={pShadow} onChange={v=>{setShadow(v);wakeControls();}} onWake={wakeControls}
-              wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
-              options={PRES_SHADOWS.map(([l,v])=>[v, l])}/>
-            <PColor C={C} value={shadowColor} onChange={setShadowCol} onWake={wakeControls} recents={recentColors}
-              wrapStyle={landscape?{flex:"0 1 auto",minWidth:0}:{flex:"1 1 calc(13% - 8px)",minWidth:0}} btnStyle={{height:landscape?38:48,borderRadius:10,cursor:"pointer",minWidth:44}}/>
-            <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i-1+list.length)%Math.max(1,list.length)); wakeControls(); }} title="Previous" style={pCtrl}>‹</button>
-            <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i+1)%Math.max(1,list.length)); wakeControls(); }} title="Next" style={pCtrl}>›</button>
-            <button onClick={()=>{setPaused(p=>!p);wakeControls();}} style={pCtrl}>{paused?"▶":"⏸"}</button>
-            <button onClick={()=>{ setPresent(false); setPaused(false); setForced(null); }} style={{...pCtrl,color:"#f87171"}}>✕</button>
+          {ctrlVis && (<div style={{position:"absolute",left:0,right:0,bottom:0,display:"flex",flexDirection:landscape?"row":"column",alignItems:landscape?"center":"stretch",justifyContent:"center",gap:landscape?5:8,flexWrap:"nowrap",
+            padding:"10px calc(12px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))",borderTop:`1px solid ${C.border}`,background:C.bg}}>
+            {landscape ? (<>
+              {[["Names",srcH,setSrcH,"jtSrcH","h"],["Taught",srcP,setSrcP,"jtSrcP","p"],["In Christ",srcC,setSrcC,"jtSrcC","c"]].map(([l,on,setter,lk,key])=>(
+                <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
+                  style={{flexShrink:0,padding:"0 9px",height:38,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
+              ))}
+              <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
+              <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
+              <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
+                wrapStyle={{flex:"1 1 0",minWidth:0}} btnStyle={{height:38,borderRadius:10,cursor:"pointer"}}/>
+              <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
+                wrapStyle={{flex:pSelSm.flex,minWidth:pSelSm.minWidth}} btnStyle={pSelSm}
+                options={[...new Set([3,5,8,10,15,20,30,45,60,90,120,300,600,1200,1800,2400,3000,3600,7200,10800,14400,18000,21600,25200,28800,delaySec])].sort((a,b)=>a-b).map(s=>[s, s<60?s+"s":s%3600===0?(s/3600)+"h":s%60===0?(s/60)+"m":s+"s"])}/>
+              <PDrop C={C} value={pFontFam} onChange={v=>{setFontFam(v);wakeControls();}} onWake={wakeControls}
+                wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
+                options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
+              <PDrop C={C} value={pShadow} onChange={v=>{setShadow(v);wakeControls();}} onWake={wakeControls}
+                wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
+                options={PRES_SHADOWS.map(([l,v])=>[v, l])}/>
+              <PColor C={C} value={shadowColor} onChange={setShadowCol} onWake={wakeControls} recents={recentColors}
+                wrapStyle={{flex:"0 1 auto",minWidth:0}} btnStyle={{height:38,borderRadius:10,cursor:"pointer",minWidth:44}}/>
+              <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i-1+list.length)%Math.max(1,list.length)); wakeControls(); }} title="Previous" style={pCtrl}>‹</button>
+              <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i+1)%Math.max(1,list.length)); wakeControls(); }} title="Next" style={pCtrl}>›</button>
+              <button onClick={()=>{setPaused(p=>!p);wakeControls();}} style={pCtrl}>{paused?"▶":"⏸"}</button>
+              <button onClick={()=>{ setPresent(false); setPaused(false); setForced(null); }} style={{...pCtrl,color:"#f87171"}}>✕</button>
+            </>) : (<>
+              <div style={{display:"flex",gap:8}}>
+                {[["Names",srcH,setSrcH,"jtSrcH","h"],["Taught",srcP,setSrcP,"jtSrcP","p"],["In Christ",srcC,setSrcC,"jtSrcC","c"]].map(([l,on,setter,lk,key])=>(
+                  <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
+                    style={{flex:1,minWidth:0,padding:"10px 4px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer",lineHeight:1.1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"stretch"}}>
+                <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={{flex:"0 0 52px",padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:17,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>A−</button>
+                <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={{flex:"0 0 52px",padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:17,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>A+</button>
+                <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
+                  wrapStyle={{flex:"0 0 52px",minWidth:0}} btnStyle={{height:"100%",minHeight:42,borderRadius:10,cursor:"pointer",width:"100%"}}/>
+                <PDrop C={C} value={pFontFam} onChange={v=>{setFontFam(v);wakeControls();}} onWake={wakeControls}
+                  wrapStyle={{flex:"1 1 0",minWidth:0}} btnStyle={{width:"100%",padding:"11px 2px",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",textAlign:"center",fontFamily:pFontFam||undefined}}
+                  options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
+                <PDrop C={C} value={pShadow} onChange={v=>{setShadow(v);wakeControls();}} onWake={wakeControls}
+                  wrapStyle={{flex:"1 1 0",minWidth:0}} btnStyle={{width:"100%",padding:"11px 2px",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:13,fontWeight:800,cursor:"pointer",textAlign:"center"}}
+                  options={PRES_SHADOWS.map(([l,v])=>[v, l])}/>
+                <PColor C={C} value={shadowColor} onChange={setShadowCol} onWake={wakeControls} recents={recentColors}
+                  wrapStyle={{flex:"0 0 52px",minWidth:0}} btnStyle={{height:"100%",minHeight:42,borderRadius:10,cursor:"pointer",width:"100%"}}/>
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"stretch"}}>
+                <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
+                  wrapStyle={{flex:"0 0 72px",minWidth:0}} btnStyle={{width:"100%",padding:"11px 2px",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",textAlign:"center"}}
+                  options={[...new Set([3,5,8,10,15,20,30,45,60,90,120,300,600,1200,1800,2400,3000,3600,7200,10800,14400,18000,21600,25200,28800,delaySec])].sort((a,b)=>a-b).map(s=>[s, s<60?s+"s":s%3600===0?(s/3600)+"h":s%60===0?(s/60)+"m":s+"s"])}/>
+                <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i-1+list.length)%Math.max(1,list.length)); wakeControls(); }} title="Previous" style={{flex:"1 1 0",minWidth:0,padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:19,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>‹</button>
+                <button onClick={()=>{ setForced(null); setPresentIdx(i=>(i+1)%Math.max(1,list.length)); wakeControls(); }} title="Next" style={{flex:"1 1 0",minWidth:0,padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:19,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>›</button>
+                <button onClick={()=>{setPaused(p=>!p);wakeControls();}} style={{flex:"1 1 0",minWidth:0,padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:17,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>{paused?"▶":"⏸"}</button>
+                <button onClick={()=>{ setPresent(false); setPaused(false); setForced(null); }} style={{flex:"1 1 0",minWidth:0,padding:"11px 0",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:"#f87171",fontSize:17,fontWeight:800,cursor:"pointer",lineHeight:1,textAlign:"center"}}>✕</button>
+              </div>
+            </>)}
           </div>)}
         </div>
       )}
