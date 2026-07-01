@@ -8812,8 +8812,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const darkRef = React.useRef(null);
   const touchStartX = React.useRef(null);
   React.useLayoutEffect(() => {
-    if (present && transStyle==="through" && darkRef.current && darkRef.current.animate) {
-      // Fade to dark, then back to full brightness
+    if (false && present && darkRef.current && darkRef.current.animate) {
       try { darkRef.current.animate([{opacity:0},{opacity:1},{opacity:0}], {duration:transMs, easing:"ease-in-out", fill:"both"}); } catch(e){}
     }
   }, [presentIdx, present, transMs, transStyle]);
@@ -8942,13 +8941,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
           <div onClick={wakeControls}
             style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:`calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom) + ${ctrlVis?(landscape?80:175):0}px) calc(20px + env(safe-area-inset-left))`,textAlign:"center",overflow:"auto",cursor:"pointer",transition:"padding .3s"}}>
-            {outgoing && (transStyle==="crossfade"||transStyle==="slide") && (
-              <div key={"o"+outgoing.k} style={{position:"absolute",left:0,right:0,top:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",padding:24,pointerEvents:"none",animation:_outAnim}}>
-                <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{outgoing.item&&outgoing.item.n}</div>
-              </div>
-            )}
             <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-              <div key={forced?("f"+(pItem&&pItem.n)):("i"+presentIdx)} style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss,animation:_inAnim}}>{pItem&&pItem.n}</div>
+              <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{pItem&&pItem.n}</div>
               {(ctrlVis || vKey) && pItem && pItem.a && !hideAuthor && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
               {(vLoading || vBlock || vErr) && <div style={{fontSize:Math.max(15,Math.round(pFont*0.42)),color:C.gold,fontStyle:"italic",marginTop:16,maxWidth:760,whiteSpace:"pre-wrap",lineHeight:1.5,opacity:0.95}}>{vLoading ? "…" : (vBlock || vErr)}</div>}
             </div>
@@ -8967,12 +8961,6 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
               wrapStyle={{flex:pSelSm.flex,minWidth:pSelSm.minWidth}} btnStyle={pSelSm}
               options={[...new Set([3,5,8,10,15,20,30,45,60,90,120,300,600,1200,1800,2400,3000,3600,7200,10800,14400,18000,21600,25200,28800,delaySec])].sort((a,b)=>a-b).map(s=>[s, s<60?s+"s":s%3600===0?(s/3600)+"h":s%60===0?(s/60)+"m":s+"s"])}/>
-            <PDrop C={C} value={transMs} onChange={v=>{setTrans(v);wakeControls();}} onWake={wakeControls}
-              wrapStyle={{flex:pSelSm.flex,minWidth:pSelSm.minWidth}} btnStyle={pSelSm}
-              options={[...new Set([200,300,500,800,1100,1500,2000,3000,4000,transMs])].sort((a,b)=>a-b).map(ms=>[ms, "↹ "+(ms/1000)+"s"])}/>
-            <PDrop C={C} value={transStyle} onChange={v=>{setTransSty(v);wakeControls();}} onWake={wakeControls}
-              wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
-              options={[["cut","✂ Cut"],["crossfade","⇋ Cross-fade"],["through","◐ Thru-black"],["slide","➜ Slide"]]}/>
             <PDrop C={C} value={pFontFam} onChange={v=>{setFontFam(v);wakeControls();}} onWake={wakeControls}
               wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
               options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
