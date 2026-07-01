@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v190";
+const APP_VERSION = "v194";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8730,6 +8730,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [present, setPresent] = React.useState(false);
   React.useEffect(()=>{ presentRef.current = present; },[present]);
   const [presentIdx, setPresentIdx] = React.useState(0);
+  const [outgoing, setOutgoing] = React.useState(null);
+  const shownRef = React.useRef(null);
+  const outTimerRef = React.useRef(null);
   const [forced, setForced] = React.useState(null);
   const [paused, setPaused] = React.useState(false);
   const [delaySec, setDelaySec] = React.useState(() => { try { return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8; } catch(e){ return 8; } });
@@ -8738,6 +8741,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const setFont = v => { const n=Math.max(16,Math.min(220,v)); setPFont(n); try{localStorage.setItem("jtPresentFont",String(n));}catch(e){} };
   const [transMs, setTransMs] = React.useState(() => { try { return parseInt(localStorage.getItem("jtPresentTrans")||"1100",10)||1100; } catch(e){ return 1100; } });
   const setTrans = v => { setTransMs(v); try{localStorage.setItem("jtPresentTrans",String(v));}catch(e){} };
+  const [transStyle, setTransStyle] = React.useState(() => { try { return localStorage.getItem("jtPresentTransStyle")||"crossfade"; } catch(e){ return "crossfade"; } });
+  const setTransSty = v => { setTransStyle(v); try{localStorage.setItem("jtPresentTransStyle",v);}catch(e){} };
   const [pFontFam, setPFontFam] = React.useState(() => { try { return localStorage.getItem("jtPresentFontFam")||""; } catch(e){ return ""; } });
   const setFontFam = v => { setPFontFam(v); try{localStorage.setItem("jtPresentFontFam",v);}catch(e){} };
   const PRES_FONTS = [["Default",""],["Serif","Georgia, serif"],["Elegant","Baskerville, serif"],["Didot","Didot, 'Bodoni 72', serif"],["Optima","Optima, 'Gill Sans', sans-serif"],["Futura","Futura, 'Century Gothic', sans-serif"],["Avenir","'Avenir Next', Avenir, sans-serif"],["Rounded","'SF Pro Rounded', 'Arial Rounded MT Bold', sans-serif"],["Typewriter","'American Typewriter', monospace"],["Copperplate","Copperplate, serif"],["Marker","'Marker Felt', cursive"],["Note","Noteworthy, cursive"],["Script","'Snell Roundhand', cursive"],["Chalk","'Chalkboard SE', sans-serif"],["Papyrus","Papyrus, fantasy"]];
@@ -8757,6 +8762,17 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const vLoading = vKey && esvChapBusy===vKey && !vBlock;
   const vErr = vKey && !vBlock && !vLoading && esvChapErr ? esvChapErr : "";
   const pItem = forced || (list[presentIdx % Math.max(1,list.length)] || list[0]);
+  React.useEffect(() => {
+    if (!present) { shownRef.current = pItem; setOutgoing(null); return; }
+    const prev = shownRef.current;
+    shownRef.current = pItem;
+    if (!prev || !pItem || prev.n===pItem.n || transStyle==="cut" || transStyle==="through") { setOutgoing(null); return; }
+    setOutgoing({ item: prev, k: Date.now() });
+    if (outTimerRef.current) clearTimeout(outTimerRef.current);
+    outTimerRef.current = setTimeout(() => setOutgoing(null), transMs);
+  }, [pItem && pItem.n, present]);
+  const _inAnim = transStyle==="cut" ? "none" : transStyle==="through" ? `jtNameSwap ${transMs}ms ease both` : transStyle==="slide" ? `jtSlideInR ${transMs}ms ease both` : `jtXfadeIn ${transMs}ms ease both`;
+  const _outAnim = transStyle==="slide" ? `jtSlideOutL ${transMs}ms ease both` : `jtXfadeOut ${transMs}ms ease both`;
   React.useEffect(() => {
     if (!present || paused || forced || list.length<=1) return;
     const t = setInterval(() => setPresentIdx(i => (i+1) % list.length), Math.max(2,delaySec)*1000);
@@ -8794,16 +8810,13 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   }, [present]);
   const slideRef = React.useRef(null);
   const darkRef = React.useRef(null);
+  const touchStartX = React.useRef(null);
   React.useLayoutEffect(() => {
-    if (present && slideRef.current && slideRef.current.animate) {
-      // New slide stays hidden through the black peak, then brightens in
-      try { slideRef.current.animate([{opacity:0,transform:"translateY(8px)",offset:0},{opacity:0,transform:"translateY(8px)",offset:0.5},{opacity:1,transform:"translateY(0)",offset:1}], {duration:transMs, easing:"ease", fill:"both"}); } catch(e){}
-    }
-    if (present && darkRef.current && darkRef.current.animate) {
+    if (present && transStyle==="through" && darkRef.current && darkRef.current.animate) {
       // Fade to dark, then back to full brightness
       try { darkRef.current.animate([{opacity:0},{opacity:1},{opacity:0}], {duration:transMs, easing:"ease-in-out", fill:"both"}); } catch(e){}
     }
-  }, [presentIdx, present, transMs]);
+  }, [presentIdx, present, transMs, transStyle]);
   const isPersonal = (nm) => personal.some(p => p.n === nm.n);
   const readCat = () => { try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return Array.isArray(a)?a:[]; }catch(e){ return []; } };
   const writeCat = (arr) => { try{ localStorage.setItem("jtPersonalCatechism", JSON.stringify(arr)); localStorage.setItem("jtPersonalCatechismTs", String(Date.now())); window.dispatchEvent(new Event("jtPersonalCatechismChanged")); }catch(e){} };
@@ -8923,11 +8936,19 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
       </div>
       {editCat && <CatechismEditor C={C} onClose={()=>setEditCat(false)} />}
       {present && (
-        <div onPointerDown={wakeControls} onClick={wakeControls} onTouchStart={wakeControls} style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
+        <div onPointerDown={wakeControls} onClick={wakeControls}
+          onTouchStart={(e)=>{ wakeControls(); touchStartX.current = (e.touches&&e.touches[0])?e.touches[0].clientX:null; }}
+          onTouchEnd={(e)=>{ const sx=touchStartX.current; touchStartX.current=null; if(sx==null||list.length<=1)return; const ex=(e.changedTouches&&e.changedTouches[0])?e.changedTouches[0].clientX:sx; const dx=ex-sx; if(Math.abs(dx)>45){ setForced(null); if(dx<0) setPresentIdx(i=>(i+1)%list.length); else setPresentIdx(i=>(i-1+list.length)%list.length); wakeControls(); } }}
+          style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
           <div onClick={wakeControls}
             style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:`calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom) + ${ctrlVis?(landscape?80:175):0}px) calc(20px + env(safe-area-inset-left))`,textAlign:"center",overflow:"auto",cursor:"pointer",transition:"padding .3s"}}>
+            {outgoing && (transStyle==="crossfade"||transStyle==="slide") && (
+              <div key={"o"+outgoing.k} style={{position:"absolute",left:0,right:0,top:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",padding:24,pointerEvents:"none",animation:_outAnim}}>
+                <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{outgoing.item&&outgoing.item.n}</div>
+              </div>
+            )}
             <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-              <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{pItem&&pItem.n}</div>
+              <div key={forced?("f"+(pItem&&pItem.n)):("i"+presentIdx)} style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss,animation:_inAnim}}>{pItem&&pItem.n}</div>
               {(ctrlVis || vKey) && pItem && pItem.a && !hideAuthor && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
               {(vLoading || vBlock || vErr) && <div style={{fontSize:Math.max(15,Math.round(pFont*0.42)),color:C.gold,fontStyle:"italic",marginTop:16,maxWidth:760,whiteSpace:"pre-wrap",lineHeight:1.5,opacity:0.95}}>{vLoading ? "…" : (vBlock || vErr)}</div>}
             </div>
@@ -8949,6 +8970,9 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             <PDrop C={C} value={transMs} onChange={v=>{setTrans(v);wakeControls();}} onWake={wakeControls}
               wrapStyle={{flex:pSelSm.flex,minWidth:pSelSm.minWidth}} btnStyle={pSelSm}
               options={[...new Set([200,300,500,800,1100,1500,2000,3000,4000,transMs])].sort((a,b)=>a-b).map(ms=>[ms, "↹ "+(ms/1000)+"s"])}/>
+            <PDrop C={C} value={transStyle} onChange={v=>{setTransSty(v);wakeControls();}} onWake={wakeControls}
+              wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
+              options={[["cut","✂ Cut"],["crossfade","⇋ Cross-fade"],["through","◐ Thru-black"],["slide","➜ Slide"]]}/>
             <PDrop C={C} value={pFontFam} onChange={v=>{setFontFam(v);wakeControls();}} onWake={wakeControls}
               wrapStyle={{flex:pSel.flex,minWidth:pSel.minWidth}} btnStyle={pSel}
               options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
@@ -13482,6 +13506,11 @@ export default function App() {
         input, textarea { transition: border-color .15s ease, box-shadow .15s ease; }
         input:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(212,160,23,0.15); }
         @keyframes jtFadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes jtNameSwap { 0% { opacity:0; } 45% { opacity:0; } 100% { opacity:1; } }
+        @keyframes jtXfadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes jtXfadeOut { from { opacity:1; } to { opacity:0; } }
+        @keyframes jtSlideInR { from { opacity:0; transform:translateX(42px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes jtSlideOutL { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-42px); } }
         @keyframes jtSlideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         @keyframes jtPopUp { from { opacity:0; transform:translate(-50%,10px); } to { opacity:1; transform:translate(-50%,0); } }
         @keyframes jtPopUpL { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
