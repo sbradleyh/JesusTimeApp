@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v177";
+const APP_VERSION = "v179";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10029,7 +10029,7 @@ function NamesChip({tabStarMap,entries,today}) {
   return <TabChip tag="Names_Review" starKey="names" short="👤" label="Names Review" filter="sepia(1) saturate(3) hue-rotate(80deg)" tabStarMap={tabStarMap} entries={entries} today={today}/>;
 }
 
-function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onOpenMenu=()=>{} }) {
+function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
   const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
@@ -10151,8 +10151,12 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
             <button key={lbl} onClick={()=>logTag(pick,m)} style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>{lbl}</button>
           ))}
         </div>
-        <button onClick={()=>{ onDeleteToday(pick); setPick(null); }}
-          style={{padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>🗑 Delete today's time</button>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={()=>{ onDeleteToday(pick); setPick(null); }}
+            style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>🗑 Delete today's time</button>
+          <button onClick={()=>{ onDeleteTag(pick); setPick(null); }}
+            style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>✕ Delete tag</button>
+        </div>
       </div>
     </>)}
   </div>);
@@ -12206,9 +12210,9 @@ export default function App() {
           style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
             border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
             alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
-          <span style={{fontSize:"clamp(24px,7vw,34px)",fontWeight:800,color:"#d4a017"}}>{titleStats.count}</span>
-          <span style={{fontSize:"clamp(15px,4vw,24px)",fontWeight:800,color:C.text}}>{titleStats.count===1?"time":"times"} with</span>
-          <span style={{fontSize:"clamp(24px,7.5vw,40px)",fontWeight:800,color:"#d4a017"}}>Jesus</span>
+          <span style={{fontSize:"clamp(26px,7vw,36px)",fontWeight:800,color:"#d4a017"}}>{titleStats.count}</span>
+          <span style={{fontSize:"clamp(17px,4vw,26px)",fontWeight:800,color:C.text}}>{titleStats.count===1?"time":"times"} with</span>
+          <span style={{fontSize:"clamp(26px,7.5vw,42px)",fontWeight:800,color:"#d4a017"}}>Jesus</span>
         </div>
         {/* Stats — flex:1, shifts right as date expands */}
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
@@ -12729,7 +12733,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
-                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
+                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
                               {selectedFilterTags.length > 0 && (
