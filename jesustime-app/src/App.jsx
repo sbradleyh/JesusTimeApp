@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v213";
+const APP_VERSION = "v214";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11630,7 +11630,9 @@ export default function App() {
       else if (w >= 820) z = 1.15;
       try {
         const de = document.documentElement;
-        if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", window.innerHeight + "px"); }
+        const vv = window.visualViewport;
+        const vh = vv ? Math.round(vv.height) : window.innerHeight;
+        if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", vh + "px"); }
         else { de.style.zoom = String(z); de.style.setProperty("--jt-vh", `calc(100dvh / ${z})`); }
       } catch(e){}
     };
@@ -11638,7 +11640,9 @@ export default function App() {
     const applyLater = () => { apply(); setTimeout(apply, 300); };
     window.addEventListener("resize", apply);
     window.addEventListener("orientationchange", applyLater);
-    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); };
+    const vv = window.visualViewport;
+    if (vv) vv.addEventListener("resize", apply);
+    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); if (vv) vv.removeEventListener("resize", apply); };
   }, []);
 
   const [userInitials, setUserInitials] = useState(() => localStorage.getItem("ofInitials")||"");
@@ -13514,8 +13518,8 @@ export default function App() {
       )}
 
       <style>{`
-        html { height: var(--jt-vh,100dvh); background: ${C.bg}; overflow: hidden; }
-        body { margin:0; padding:0; width:100%; height:var(--jt-vh,100dvh); overflow:hidden; background:${C.bg}; }
+        html { height: var(--jt-vh,100dvh); background: ${C.bg}; overflow: hidden; overscroll-behavior: none; }
+        body { margin:0; padding:0; width:100%; height:var(--jt-vh,100dvh); overflow:hidden; background:${C.bg}; position:fixed; inset:0; overscroll-behavior:none; }
         #root { height: var(--jt-vh,100dvh); overflow: hidden; }
         * { -webkit-tap-highlight-color:transparent; box-sizing:border-box; }
         button { transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease, transform .1s ease; }
