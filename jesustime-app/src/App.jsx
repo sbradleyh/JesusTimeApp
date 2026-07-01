@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v198";
+const APP_VERSION = "v200";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8658,6 +8658,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [editCat, setEditCat] = React.useState(false);
   const [titleScale, setTitleScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtTitleScale")); return v>0?v:1; } catch(e){ return 1; } });
+  const [fitScale, setFitScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtFitScale")); return v>0?v:1; } catch(e){ return 1; } });
+  const bumpFit = (d) => setFitScale(s=>{ const v=Math.min(2, Math.max(0.5, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtFitScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   React.useEffect(() => {
     const open = () => setMenuOpen(true);
@@ -8941,8 +8943,10 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
           <div onClick={wakeControls}
             style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:`calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom) + ${ctrlVis?(landscape?80:175):0}px) calc(20px + env(safe-area-inset-left))`,textAlign:"center",overflow:"auto",cursor:"pointer",transition:"padding .3s"}}>
-            <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
-              <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{pItem&&pItem.n}</div>
+            <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",flex:1,minHeight:0,justifyContent:"center"}}>
+              <div style={{flex:1,minHeight:0,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+                <FitText text={pItem&&pItem.n} min={22} max={240} scale={fitScale} style={{fontWeight:800,color:slideColor,lineHeight:1.15,fontFamily:pFontFam||undefined,textShadow:shadowCss,textAlign:"center"}}/>
+              </div>
               {(ctrlVis || vKey) && pItem && pItem.a && !hideAuthor && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
               {(vLoading || vBlock || vErr) && <div style={{fontSize:Math.max(15,Math.round(pFont*0.42)),color:C.gold,fontStyle:"italic",marginTop:16,maxWidth:760,whiteSpace:"pre-wrap",lineHeight:1.5,opacity:0.95}}>{vLoading ? "…" : (vBlock || vErr)}</div>}
             </div>
@@ -8954,8 +8958,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
                 style={{flexShrink:0,padding:landscape?"0 9px":"7px 10px",height:landscape?38:undefined,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
             ))}
-            <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
-            <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
+            <button onClick={()=>{bumpFit(-0.1);wakeControls();}} style={pCtrl}>A−</button>
+            <button onClick={()=>{bumpFit(0.1);wakeControls();}} style={pCtrl}>A+</button>
             <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
               wrapStyle={landscape?{flex:"1 1 0",minWidth:0}:{flex:"1 1 calc(20% - 9px)",minWidth:0}} btnStyle={{height:landscape?38:48,borderRadius:10,cursor:"pointer"}}/>
             <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
@@ -10053,6 +10057,26 @@ function NamesChip({tabStarMap,entries,today}) {
   return <TabChip tag="Names_Review" starKey="names" short="👤" label="Names Review" filter="sepia(1) saturate(3) hue-rotate(80deg)" tabStarMap={tabStarMap} entries={entries} today={today}/>;
 }
 
+function FitText({ text, min=16, max=180, scale=1, style }) {
+  const ref = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = ref.current; if(!el) return;
+    const parent = el.parentElement; if(!parent) return;
+    const fit = () => {
+      const aw = parent.clientWidth, ah = parent.clientHeight;
+      if(!aw || !ah) return;
+      let lo=min, hi=max, best=min;
+      while(lo<=hi){ const mid=(lo+hi)>>1; el.style.fontSize=mid+"px"; if(el.scrollWidth<=aw+0.5 && el.scrollHeight<=ah+0.5){ best=mid; lo=mid+1; } else { hi=mid-1; } }
+      el.style.fontSize = Math.max(min, Math.round(best*scale))+"px";
+    };
+    fit();
+    let ro=null;
+    try{ ro=new ResizeObserver(fit); ro.observe(parent); }catch(e){}
+    return ()=>{ try{ ro&&ro.disconnect(); }catch(e){} };
+  }, [text, min, max, scale, style && style.fontFamily]);
+  return <div ref={ref} style={{width:"100%",boxSizing:"border-box",overflow:"hidden",...style}}>{text}</div>;
+}
+
 function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenStreaks=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
@@ -10070,7 +10094,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const [styleTick,setStyleTick]=React.useState(0); void styleTick;
   React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
   const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
-  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})(); void nmScale;
+  const nmFit=(()=>{try{const v=parseFloat(localStorage.getItem("jtFitScale"));return v>0?v:1;}catch(e){return 1;}})();
   const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
   const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
   const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
@@ -10136,9 +10161,11 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
-      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
-        <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
-        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflow:"hidden",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:18,textAlign:"center"}}>
+        <div style={{flex:1,minHeight:0,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+          <FitText text={curSlide.n} min={20} max={96} scale={nmFit} style={{fontWeight:800,color:nmColor,lineHeight:1.15,fontFamily:nmFont||"Georgia, serif",textAlign:"center"}}/>
+        </div>
+        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold,flexShrink:0}}>{curSlide.a}</span>}
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
