@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v188";
+const APP_VERSION = "v190";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8794,7 +8794,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   }, [present]);
   const slideRef = React.useRef(null);
   const darkRef = React.useRef(null);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (present && slideRef.current && slideRef.current.animate) {
       // New slide stays hidden through the black peak, then brightens in
       try { slideRef.current.animate([{opacity:0,transform:"translateY(8px)",offset:0},{opacity:0,transform:"translateY(8px)",offset:0.5},{opacity:1,transform:"translateY(0)",offset:1}], {duration:transMs, easing:"ease", fill:"both"}); } catch(e){}
@@ -10081,13 +10081,13 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const fmt=m=>m>0?(m>=60?`${Math.floor(m/60)}h${m%60?` ${m%60}m`:""}`:`${m}m`):"—";
   const ciTag=s=>String(s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const normS=(raw)=>{ const t=raw.slice(1).replace(/Prayed_\d+/,"Prayed");
-    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory_/i.test(t))return "Bible_Memory";
+    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory_/i.test(t))return "Bible_Memory"; if(/^Bible_Books/i.test(t))return "Bible_Books";
     if(/^Names_Review_\d+/i.test(t))return "Names_Review"; if(/^Prayer_Request_Answered/i.test(t))return "Prayer_Request_Answered";
     if(/^Prayer_Request/i.test(t))return "Prayer_Request"; if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
     if(/^Look4Jesus/i.test(t))return "Look4Jesus"; if(/_\d{8,}$/.test(t))return null;
     return ciTag(t.split("-")[0].replace(/_/g," ")); };
   const deletedT=(()=>{try{return JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){return [];}})();
-  const tagSet=new Set(["Bible_Read","Bible_Memory","Prayed","Names_Review"]);
+  const tagSet=new Set(["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"]);
   Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)tagSet.add(t);})));
   (tags||[]).forEach(t=>tagSet.add(t));
   const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
