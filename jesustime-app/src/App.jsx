@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v210";
+const APP_VERSION = "v213";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10144,8 +10144,6 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
       <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}%</div>
       <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>avg</div>
-      {isNow && <div style={{position:"absolute",zIndex:1,...nowS}}/>}
-      {isNow && <div style={{position:"absolute",zIndex:4,top:1,left:`${Math.min(94,nowF*100)}%`,transform:"translateX(-50%)",fontSize:9,fontWeight:800,color:"rgba(255,255,255,0.95)",lineHeight:1,pointerEvents:"none",textShadow:"0 1px 2px rgba(0,0,0,0.7)"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
           <span style={{fontSize:19,fontWeight:800,color:C.textMid}}>{lb}</span>
