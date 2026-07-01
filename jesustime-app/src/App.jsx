@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v194";
+const APP_VERSION = "v196";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10093,7 +10093,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const fmt=m=>m>0?(m>=60?`${Math.floor(m/60)}h${m%60?` ${m%60}m`:""}`:`${m}m`):"—";
   const ciTag=s=>String(s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
   const normS=(raw)=>{ const t=raw.slice(1).replace(/Prayed_\d+/,"Prayed");
-    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory_/i.test(t))return "Bible_Memory"; if(/^Bible_Books/i.test(t))return "Bible_Books";
+    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory/i.test(t))return "Bible_Memory"; if(/^Bible_Books/i.test(t))return "Bible_Books";
     if(/^Names_Review_\d+/i.test(t))return "Names_Review"; if(/^Prayer_Request_Answered/i.test(t))return "Prayer_Request_Answered";
     if(/^Prayer_Request/i.test(t))return "Prayer_Request"; if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
     if(/^Look4Jesus/i.test(t))return "Look4Jesus"; if(/_\d{8,}$/.test(t))return null;
