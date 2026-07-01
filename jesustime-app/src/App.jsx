@@ -8943,10 +8943,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
           style={{position:"fixed",inset:0,zIndex:100000,background:C.bg}}>
           <div onClick={wakeControls}
             style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:`calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom) + ${ctrlVis?(landscape?80:175):0}px) calc(20px + env(safe-area-inset-left))`,textAlign:"center",overflow:"auto",cursor:"pointer",transition:"padding .3s"}}>
-            <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",flex:1,minHeight:0,justifyContent:"center"}}>
-              <div style={{flex:1,minHeight:0,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
-                <FitText text={pItem&&pItem.n} min={22} max={240} scale={fitScale} style={{fontWeight:800,color:slideColor,lineHeight:1.15,fontFamily:pFontFam||undefined,textShadow:shadowCss,textAlign:"center"}}/>
-              </div>
+            <div ref={slideRef} style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+              <div style={{fontSize:pFont,fontWeight:800,color:slideColor,lineHeight:1.3,maxWidth:820,fontFamily:pFontFam||undefined,textShadow:shadowCss}}>{pItem&&pItem.n}</div>
               {(ctrlVis || vKey) && pItem && pItem.a && !hideAuthor && <div onClick={(e)=>{ e.stopPropagation(); wakeControls(); if(refLike(pItem.a)){ setVKey(pItem.a); loadEsvPassage(pItem.a, pItem.a, true); } }} style={{fontSize:Math.max(13,Math.round(pFont*0.5)),color:C.gold,fontStyle:"italic",marginTop:18,cursor:refLike(pItem.a)?"pointer":"default",textDecoration:refLike(pItem.a)?"underline":"none",animation:"jtSlideFade .3s ease both"}}>{pItem.a}</div>}
               {(vLoading || vBlock || vErr) && <div style={{fontSize:Math.max(15,Math.round(pFont*0.42)),color:C.gold,fontStyle:"italic",marginTop:16,maxWidth:760,whiteSpace:"pre-wrap",lineHeight:1.5,opacity:0.95}}>{vLoading ? "…" : (vBlock || vErr)}</div>}
             </div>
@@ -8958,8 +8956,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
                 style={{flexShrink:0,padding:landscape?"0 9px":"7px 10px",height:landscape?38:undefined,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
             ))}
-            <button onClick={()=>{bumpFit(-0.1);wakeControls();}} style={pCtrl}>A−</button>
-            <button onClick={()=>{bumpFit(0.1);wakeControls();}} style={pCtrl}>A+</button>
+            <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
+            <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
             <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
               wrapStyle={landscape?{flex:"1 1 0",minWidth:0}:{flex:"1 1 calc(20% - 9px)",minWidth:0}} btnStyle={{height:landscape?38:48,borderRadius:10,cursor:"pointer"}}/>
             <PDrop C={C} value={delaySec} onChange={v=>{setDelay(v);wakeControls();}} onWake={wakeControls}
@@ -10165,11 +10163,9 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
-      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflow:"hidden",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,padding:18,textAlign:"center"}}>
-        <div style={{flex:1,minHeight:0,width:"100%",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
-          <FitText text={curSlide.n} min={20} max={96} scale={nmFit} style={{fontWeight:800,color:nmColor,lineHeight:1.15,fontFamily:nmFont||"Georgia, serif",textAlign:"center"}}/>
-        </div>
-        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold,flexShrink:0}}>{curSlide.a}</span>}
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
+        <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
