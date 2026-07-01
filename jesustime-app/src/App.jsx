@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v200";
+const APP_VERSION = "v202";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1099,7 +1099,7 @@ function bestDrillScore() {
 
 // ── computeStreak utility ─────────────────────────────────────────────────────
 function computeStreak(tag, entries, today) {
-  const lTag = ("#"+tag).toLowerCase();
+  const lTag = ("#"+String(tag).replace(/ /g,"_")).toLowerCase();
   const hasTag = (iso) => (entries[iso]||[]).some(e =>
     (e.notes||"").toLowerCase().includes(lTag)
   );
@@ -8658,8 +8658,8 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [editCat, setEditCat] = React.useState(false);
   const [titleScale, setTitleScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtTitleScale")); return v>0?v:1; } catch(e){ return 1; } });
-  const [fitScale, setFitScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtFitScale")); return v>0?v:1; } catch(e){ return 1; } });
-  const bumpFit = (d) => setFitScale(s=>{ const v=Math.min(2, Math.max(0.5, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtFitScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
+  const [fitScale, setFitScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtFitScale")); return v>0?Math.min(1,v):1; } catch(e){ return 1; } });
+  const bumpFit = (d) => setFitScale(s=>{ const v=Math.min(1, Math.max(0.4, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtFitScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   React.useEffect(() => {
     const open = () => setMenuOpen(true);
@@ -10067,7 +10067,7 @@ function FitText({ text, min=16, max=180, scale=1, style }) {
       if(!aw || !ah) return;
       let lo=min, hi=max, best=min;
       while(lo<=hi){ const mid=(lo+hi)>>1; el.style.fontSize=mid+"px"; if(el.scrollWidth<=aw+0.5 && el.scrollHeight<=ah+0.5){ best=mid; lo=mid+1; } else { hi=mid-1; } }
-      el.style.fontSize = Math.max(min, Math.round(best*scale))+"px";
+      el.style.fontSize = Math.min(best, Math.max(min, Math.round(best*scale)))+"px";
     };
     fit();
     let ro=null;
@@ -10095,7 +10095,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
   const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
   const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})(); void nmScale;
-  const nmFit=(()=>{try{const v=parseFloat(localStorage.getItem("jtFitScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmFit=(()=>{try{const v=parseFloat(localStorage.getItem("jtFitScale"));return v>0?Math.min(1,v):1;}catch(e){return 1;}})();
   const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
   const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
   const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
