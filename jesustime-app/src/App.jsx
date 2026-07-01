@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v205";
+const APP_VERSION = "v206";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10061,8 +10061,8 @@ function FitText({ text, min=16, max=180, scale=1, style }) {
   const ref = React.useRef(null);
   React.useLayoutEffect(() => {
     const el = ref.current; if(!el) return;
-    const parent = el.parentElement; if(!parent) return;
     const fit = () => {
+      const parent = el.parentElement; if(!parent) return;
       const aw = parent.clientWidth, ah = parent.clientHeight;
       if(!aw || !ah) return;
       let lo=min, hi=max, best=min;
@@ -10070,9 +10070,13 @@ function FitText({ text, min=16, max=180, scale=1, style }) {
       el.style.fontSize = Math.min(best, Math.max(min, Math.round(best*scale)))+"px";
     };
     fit();
+    const raf = requestAnimationFrame(fit);
+    const t = setTimeout(fit, 90);
     let ro=null;
-    try{ ro=new ResizeObserver(fit); ro.observe(parent); }catch(e){}
-    return ()=>{ try{ ro&&ro.disconnect(); }catch(e){} };
+    try{ ro=new ResizeObserver(fit); if(el.parentElement) ro.observe(el.parentElement); }catch(e){}
+    window.addEventListener("resize", fit);
+    window.addEventListener("orientationchange", fit);
+    return ()=>{ cancelAnimationFrame(raf); clearTimeout(t); try{ ro&&ro.disconnect(); }catch(e){} window.removeEventListener("resize",fit); window.removeEventListener("orientationchange",fit); };
   }, [text, min, max, scale, style && style.fontFamily]);
   return <div ref={ref} style={{width:"100%",boxSizing:"border-box",overflow:"hidden",...style}}>{text}</div>;
 }
