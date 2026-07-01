@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v202";
+const APP_VERSION = "v205";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10140,16 +10140,16 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?C.gold:has?col:C.border}`,boxShadow:seld?`0 0 0 2px ${C.gold}`:"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
-      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:9,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}%</div>
+      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}% avg</div>
       {isNow && <div style={{position:"absolute",zIndex:1,...nowS}}/>}
-      {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:8,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
+      {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:10,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
-          <span style={{fontSize:17,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:19,fontWeight:800,color:C.textMid}}>{lb}</span>
           <span style={{fontSize:vertical?24:20,lineHeight:1}}>{ic}</span>
         </div>
-        <span style={{fontSize:17,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:12,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
-        <span style={{fontSize:13,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
+        <span style={{fontSize:19,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:14,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
+        <span style={{fontSize:15,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
       </div>
     </div>);
   };
