@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v206";
+const APP_VERSION = "v210";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10138,13 +10138,14 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot; const isNow=slot===cur; const nowF=nowFracOf(slot);
     const fillS=vertical?{left:0,right:0,bottom:0,height:`${Math.min(100,pct)}%`}:{top:0,bottom:0,left:0,width:`${Math.min(100,pct)}%`};
     const avgS=vertical?{left:0,right:0,bottom:`${Math.min(100,avg)}%`,borderTop:`2px dashed rgba(${C.ink},0.55)`}:{top:0,bottom:0,left:`${Math.min(100,avg)}%`,borderLeft:`2px dashed rgba(${C.ink},0.55)`};
-    const nowS=vertical?{left:0,right:0,bottom:`${Math.min(100,nowF*100)}%`,borderTop:`2px solid rgba(255,255,255,0.85)`}:{top:0,bottom:0,left:`${Math.min(100,nowF*100)}%`,borderLeft:`2px solid rgba(255,255,255,0.85)`};
+    const nowS={top:0,bottom:0,left:`${Math.min(97,nowF*100)}%`,borderLeft:`2px solid rgba(255,255,255,0.9)`};
     return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?C.gold:has?col:C.border}`,boxShadow:seld?`0 0 0 2px ${C.gold}`:"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
-      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}% avg</div>
+      <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}%</div>
+      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>avg</div>
       {isNow && <div style={{position:"absolute",zIndex:1,...nowS}}/>}
-      {isNow && <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,nowF*100)}%`,fontSize:10,fontWeight:800,color:"rgba(255,255,255,0.85)",lineHeight:1,pointerEvents:"none"}}>now</div>}
+      {isNow && <div style={{position:"absolute",zIndex:4,top:1,left:`${Math.min(94,nowF*100)}%`,transform:"translateX(-50%)",fontSize:9,fontWeight:800,color:"rgba(255,255,255,0.95)",lineHeight:1,pointerEvents:"none",textShadow:"0 1px 2px rgba(0,0,0,0.7)"}}>now</div>}
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
           <span style={{fontSize:19,fontWeight:800,color:C.textMid}}>{lb}</span>
@@ -10158,14 +10159,14 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const BAR_W=58,BAR_H=50,AMTS=[5,10,15,20,30,45,60];
   return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
     <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8,flex:1,minHeight:0}}>
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
+        <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+      </div>
       <div style={{display:"flex",gap:8,height:88,flexShrink:0}}>
         <div style={{flex:1}}><Bar slot="morning" vertical/></div>
         <div style={{flex:1}}><Bar slot="midday" vertical/></div>
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
-      </div>
-      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
-        <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
-        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
@@ -11470,13 +11471,16 @@ export default function App() {
   const [bibleChosen, setBibleChosen] = useState(false); // page shows only after a menu pick
   const [drillSignal, setDrillSignal] = useState(0);
   const TAB_DEFAULT_TAGS = {prayer:"Prayed",names:"Names_Review"};
+  const backTargetRef = React.useRef("today");
   const saveMainTab = (t) => {
+    if (activeMainTab !== t) backTargetRef.current = activeMainTab;
     setActiveMainTab(t);
     localStorage.setItem("jtMainTab",t);
     if (TAB_DEFAULT_TAGS[t]) {
       setSelectedFilterTags([TAB_DEFAULT_TAGS[t]]);
     }
   };
+  const goBack = () => { const t = backTargetRef.current || "today"; setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab(t); };
   const openTagTab = (tag) => {
     const t = TAG_TAB_MAP[tag];
     if (!t) return;
@@ -12272,6 +12276,7 @@ export default function App() {
         </div>
         {/* Stats — flex:1, shifts right as date expands */}
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
+          <button onClick={goBack} title="Back" style={{pointerEvents:"auto",flexShrink:0,fontSize:20,fontWeight:800,color:C.gold,background:"#000",border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 11px",cursor:"pointer",lineHeight:1.1,marginRight:4}}>‹</button>
           <div style={{flex:1,display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
