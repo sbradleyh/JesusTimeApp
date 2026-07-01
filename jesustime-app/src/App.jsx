@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v196";
+const APP_VERSION = "v198";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3500,12 +3500,12 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                     </div>
                     <div style={{display:"flex",gap:10}}>
                       <div style={{flex:1,minWidth:0}}>
-                        <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>APPS</div>
-                        {_appItems.map(navRow)}
-                      </div>
-                      <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>GRAPHS</div>
                         {_graphItems.map(navRow)}
+                      </div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>APPS</div>
+                        {_appItems.map(navRow)}
                       </div>
                     </div>
                   </div>
@@ -8880,7 +8880,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             <div style={{padding:"6px 10px",borderBottom:`1px solid ${C.border}`}}>
               <div style={{fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:4}}>Show</div>
               <div style={{display:"flex",gap:6}}>
-                {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","My Teaching",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
+                {[["h","Historical Jesus Names",srcH,setSrcH,"jtSrcH"],["p","Taught",srcP,setSrcP,"jtSrcP"],["c","In Christ",srcC,setSrcC,"jtSrcC"]].map(([key,l,on,setter,lk])=>(
                   <button key={key} onClick={()=>{
                     const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]);
                     if (on && !othersOn) return; // keep at least one source on
@@ -8920,7 +8920,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
             </div>
             <div style={{display:"flex",gap:6,padding:"6px 10px",borderBottom:`1px solid ${C.border}`,alignItems:"center"}}>
               <input value={entryVal} onChange={e=>setEntryVal(e.target.value)} maxLength={80}
-                placeholder="Add a name of Jesus…"
+                placeholder="Taught by Jesus …"
                 onKeyDown={e=>{ if(e.key==="Enter") addPersonal(); }}
                 style={{flex:1,minWidth:0,padding:"8px 10px",borderRadius:8,border:`1px solid ${C.border}`,
                   background:C.inputBg,color:C.text,fontSize:14,outline:"none"}}/>
