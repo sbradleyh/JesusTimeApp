@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v180";
+const APP_VERSION = "v184";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -3461,8 +3461,10 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                 const out = [];
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
                 const _graphs = [["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
+                const _bibleExtra = [["bible:mem","🧠","Bible Memory"],["bible:drill","📚","Bible Books"]];
                 const _navItems = [
-                  ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
+                  ...alphaTabs.filter(id=>!["abide","today"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
+                  ..._bibleExtra.map(b=>({key:b[0], icon:b[1], label:b[2], tap:()=>{onSelectTab(b[0]);setMenuOpen(false);}})),
                   ..._graphs.map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}))
                 ].sort((a,b)=>a.label.localeCompare(b.label));
                 const navRow = (it)=>(
@@ -10029,7 +10031,7 @@ function NamesChip({tabStarMap,entries,today}) {
   return <TabChip tag="Names_Review" starKey="names" short="👤" label="Names Review" filter="sepia(1) saturate(3) hue-rotate(80deg)" tabStarMap={tabStarMap} entries={entries} today={today}/>;
 }
 
-function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenMenu=()=>{} }) {
+function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenStreaks=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
   const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
@@ -10119,7 +10121,11 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     </div>
     <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 2px 6px"}}>
-        <span style={{color:C.textFaint,fontSize:11,fontWeight:800,letterSpacing:"0.06em"}}>ADD TO TIME OR ADD A NEW TIME · LOGS TO <span style={{color:SLOT_COLOR[sel]}}>{META[sel][1].toUpperCase()}</span></span>
+        <span style={{display:"flex",alignItems:"baseline",gap:6,flexWrap:"wrap",flex:1,minWidth:0}}>
+          <span onClick={()=>onOpenStreaks()} style={{color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer",textDecoration:"underline"}}>Meetings with Jesus</span>
+          <span onClick={()=>setAdding(a=>!a)} style={{color:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>or add new meeting</span>
+          <span style={{color:SLOT_COLOR[sel],fontSize:10,fontWeight:800,letterSpacing:"0.05em"}}>· {META[sel][1].toUpperCase()}</span>
+        </span>
         <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
       </div>
       {adding && (
@@ -10163,10 +10169,11 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
 }
 
 function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bottomTabVisible={}, saveBottomTabVisible=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, onClose=()=>{} }) {
-  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
+  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
   const GRAPHS = ["g:today","g:square","g:dayline","g:week","g:month","g:year"];
-  const EXCLUDE = new Set(["abide","today","names","chart"]);
-  const CANDIDATES = [...new Set([...(allTabIds&&allTabIds.length?allTabIds:["streaks","bible","prayer","catechism","reader","log"]), ...GRAPHS])].filter(id=>TAB_META[id] && !EXCLUDE.has(id));
+  const BIBLE_SUB = ["bible:mem","bible:drill"];
+  const EXCLUDE = new Set(["abide","today","chart"]);
+  const CANDIDATES = [...new Set([...(allTabIds&&allTabIds.length?allTabIds:["streaks","bible","prayer","catechism","reader","log"]), ...BIBLE_SUB, ...GRAPHS])].filter(id=>TAB_META[id] && !EXCLUDE.has(id));
   const DEFAULT = [{main:"g:square",sub:[]},{main:"streaks",sub:[]},{main:"bible",sub:[]},{main:"prayer",sub:[]},{main:"log",sub:[]}];
   const layout = (Array.isArray(barLayout)&&barLayout.length===5) ? barLayout : DEFAULT;
   const [drag,setDrag]=React.useState(null);
@@ -12733,7 +12740,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
-                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
+                          {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
                               {selectedFilterTags.length > 0 && (
