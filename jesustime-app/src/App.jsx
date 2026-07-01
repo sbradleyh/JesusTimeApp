@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v179";
+const APP_VERSION = "v180";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12940,7 +12940,7 @@ export default function App() {
 
       {/* Bottom tab bar */}
       {bottomTabVisible["BAR"]===false ? (
-      <div ref={el=>{ if(el && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h","0px"); }} />
+      <div ref={el=>{ if(el && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h","env(safe-area-inset-bottom)"); }} />
       ) : (
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-tab-h", h+"px"); } }} style={{flexShrink:0,background:C.card,borderTop:`1px solid ${C.border}`,
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
