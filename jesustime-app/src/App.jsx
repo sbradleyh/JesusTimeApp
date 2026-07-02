@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v221";
+const APP_VERSION = "v223";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -8914,7 +8914,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               ))}
             </div>
             <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>STYLE</div>
-            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6,flexWrap:"nowrap"}}>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10,flexWrap:"nowrap"}}>
               <button onClick={()=>bumpTitle(-0.1)} title="Smaller"
                 style={{width:34,padding:"7px 0",borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",flexShrink:0}}>A−</button>
               <span style={{fontSize:11,fontWeight:700,color:C.textMid,minWidth:32,textAlign:"center",flexShrink:0}}>{Math.round(titleScale*100)}%</span>
@@ -8923,15 +8923,15 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <PDrop C={C} value={titleFont} onChange={setTitleF}
                 wrapStyle={{flex:1,minWidth:48}} btnStyle={{height:36,borderRadius:9,cursor:"pointer",width:"100%",fontFamily:titleFont||undefined}}
                 options={PRES_FONTS.map(([l,f])=>[f, l, {fontFamily:f||undefined}])}/>
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10,overflowX:"auto",paddingBottom:2}}>
-              <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:30,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
-              {recentColors.map(c=>(
-                <button key={c} onClick={()=>pickColor(c)} style={{width:22,height:22,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
-              ))}
+              <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:1,minWidth:0,overflowX:"auto",maxWidth:"46%"}}>
+                <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
+                {recentColors.map(c=>(
+                  <button key={c} onClick={()=>pickColor(c)} style={{width:20,height:20,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
+                ))}
+              </div>
             </div>
             <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"0 0 4px 2px"}}>SLIDESHOW</div>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
               <span style={{fontSize:12,fontWeight:700,color:C.textMid,flexShrink:0}}>Rotate</span>
               <PDrop C={C} value={delaySec} onChange={v=>setDelay(v)}
                 wrapStyle={{flexShrink:0,minWidth:76}} btnStyle={{height:34,borderRadius:9,cursor:"pointer",padding:"0 10px"}}
@@ -8939,10 +8939,10 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
               <button onClick={toggleHideAuthor}
                 style={{marginLeft:"auto",flexShrink:0,padding:"8px 12px",borderRadius:9,fontSize:13,fontWeight:700,cursor:"pointer",
                   border:`1px solid ${hideAuthor?C.gold:C.border}`,background:hideAuthor?"rgba(212,160,23,0.15)":"transparent",color:hideAuthor?C.gold:C.textMid}}>{hideAuthor?"✓ Author hidden":"Hide author"}</button>
+              <button onClick={()=>{ setMenuOpen(false); setEditCat(true); }} title="Edit Taught list"
+                style={{flexShrink:0,padding:"8px 12px",borderRadius:9,fontSize:13,fontWeight:800,cursor:"pointer",
+                  border:`1px solid rgba(212,160,23,0.35)`,background:"rgba(212,160,23,0.12)",color:C.gold}}>✏️ Edit</button>
             </div>
-            <button onClick={openTaughtPop}
-              style={{width:"100%",padding:"11px 12px",borderRadius:12,border:`1px solid rgba(212,160,23,0.35)`,
-                background:"linear-gradient(135deg, rgba(212,160,23,0.14), rgba(212,160,23,0.05))",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer",textAlign:"center"}}>✏️ Taught by Jesus …</button>
           </div>
         </>)}
       </div>
@@ -11695,8 +11695,7 @@ export default function App() {
       else if (w >= 820) z = 1.15;
       try {
         const de = document.documentElement;
-        const vv = window.visualViewport;
-        const vh = Math.max(vv ? Math.round(vv.height * (vv.scale || 1)) : 0, window.innerHeight || 0, de.clientHeight || 0);
+        const vh = (document.body && document.body.clientHeight) || window.innerHeight || de.clientHeight;
         if (!vh) return;
         if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", vh + "px"); }
         else { de.style.zoom = String(z); de.style.setProperty("--jt-vh", `calc(100dvh / ${z})`); }
@@ -12327,7 +12326,7 @@ export default function App() {
   };
 
   return (
-    <div className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
+    <div className="jt-app" style={{height:"100%",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
       overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,paddingTop:0,paddingBottom:0,paddingLeft:"env(safe-area-inset-left)",paddingRight:"env(safe-area-inset-right)"}}>
       {/* Title/stats row */}
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
