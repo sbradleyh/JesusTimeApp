@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v219";
+const APP_VERSION = "v221";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10209,14 +10209,13 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
     const nowS={top:0,bottom:0,left:`${Math.min(97,nowF*100)}%`,borderLeft:`2px solid rgba(255,255,255,0.9)`};
     return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?"#d4a017":has?col:C.border}`,boxShadow:seld?"0 0 12px rgba(212,160,23,0.55), 0 0 0 1px #d4a017":"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
-      <div style={{position:"absolute",zIndex:1,...avgS}}/>
       <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?1:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
-          <span style={{fontSize:19,fontWeight:800,color:C.textMid}}>{lb}</span>
+          <span style={{fontSize:21,fontWeight:800,color:C.textMid}}>{lb}</span>
           <span style={{fontSize:vertical?24:20,lineHeight:1}}>{ic}</span>
         </div>
-        <span style={{fontSize:19,fontWeight:800,color:pct>=avg?"#4ade80":"#f0a030",lineHeight:1}}>{pct}%<span style={{fontSize:14,fontWeight:700,color:has?col:C.textFaint,marginLeft:6}}>{fmt(todayMins[slot])}</span></span>
-        <span style={{fontSize:11,fontWeight:700,color:`rgba(${C.ink},0.8)`,lineHeight:1}}>avg {avg}%</span>
+        <span style={{fontSize:19,fontWeight:800,color:pct>=avg?"#4ade80":"#f0a030",lineHeight:1}}>{pct}%<span style={{fontSize:15,fontWeight:700,color:has?col:C.textFaint,marginLeft:6}}>{fmt(todayMins[slot])}</span></span>
+        <span style={{fontSize:12,fontWeight:700,color:`rgba(${C.ink},0.8)`,lineHeight:1}}>avg {avg}%</span>
       </div>
     </div>);
   };
@@ -11710,10 +11709,11 @@ export default function App() {
     window.addEventListener("resize", apply);
     window.addEventListener("orientationchange", applyLater);
     window.addEventListener("pageshow", applySettle);
+    window.addEventListener("load", applySettle);
     window.addEventListener("focus", apply);
     const vv = window.visualViewport;
     if (vv) vv.addEventListener("resize", apply);
-    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); window.removeEventListener("pageshow", applySettle); window.removeEventListener("focus", apply); if (vv) vv.removeEventListener("resize", apply); };
+    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); window.removeEventListener("pageshow", applySettle); window.removeEventListener("load", applySettle); window.removeEventListener("focus", apply); if (vv) vv.removeEventListener("resize", apply); };
   }, []);
 
   const [userInitials, setUserInitials] = useState(() => localStorage.getItem("ofInitials")||"");
@@ -13589,9 +13589,9 @@ export default function App() {
       )}
 
       <style>{`
-        html { height: var(--jt-vh,100dvh); background: ${C.bg}; overflow: hidden; overscroll-behavior: none; }
-        body { margin:0; padding:0; width:100%; height:var(--jt-vh,100dvh); overflow:hidden; background:${C.bg}; position:fixed; inset:0; overscroll-behavior:none; }
-        #root { height: var(--jt-vh,100dvh); overflow: hidden; }
+        html { height: 100%; background: ${C.bg}; overflow: hidden; overscroll-behavior: none; }
+        body { margin:0; padding:0; overflow:hidden; background:${C.bg}; position:fixed; top:0; left:0; right:0; bottom:0; overscroll-behavior:none; }
+        #root { height: 100%; overflow: hidden; }
         * { -webkit-tap-highlight-color:transparent; box-sizing:border-box; }
         button { transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease, transform .1s ease; }
         button:active { transform: scale(0.96); }
