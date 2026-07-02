@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v217";
+const APP_VERSION = "v218";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -10199,32 +10199,31 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
   const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
   const yest=(()=>{const d=new Date(today+"T00:00:00"); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10);})();
   const sortVal=t=>usedToday.has(t)?computeStreak(t,entries,today):computeStreak(t,entries,yest);
-  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>sortVal(b)-sortVal(a));
+  const riskOf=t=>(!usedToday.has(t) && sortVal(t)>0)?1:0;
+  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>(riskOf(b)-riskOf(a))||(sortVal(b)-sortVal(a)));
   const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[sel]},today); setPick(null); };
   const nowFracOf=(slot)=>{ const d=new Date(); const h=d.getHours()+d.getMinutes()/60; if(slot==="morning") return Math.min(1,Math.max(0,h/11)); if(slot==="midday") return Math.min(1,Math.max(0,(h-11)/5)); return Math.min(1,Math.max(0,(h-16)/8)); };
   const Bar=({slot,vertical})=>{ const [ic,lb]=META[slot]; const col=SLOT_COLOR[slot]; const has=todayMins[slot]>0; const pct=slotPct[slot]; const avg=slotAvg[slot]; const seld=sel===slot; const isNow=slot===cur; const nowF=nowFracOf(slot);
     const fillS=vertical?{left:0,right:0,bottom:0,height:`${Math.min(100,pct)}%`}:{top:0,bottom:0,left:0,width:`${Math.min(100,pct)}%`};
     const avgS=vertical?{left:0,right:0,bottom:`${Math.min(100,avg)}%`,borderTop:`2px dashed rgba(${C.ink},0.55)`}:{top:0,bottom:0,left:`${Math.min(100,avg)}%`,borderLeft:`2px dashed rgba(${C.ink},0.55)`};
     const nowS={top:0,bottom:0,left:`${Math.min(97,nowF*100)}%`,borderLeft:`2px solid rgba(255,255,255,0.9)`};
-    return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?C.gold:has?col:C.border}`,boxShadow:seld?`0 0 0 2px ${C.gold}`:"none",background:`rgba(${C.ink},0.05)`}}>
+    return (<div onClick={()=>setSel(slot)} style={{position:"relative",width:"100%",height:"100%",overflow:"hidden",cursor:"pointer",borderRadius:12,boxSizing:"border-box",border:`1px solid ${seld?"#d4a017":has?col:C.border}`,boxShadow:seld?"0 0 12px rgba(212,160,23,0.55), 0 0 0 1px #d4a017":"none",background:`rgba(${C.ink},0.05)`}}>
       <div style={{position:"absolute",background:hexA(col,0.3),transition:"all .4s ease",zIndex:0,...fillS}}/>
       <div style={{position:"absolute",zIndex:1,...avgS}}/>
-      <div style={{position:"absolute",zIndex:3,left:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>{avg}%</div>
-      <div style={{position:"absolute",zIndex:3,right:3,bottom:`${Math.min(92,avg)}%`,fontSize:11,fontWeight:800,color:`rgba(${C.ink},0.95)`,lineHeight:1,pointerEvents:"none"}}>avg</div>
-      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?2:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
+      <div style={{position:"relative",zIndex:2,height:"100%",display:"flex",flexDirection:vertical?"column":"row",alignItems:"center",justifyContent:"center",gap:vertical?1:8,padding:vertical?"2px 2px":"0 8px",textAlign:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:4}}>
           <span style={{fontSize:19,fontWeight:800,color:C.textMid}}>{lb}</span>
           <span style={{fontSize:vertical?24:20,lineHeight:1}}>{ic}</span>
         </div>
-        <span style={{fontSize:19,fontWeight:800,color:has?col:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:1}}>{pct}%<span style={{fontSize:14,color:pct>=avg?"#4ade80":"#f0a030"}}>{pct>=avg?"▲":"▼"}</span></span>
-        <span style={{fontSize:15,fontWeight:700,color:has?col:C.textFaint,opacity:0.85}}>{fmt(todayMins[slot])}</span>
+        <span style={{fontSize:19,fontWeight:800,color:pct>=avg?"#4ade80":"#f0a030",lineHeight:1}}>{pct}%<span style={{fontSize:14,fontWeight:700,color:has?col:C.textFaint,marginLeft:6}}>{fmt(todayMins[slot])}</span></span>
+        <span style={{fontSize:11,fontWeight:700,color:`rgba(${C.ink},0.8)`,lineHeight:1}}>avg {avg}%</span>
       </div>
     </div>);
   };
   const BAR_W=58,BAR_H=50,AMTS=[5,10,15,20,30,45,60];
   return (<div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
-    <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8,flex:1,minHeight:0}}>
-      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flex:1,minHeight:0,overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:18,textAlign:"center"}}>
+    <div style={{width:"100%",maxWidth:380,display:"flex",flexDirection:"column",gap:8,flexShrink:0}}>
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{flexShrink:0,maxHeight:"52vh",overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:"22px 18px",textAlign:"center"}}>
         <span style={{fontSize:`calc(clamp(22px,6.5vw,36px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
         {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(13px,3.5vw,17px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
       </div>
@@ -10234,17 +10233,17 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
         <div style={{flex:1}}><Bar slot="evening" vertical/></div>
       </div>
     </div>
-    <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"25%",overflowY:"auto"}}>
+    <div style={{width:"100%",maxWidth:380,flex:1,minHeight:0,overflowY:"auto"}}>
       <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 2px 6px"}}>
         <span style={{display:"flex",alignItems:"baseline",gap:6,flexWrap:"wrap",flex:1,minWidth:0}}>
           <span onClick={()=>onOpenStreaks()} style={{color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer",textDecoration:"underline"}}>Meetings with Jesus</span>
           <span onClick={()=>setAdding(a=>!a)} style={{color:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>or add new meeting</span>
-          <span style={{color:SLOT_COLOR[sel],fontSize:10,fontWeight:800,letterSpacing:"0.05em"}}>· {META[sel][1].toUpperCase()}</span>
         </span>
         <button onClick={()=>setAdding(a=>!a)} title="Add a streak" style={{width:24,height:24,borderRadius:7,border:`1px solid ${adding?C.gold:C.border}`,background:adding?"rgba(212,160,23,0.15)":"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1,flexShrink:0,padding:0}}>+</button>
       </div>
       {adding && (
-        <div style={{display:"flex",gap:6,margin:"0 2px 8px"}}>
+        <div style={{display:"flex",gap:6,margin:"0 2px 8px",alignItems:"center"}}>
+          <span style={{color:SLOT_COLOR[sel],fontSize:10,fontWeight:800,letterSpacing:"0.05em",flexShrink:0}}>{META[sel][1].toUpperCase()}</span>
           <input value={newStreak} onChange={e=>setNewStreak(e.target.value)} maxLength={40} autoFocus
             onKeyDown={e=>{ if(e.key==="Enter" && newStreak.trim()){ setPick(newStreak.trim()); setAdding(false); setNewStreak(""); } }}
             placeholder="New streak name…"
@@ -10256,7 +10255,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); const atRisk=!done && st>0; return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
-            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.8}}>{st}d</span>}
+            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
           </button>
         );})}
       </div>
@@ -12345,7 +12344,7 @@ export default function App() {
         </div>
         {/* Stats — flex:1, shifts right as date expands */}
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
-          <button onClick={goBack} title="Back" style={{pointerEvents:"auto",flexShrink:0,fontSize:20,fontWeight:800,color:C.gold,background:"#000",border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 11px",cursor:"pointer",lineHeight:1.1,marginRight:4}}>‹</button>
+          <button onClick={goBack} title="Back" style={{pointerEvents:"auto",flexShrink:0,alignSelf:"stretch",display:"flex",alignItems:"center",fontSize:20,fontWeight:800,color:C.gold,background:"#000",border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 11px",cursor:"pointer",lineHeight:1.1,marginRight:4}}>‹</button>
           <div style={{flex:1,display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
