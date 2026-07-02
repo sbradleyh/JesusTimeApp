@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v218";
+const APP_VERSION = "v219";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11697,18 +11697,23 @@ export default function App() {
       try {
         const de = document.documentElement;
         const vv = window.visualViewport;
-        const vh = vv ? Math.round(vv.height) : window.innerHeight;
+        const vh = Math.max(vv ? Math.round(vv.height * (vv.scale || 1)) : 0, window.innerHeight || 0, de.clientHeight || 0);
+        if (!vh) return;
         if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", vh + "px"); }
         else { de.style.zoom = String(z); de.style.setProperty("--jt-vh", `calc(100dvh / ${z})`); }
       } catch(e){}
     };
     apply();
     const applyLater = () => { apply(); setTimeout(apply, 300); };
+    const applySettle = () => { apply(); setTimeout(apply, 120); setTimeout(apply, 400); setTimeout(apply, 1000); };
+    applySettle();
     window.addEventListener("resize", apply);
     window.addEventListener("orientationchange", applyLater);
+    window.addEventListener("pageshow", applySettle);
+    window.addEventListener("focus", apply);
     const vv = window.visualViewport;
     if (vv) vv.addEventListener("resize", apply);
-    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); if (vv) vv.removeEventListener("resize", apply); };
+    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); window.removeEventListener("pageshow", applySettle); window.removeEventListener("focus", apply); if (vv) vv.removeEventListener("resize", apply); };
   }, []);
 
   const [userInitials, setUserInitials] = useState(() => localStorage.getItem("ofInitials")||"");
