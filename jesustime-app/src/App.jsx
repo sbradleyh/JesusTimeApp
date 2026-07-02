@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v245";
+const APP_VERSION = "v246";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -357,7 +357,7 @@ function CelebrationBurst() {
 }
 
 
-function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false, elapsedGray=false}) {
+function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false, elapsedGray=false, stackTop=false}) {
   const cx = size/2, cy = size/2, r = (size-stroke)/2;
   const mc = "#2a5ab8", dc = "#3aaa55", ec = "#e05a18";
   const total = morningMins + middayMins + eveningMins;
@@ -453,7 +453,10 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         return <path d={`M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y} Z`}
           fill="rgba(150,150,150,0.30)" pointerEvents="none"/>;
       })()}
-      {clockMode ? (
+      {clockMode && stackTop ? (
+        /* Cumulative fill from top: colored by slot, grows as time is added */
+        (()=>{ const DM=16*60; const parts=[["morning",mc,anim.m],["midday",dc,anim.d],["evening",ec,anim.e]]; let acc=0; return parts.map(([sl,cl,mn],i)=>{ if(mn<=0) return null; const a0=acc/DM*360; acc+=mn; const a1=Math.min(360,acc/DM*360); return sector(a0,a1,cl,`st${i}`,sl); }); })()
+      ) : clockMode ? (
         /* Clock fill: each entry a wedge at its actual time of day */
         [...timeline].sort((a,b)=>(a.ts||0)-(b.ts||0)).map((e,i)=>{
           const d = new Date(e.ts);
@@ -13036,6 +13039,7 @@ export default function App() {
                               timeline={chartTab==="day" ? filteredViewArr : null}
                               showNow={chartTab==="day" && viewDay===today}
                               elapsedGray={chartTab==="day" && viewDay===today}
+                              stackTop={true}
                               onSlotTap={handleSlotTap}/>
 
                             {showAddToCircle && (()=>{
@@ -13312,17 +13316,20 @@ export default function App() {
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
                               {circle2El}
                               {(()=>{
-                                const norm=t=>/^Bible_Read/i.test(t)?"Bible_Read":/^Bible_Memory/i.test(t)?"Bible_Memory":/^Bible_Books/i.test(t)?"Bible_Books":/^Prayed/i.test(t)?"Prayed":/^Names_Review/i.test(t)?"Names_Review":t;
+                                const ciTag=x=>String(x||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+                                const norm=t=>/^Bible_Read/i.test(t)?"Bible_Read":/^Bible_Memory/i.test(t)?"Bible_Memory":/^Bible_Books/i.test(t)?"Bible_Books":/^Prayed/i.test(t)?"Prayed":/^Names_Review/i.test(t)?"Names_Review":ciTag(t.replace(/_/g," ")).replace(/ /g,"_");
                                 let del=[]; try{del=JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){}
-                                const set=new Set(["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"]);
-                                starredTags.forEach(t=>set.add(t.replace(/ /g,"_")));
-                                Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) set.add(norm(t));})));
-                                const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) usedT.add(norm(t));}));
+                                const map=new Map();
+                                const add=t=>{const n=norm(t); const k=n.toLowerCase(); if(!map.has(k)) map.set(k,n);};
+                                ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"].forEach(add);
+                                starredTags.forEach(t=>add(t.replace(/ /g,"_")));
+                                Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) add(t);})));
+                                const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) usedT.add(norm(t).toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
-                                const arr=[...set].filter(t=>!del.includes(t)&&!del.includes(t.replace(/_/g," "))).sort((a,b)=>{const ra=(!usedT.has(a)&&sv(a)>0)?1:0,rb=(!usedT.has(b)&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
+                                const arr=[...map.values()].filter(t=>!del.includes(t)&&!del.includes(t.replace(/_/g," "))).sort((a,b)=>{const ra=(!usedT.has(a.toLowerCase())&&sv(a)>0)?1:0,rb=(!usedT.has(b.toLowerCase())&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
                                 return (
                                   <div style={{width:"100%",maxWidth:420,marginTop:10,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
-                                    {arr.map(tag=>{ const done=usedT.has(tag); const st=sv(tag); const atRisk=!done&&st>0; return (
+                                    {arr.map(tag=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; return (
                                       <button key={tag} onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
                                         style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
                                         <span>{tag.replace(/_/g," ")}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
