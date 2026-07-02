@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v246";
+const APP_VERSION = "v247";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1144,6 +1144,13 @@ function parseDuration(str) {
   return 0;
 }
 function sumMins(arr) { return (arr||[]).reduce((s,e) => s+e.minutes, 0); }
+function dispLabel(t) {
+  const s = String(t||"");
+  const key = s.replace(/[_ ]/g,"").toLowerCase();
+  if (key === "familyworship") return "FamWorship";
+  const parts = s.split(/[_ ]+/).filter(Boolean);
+  return parts.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join("");
+}
 function nowTimeStr() {
   const n = new Date();
   const h = n.getHours(), m = n.getMinutes();
@@ -10246,7 +10253,7 @@ function HomeBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry
         <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
           {doneT.map(tag=>(
             <button key={tag} onClick={()=>onOpenTag(tag)} style={{padding:"6px 10px",borderRadius:999,border:"1px solid rgba(74,222,128,0.5)",background:"rgba(74,222,128,0.10)",color:"#4ade80",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
-              <span>{tag.replace(/_/g," ")}</span><span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{sortVal(tag)}🔥</span>
+              <span>{dispLabel(tag)}</span><span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{sortVal(tag)}🔥</span>
             </button>
           ))}
         </div>
@@ -10333,7 +10340,7 @@ function Today2Body({ entries={}, today, C, tags=[], computeStreak=()=>0, addEnt
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); const atRisk=!done && st>0; return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
-            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
+            <span>{dispLabel(tag)}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
           </button>
         );})}
       </div>
@@ -10548,7 +10555,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
         {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); const atRisk=!done && st>0; return (
           <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
-            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
+            <span>{dispLabel(tag)}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
           </button>
         );})}
       </div>
@@ -13332,7 +13339,7 @@ export default function App() {
                                     {arr.map(tag=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; return (
                                       <button key={tag} onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
                                         style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
-                                        <span>{tag.replace(/_/g," ")}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
+                                        <span>{dispLabel(tag)}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
                                       </button>
                                     );})}
                                   </div>
@@ -13872,7 +13879,7 @@ export default function App() {
               const hit=iso=>(entries[iso]||[]).some(e=>(e.notes||"").toLowerCase().includes(("#"+matchTag).toLowerCase()));
               return (<>
                 <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:6}}>
-                  <span style={{fontSize:22,fontWeight:800,color:doneToday?C.gold:C.text,lineHeight:1.1,wordBreak:"break-word"}}>#{matchTag}</span>
+                  <span style={{fontSize:22,fontWeight:800,color:doneToday?C.gold:C.text,lineHeight:1.1,wordBreak:"break-word"}}>{dispLabel(matchTag)}</span>
                   <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0,paddingTop:4}}>
                     {false&&inCircle&&<span style={{fontSize:13,fontWeight:800,padding:"2px 7px",borderRadius:6,color:"#d4a017",border:"1px solid #d4a017",background:"rgba(212,160,23,0.15)"}}>C</span>}
                     {streak>0&&<span style={{fontSize:18,fontWeight:800,color:doneToday?"#f07a40":C.textFaint,background:doneToday?"rgba(240,122,64,0.15)":`rgba(${C.ink},0.08)`,border:`1px solid ${doneToday?"rgba(240,122,64,0.4)":C.border}`,borderRadius:9,padding:"3px 8px",display:"flex",alignItems:"center",gap:3}}>🔥{streak}d</span>}
