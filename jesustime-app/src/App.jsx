@@ -3,7 +3,17 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v223";
+const APP_VERSION = "v227";
+
+// iOS standalone PWAs read viewport-fit at document load — set it as early as
+// possible (module evaluation, before first paint) so the layout viewport
+// extends under the home indicator instead of leaving a bottom strip.
+(() => { try {
+  let m = document.querySelector('meta[name="viewport"]');
+  if (!m) { m = document.createElement("meta"); m.setAttribute("name","viewport"); document.head.appendChild(m); }
+  const c = m.getAttribute("content") || "width=device-width, initial-scale=1";
+  if (!/viewport-fit/.test(c)) m.setAttribute("content", c + ", viewport-fit=cover");
+} catch(e){} })();
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -2566,21 +2576,22 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
   const nowPct=Math.max(0,Math.min(100,((nowHour-SLOT_START[nowSlot])/SLOT_HRS[nowSlot])*100));
   const timeBubbles = [["morning","☀️","Morn"],["midday","🕑","Noon"],["evening","🌙","Night"]].map(([slot,icon,lbl])=>{
     const mins=slotMins[slot]; const narrow=(slotPos==="top"||slotPos==="bottom")?true:(cols>=2); const pct=slotPct[slot]; const fillPct=Math.min(100,pct); const slotAvg=Math.round(allSlotAvg[slot]); const over=pct>=slotAvg;
+    const fmtM = mins>0?(mins>=60?`${Math.floor(mins/60)}h${mins%60?` ${mins%60}m`:""}`:`${mins}m`):"—";
+    const isCur = slot===nowSlot;
     return (
-      <div key={slot} onClick={()=>setSelectedSlot(s=>s===slot?null:slot)} style={{cursor:"pointer",position:"relative",overflow:"hidden",borderRadius:14,border:`1px solid ${selectedSlot===slot?C.gold:mins>0?C.borderHi:C.border}`,boxShadow:selectedSlot===slot?`0 0 0 2px ${C.gold}`:"none",boxSizing:"border-box",flex:1,minHeight:0,background:`rgba(${C.ink},0.05)`}}>
+      <div key={slot} onClick={()=>setSelectedSlot(s=>s===slot?null:slot)} style={{cursor:"pointer",position:"relative",overflow:"hidden",borderRadius:12,boxSizing:"border-box",flex:1,minHeight:0,
+        border:`1px solid ${selectedSlot===slot?"#d4a017":isCur?"#d4a017":mins>0?C.borderHi:C.border}`,
+        boxShadow:(selectedSlot===slot||isCur)?"0 0 12px rgba(212,160,23,0.55), 0 0 0 1px #d4a017":"none",
+        background:`rgba(${C.ink},0.05)`}}>
         <div style={{position:"absolute",left:0,right:0,bottom:0,height:`${fillPct}%`,background:`rgba(${C.ink},0.20)`,zIndex:0}}/>
-        <div style={{position:"absolute",left:0,right:0,bottom:`${Math.min(100,slotAvg)}%`,borderTop:`2px dashed rgba(${C.ink},0.55)`,zIndex:1}}><span style={{position:"absolute",left:2,top:-9,fontSize:11,fontWeight:800,color:C.textMid,background:C.bg,padding:"0 3px",borderRadius:3}}>avg</span></div>
-        {slot===nowSlot && (<div style={{position:"absolute",left:0,right:0,bottom:`${nowPct}%`,borderTop:"2px solid #3b82f6",zIndex:1}}><span style={{position:"absolute",right:2,top:-9,fontSize:11,fontWeight:800,color:"#3b82f6",background:C.bg,padding:"0 3px",borderRadius:3}}>now</span></div>)}
-        <div style={{position:"relative",zIndex:2,height:"100%",padding:"12px 12px",boxSizing:"border-box",
-          display:"flex",flexDirection:narrow?"column":"row",alignItems:narrow?"center":"flex-start",justifyContent:narrow?"flex-start":"center",gap:narrow?3:10,textAlign:"center"}}>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,flexShrink:0}}>
-          <span style={{fontSize:narrow?18:23,fontWeight:700,color:mins>0?C.gold:C.textFaint,opacity:0.85,lineHeight:1}}>{mins>0?(mins>=60?`${Math.floor(mins/60)}h${mins%60?` ${mins%60}m`:""}`:`${mins}m`):"—"}</span>
-          <span style={{fontSize:narrow?34:44,lineHeight:1}}>{icon}</span>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:2,minWidth:0,alignItems:narrow?"center":"flex-start"}}>
-          <span style={{fontSize:narrow?16:21,fontWeight:800,color:C.textMid}}>{lbl}</span>
-          <span style={{fontSize:narrow?20:30,fontWeight:800,color:mins>0?C.gold:C.textFaint,lineHeight:1,display:"flex",alignItems:"center",gap:3}}>{pct}%<span style={{fontSize:narrow?15:20,color:over?"#4ade80":"#f0a030"}}>{over?"▲":"▼"}</span></span>
-        </div>
+        <div style={{position:"relative",zIndex:2,height:"100%",padding:"10px 8px",boxSizing:"border-box",
+          display:"flex",flexDirection:narrow?"column":"row",alignItems:"center",justifyContent:"center",gap:narrow?2:10,textAlign:"center"}}>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <span style={{fontSize:narrow?21:23,fontWeight:800,color:C.textMid}}>{lbl}</span>
+            <span style={{fontSize:narrow?26:34,lineHeight:1}}>{icon}</span>
+          </div>
+          <span style={{fontSize:narrow?20:26,fontWeight:800,color:over?"#4ade80":"#f0a030",lineHeight:1}}>{pct}%<span style={{fontSize:narrow?15:18,fontWeight:700,color:mins>0?C.gold:C.textFaint,marginLeft:6}}>{fmtM}</span></span>
+          <span style={{fontSize:narrow?12:14,fontWeight:700,color:`rgba(${C.ink},0.8)`,lineHeight:1}}>avg {slotAvg}%</span>
         </div>
       </div>
     );
@@ -2694,8 +2705,8 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
             <span>Restore {deletedTags.length} hidden tag{deletedTags.length>1?"s":""}</span>
           </button> : null}
         </div>}
-      {slotPos==="top" && (<div style={{display:"flex",gap:8,marginBottom:8,height:128}}>{timeBubbles}</div>)}
-      <div style={{display:"flex",gap:8,alignItems:"stretch",height: slotPos!=="off" ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px${(slotPos==="top"||slotPos==="bottom") ? " - 136px" : ""})` : undefined}}>
+      {slotPos==="top" && (<div style={{display:"flex",gap:8,marginBottom:8,height:88}}>{timeBubbles}</div>)}
+      <div style={{display:"flex",gap:8,alignItems:"stretch",height: slotPos!=="off" ? `calc(var(--jt-vh,100dvh) - var(--jt-title-h, 116px) - var(--jt-tab-h, 64px) - ${showFilters ? 104 : 8}px${(slotPos==="top"||slotPos==="bottom") ? " - 96px" : ""})` : undefined}}>
       {slotPos==="left" && (<div style={{flex: cols>=2 ? "0 0 30%" : "0 0 56%",display:"flex",flexDirection:"column",gap:8,minWidth:0}}>{timeBubbles}</div>)}
       <div style={{flex:1,minWidth:0,minHeight:0,alignContent:"start",overflowY: slotPos!=="off" ? "auto" : "visible",display:"grid",gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,gap:8}}>
         {!hasHeaders && (
@@ -2814,7 +2825,7 @@ function TopTagsChart({entries, chartTab, viewDay, viewOffset, today, starredTag
         })}
       </div>
       </div>
-      {slotPos==="bottom" && (<div style={{display:"flex",gap:8,marginTop:8,height:128}}>{timeBubbles}</div>)}
+      {slotPos==="bottom" && (<div style={{display:"flex",gap:8,marginTop:8,height:88}}>{timeBubbles}</div>)}
       {visibleTags.length===0 && (
         <div style={{textAlign:"center",padding:"12px 8px"}}>
           <div style={{color:C.textFaint,fontSize:13,fontStyle:"italic",marginBottom:8}}>
@@ -3460,7 +3471,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                   .sort((a,b)=>((TAB_META[a]||["",a])[1]).localeCompare((TAB_META[b]||["",b])[1]));
                 const out = [];
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
-                const _graphs = [["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
+                const _graphs = [["home2","🏠","Home"],["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
                 const _bibleExtra = [["bible:mem","🧠","Bible Memory"],["bible:drill","📚","Bible Books"]];
                 const _appItems = [
                   ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
@@ -10146,6 +10157,109 @@ function FitText({ text, min=16, max=180, scale=1, style }) {
   return <div ref={ref} style={{width:"100%",boxSizing:"border-box",overflow:"hidden",...style}}>{text}</div>;
 }
 
+function HomeBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onOpenStreaks=()=>{} }) {
+  const SLOT_HRS={morning:11,midday:5,evening:8};
+  const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
+  const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
+  const META={morning:["☀️","Morn"],midday:["🕑","Noon"],evening:["🌙","Night"]};
+  const cur=(()=>{const h=new Date().getHours();return h<11?"morning":h<16?"midday":"evening";})();
+  const [styleTick,setStyleTick]=React.useState(0); void styleTick;
+  React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
+  React.useEffect(()=>{ const f=()=>{ if(window.innerWidth>window.innerHeight*1.2) onSlideshow(); }; window.addEventListener("resize",f); window.addEventListener("orientationchange",f); return ()=>{window.removeEventListener("resize",f);window.removeEventListener("orientationchange",f);}; },[]); // eslint-disable-line
+  const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
+  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
+  const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
+  const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
+  const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
+  const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
+  const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
+    if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
+    const out=[]; const idx=g.map(()=>0); let rem=g.reduce((s,x)=>s+x.length,0); let gi=0;
+    while(rem>0){const k=gi%g.length; const arr=g[k]; if(idx[k]<arr.length){out.push(arr[idx[k]]); idx[k]++; rem--;} gi++;}
+    return out.length?out:[{n:"",a:""}]; })();
+  const [si,setSi]=React.useState(0);
+  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),Math.max(2,rotateSec)*1000); return ()=>clearInterval(t); },[slides.length,rotateSec]); // eslint-disable-line
+  const curSlide=slides[si%Math.max(1,slides.length)]||{n:"",a:""};
+  const todayMins={morning:0,midday:0,evening:0};
+  (entries[today]||[]).forEach(e=>{const s=getTimeSlot(e.ts); if(s in todayMins) todayMins[s]+=(e.minutes||0);});
+  const slotPct={}; Object.keys(todayMins).forEach(s=>slotPct[s]=Math.round(todayMins[s]/(SLOT_HRS[s]*60)*100));
+  const allMins={morning:0,midday:0,evening:0}; const keys=Object.keys(entries).filter(k=>(entries[k]||[]).length);
+  keys.forEach(k=>(entries[k]||[]).forEach(e=>{const s=getTimeSlot(e.ts); if(s in allMins) allMins[s]+=(e.minutes||0);}));
+  let nAll=1; if(keys.length){const srt=keys.slice().sort(); const span=Math.round((new Date(today)-new Date(srt[0]))/86400000)+1; nAll=Math.max(keys.length,span>0?span:1);}
+  const slotAvg={}; Object.keys(allMins).forEach(s=>slotAvg[s]=Math.round(allMins[s]/(SLOT_HRS[s]*60*nAll)*100));
+  const fmt=m=>m>0?(m>=60?`${Math.floor(m/60)}h${m%60?` ${m%60}m`:""}`:`${m}m`):"—";
+  const ciTag=s=>String(s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const normS=(raw)=>{ const t=raw.slice(1).replace(/Prayed_\d+/,"Prayed");
+    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory/i.test(t))return "Bible_Memory"; if(/^Bible_Books/i.test(t))return "Bible_Books";
+    if(/^Names_Review_\d+/i.test(t))return "Names_Review"; if(/^Prayer_Request_Answered/i.test(t))return "Prayer_Request_Answered";
+    if(/^Prayer_Request/i.test(t))return "Prayer_Request"; if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
+    if(/^Look4Jesus/i.test(t))return "Look4Jesus"; if(/_\d{8,}$/.test(t))return null;
+    return ciTag(t.split("-")[0].replace(/_/g," ")); };
+  const deletedT=(()=>{try{return JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){return [];}})();
+  const tagSet=new Set(["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"]);
+  Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)tagSet.add(t);})));
+  (tags||[]).forEach(t=>tagSet.add(t));
+  const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
+  const yest=(()=>{const d=new Date(today+"T00:00:00"); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10);})();
+  const sortVal=t=>usedToday.has(t)?computeStreak(t,entries,today):computeStreak(t,entries,yest);
+  const live=Array.from(tagSet).filter(t=>!deletedT.includes(t));
+  const atRisk=live.filter(t=>!usedToday.has(t)&&sortVal(t)>0).sort((a,b)=>sortVal(b)-sortVal(a));
+  const doneT=live.filter(t=>usedToday.has(t)).sort((a,b)=>sortVal(b)-sortVal(a));
+  const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[cur]},today); };
+  const totalToday=todayMins.morning+todayMins.midday+todayMins.evening;
+  const seg=(slot)=>{ const col=SLOT_COLOR[slot]; const pct=slotPct[slot]; const isCur=slot===cur; const [ic,lb]=META[slot];
+    return (
+      <div key={slot} onClick={()=>onOpenStreaks()} style={{flex:SLOT_HRS[slot],minWidth:0,position:"relative",height:46,borderRadius:10,overflow:"hidden",cursor:"pointer",boxSizing:"border-box",
+        border:`1px solid ${isCur?"#d4a017":C.border}`,boxShadow:isCur?"0 0 10px rgba(212,160,23,0.5)":"none",background:`rgba(${C.ink},0.05)`}}>
+        <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${Math.min(100,pct)}%`,background:`${col}55`,transition:"width .4s ease"}}/>
+        <div style={{position:"relative",zIndex:1,height:"100%",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",lineHeight:1.1}}>
+          <span style={{fontSize:12,fontWeight:800,color:C.textMid}}>{lb} {ic}</span>
+          <span style={{fontSize:13,fontWeight:800,color:pct>=slotAvg[slot]?"#4ade80":"#f0a030"}}>{pct}%<span style={{fontSize:11,fontWeight:700,color:C.textFaint,marginLeft:4}}>{fmt(todayMins[slot])}</span></span>
+        </div>
+      </div>
+    ); };
+  const quick=[["🙏","Prayer",()=>onOpenTag("Prayed")],["📖","Bible",()=>onOpenTag("Bible_Read")],["🧠","Memory",()=>onOpenTag("Bible_Memory")],["🌅","Slides",()=>onSlideshow()]];
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
+      <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"38vh",overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,padding:"20px 18px",textAlign:"center"}}>
+        <span style={{fontSize:`calc(clamp(22px,6.5vw,34px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
+        {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(12px,3.3vw,16px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+      </div>
+      <div style={{width:"100%",maxWidth:380,flexShrink:0,display:"flex",gap:6,alignItems:"center"}}>
+        {seg("morning")}{seg("midday")}{seg("evening")}
+      </div>
+      <div style={{width:"100%",maxWidth:380,flex:1,minHeight:0,overflowY:"auto",display:"flex",flexDirection:"column",gap:6}}>
+        {atRisk.length>0 && <div style={{fontSize:11,fontWeight:800,color:"#f0a030",letterSpacing:"0.06em",margin:"2px 2px 0"}}>STILL TODAY</div>}
+        {atRisk.map(tag=>{ const st=sortVal(tag);
+          return (
+            <div key={tag} style={{display:"flex",alignItems:"center",gap:8,padding:"9px 12px",borderRadius:12,border:"1.5px solid rgba(240,160,48,0.55)",background:"rgba(240,160,48,0.07)"}}>
+              <span onClick={()=>onOpenTag(tag)} style={{flex:1,minWidth:0,fontSize:15,fontWeight:800,color:"#f0b050",cursor:"pointer",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{tag.replace(/_/g," ")} <span style={{fontSize:12,opacity:0.85}}>{st}🔥</span></span>
+              {[15,30].map(m=>(
+                <button key={m} onClick={()=>logTag(tag,m)} style={{flexShrink:0,padding:"7px 11px",borderRadius:9,border:"1px solid rgba(212,160,23,0.45)",background:"rgba(212,160,23,0.14)",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",lineHeight:1}}>＋{m}m</button>
+              ))}
+            </div>
+          ); })}
+        {doneT.length>0 && <div style={{fontSize:11,fontWeight:800,color:"#4ade80",letterSpacing:"0.06em",margin:"4px 2px 0"}}>DONE · {fmt(totalToday)}</div>}
+        <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+          {doneT.map(tag=>(
+            <button key={tag} onClick={()=>onOpenTag(tag)} style={{padding:"6px 10px",borderRadius:999,border:"1px solid rgba(74,222,128,0.5)",background:"rgba(74,222,128,0.10)",color:"#4ade80",fontSize:13,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
+              <span>{tag.replace(/_/g," ")}</span><span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{sortVal(tag)}🔥</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{width:"100%",maxWidth:380,flexShrink:0,display:"flex",gap:8}}>
+        {quick.map(([ic,l,fn])=>(
+          <button key={l} onClick={fn} style={{flex:1,padding:"10px 4px",borderRadius:12,border:`1px solid rgba(212,160,23,0.35)`,background:"linear-gradient(135deg, rgba(212,160,23,0.14), rgba(212,160,23,0.05))",color:C.gold,fontSize:12,fontWeight:800,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,lineHeight:1}}>
+            <span style={{fontSize:20}}>{ic}</span>{l}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenStreaks=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
@@ -10282,8 +10396,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
 }
 
 function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bottomTabVisible={}, saveBottomTabVisible=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, onClose=()=>{} }) {
-  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
-  const GRAPHS = ["g:today","g:square","g:dayline","g:week","g:month","g:year"];
+  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:home2":["🏠","Home"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
+  const GRAPHS = ["g:home2","g:today","g:square","g:dayline","g:week","g:month","g:year"];
   const BIBLE_SUB = ["bible:mem","bible:drill"];
   const EXCLUDE = new Set(["abide","today","chart"]);
   const CANDIDATES = [...new Set([...(allTabIds&&allTabIds.length?allTabIds:["streaks","bible","prayer","catechism","reader","log"]), ...BIBLE_SUB, ...GRAPHS])].filter(id=>TAB_META[id] && !EXCLUDE.has(id));
@@ -12005,7 +12119,7 @@ export default function App() {
   const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
   React.useEffect(() => {
     // On each app open, land on the Square Graph.
-    setTodayView("square"); try{ localStorage.setItem("jtTodayView","square"); }catch(e){}
+    setTodayView("home2"); try{ localStorage.setItem("jtTodayView","home2"); }catch(e){}
     setChartTab("day");
     setActiveMainTab("today"); try{ localStorage.setItem("jtMainTab","today"); }catch(e){}
   }, []);
@@ -12338,7 +12452,7 @@ export default function App() {
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
         </div>
         {/* Times with Jesus header (tap to open the names menu) */}
-        <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("square"); setChartTab("day"); saveMainTab("today"); }}
+        <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("home2"); setChartTab("day"); saveMainTab("today"); }}
           style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
             border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
             alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
@@ -12390,7 +12504,7 @@ export default function App() {
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
-          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
           </div>
         </div>
       </div>
@@ -12866,6 +12980,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
+                          {todayView==="home2" && <HomeBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} />}
                           {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
                           {todayView==="today" && (
                             <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
@@ -13197,7 +13312,7 @@ export default function App() {
             background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"column",gap:4,minWidth:190}}>
-            {[["square","🔲","Square Graph","day"],["year","🌍","Year Chart","year"],["month","📆","Month Line","month"],["week","📈","Week Line","week"],["dayline","📊","Day Line","day"],["today","☀️","Day Circle","day"]].filter(([key])=>!todayViewHidden[key]).map(([key,icon,label,ct])=>{
+            {[["home2","🏠","Home (test)","day"],["square","🔲","Square Graph","day"],["year","🌍","Year Chart","year"],["month","📆","Month Line","month"],["week","📈","Week Line","week"],["dayline","📊","Day Line","day"],["today","☀️","Day Circle","day"]].filter(([key])=>!todayViewHidden[key]).map(([key,icon,label,ct])=>{
               const active = activeMainTab==="today" && todayView===key;
               return (
                 <button key={key} onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView(key); setChartTab(ct); saveMainTab("today"); }}
