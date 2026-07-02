@@ -3,17 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 const WAKE = 960;
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v227";
-
-// iOS standalone PWAs read viewport-fit at document load — set it as early as
-// possible (module evaluation, before first paint) so the layout viewport
-// extends under the home indicator instead of leaving a bottom strip.
-(() => { try {
-  let m = document.querySelector('meta[name="viewport"]');
-  if (!m) { m = document.createElement("meta"); m.setAttribute("name","viewport"); document.head.appendChild(m); }
-  const c = m.getAttribute("content") || "width=device-width, initial-scale=1";
-  if (!/viewport-fit/.test(c)) m.setAttribute("content", c + ", viewport-fit=cover");
-} catch(e){} })();
+const APP_VERSION = "v245";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -367,7 +357,7 @@ function CelebrationBurst() {
 }
 
 
-function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false}) {
+function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false, elapsedGray=false}) {
   const cx = size/2, cy = size/2, r = (size-stroke)/2;
   const mc = "#2a5ab8", dc = "#3aaa55", ec = "#e05a18";
   const total = morningMins + middayMins + eveningMins;
@@ -454,6 +444,15 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
           d={`M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y} Z`}
           fill={C.arcBg} {...slotTapProps(slot)}/>;
       })}
+      {clockMode && showNow && elapsedGray && (()=>{
+        const nw = new Date();
+        const a = clockAngle(nw.getHours()*60 + nw.getMinutes());
+        if (a <= 0.5) return null;
+        const p1 = polar(0, r), p2 = polar(a, r);
+        const large = a > 180 ? 1 : 0;
+        return <path d={`M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y} Z`}
+          fill="rgba(150,150,150,0.30)" pointerEvents="none"/>;
+      })()}
       {clockMode ? (
         /* Clock fill: each entry a wedge at its actual time of day */
         [...timeline].sort((a,b)=>(a.ts||0)-(b.ts||0)).map((e,i)=>{
@@ -3471,7 +3470,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                   .sort((a,b)=>((TAB_META[a]||["",a])[1]).localeCompare((TAB_META[b]||["",b])[1]));
                 const out = [];
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
-                const _graphs = [["home2","🏠","Home"],["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
+                const _graphs = [["home2","🏠","Home"],["today2","🎯","Today 2"],["circle2","🔵","Day Circle 2"],["today","⭕","Day Circle"],["square","☀️","Today"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
                 const _bibleExtra = [["bible:mem","🧠","Bible Memory"],["bible:drill","📚","Bible Books"]];
                 const _appItems = [
                   ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
@@ -10260,6 +10259,184 @@ function HomeBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry
   );
 }
 
+function Today2Body({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenStreaks=()=>{} }) {
+  const SLOT_HRS={morning:11,midday:5,evening:8};
+  const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
+  const SLOT_COLOR={morning:"#2a5ab8",midday:"#3aaa55",evening:"#e05a18"};
+  const META={morning:["☀️","Morn"],midday:["🕑","Noon"],evening:["🌙","Night"]};
+  const DAY_START=6, DAY_END=22, DAY_MIN=(DAY_END-DAY_START)*60;
+  const cur=(()=>{const h=new Date().getHours();return h<11?"morning":h<16?"midday":"evening";})();
+  const [sel,setSel]=React.useState(cur);
+  const [pick,setPick]=React.useState(null);
+  const tagHasPage=t=>/^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching)/i.test(String(t).replace(/ /g,"_"));
+  const [tick,setTick]=React.useState(0); void tick;
+  React.useEffect(()=>{ const t=setInterval(()=>setTick(x=>x+1),60000); return ()=>clearInterval(t); },[]);
+  const [styleTick,setStyleTick]=React.useState(0); void styleTick;
+  React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
+  const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
+  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
+  const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
+  const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
+  const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
+  const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
+  const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
+    if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
+    const out=[]; const idx=g.map(()=>0); let rem=g.reduce((s,x)=>s+x.length,0); let gi=0;
+    while(rem>0){const k=gi%g.length; const arr=g[k]; if(idx[k]<arr.length){out.push(arr[idx[k]]); idx[k]++; rem--;} gi++;}
+    return out.length?out:[{n:"",a:""}]; })();
+  const [si,setSi]=React.useState(0);
+  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),Math.max(2,rotateSec)*1000); return ()=>clearInterval(t); },[slides.length,rotateSec]); // eslint-disable-line
+  const curSlide=slides[si%Math.max(1,slides.length)]||{n:"",a:""};
+  const todayMins={morning:0,midday:0,evening:0};
+  (entries[today]||[]).forEach(e=>{const s=getTimeSlot(e.ts); if(s in todayMins) todayMins[s]+=(e.minutes||0);});
+  const totalMins=todayMins.morning+todayMins.midday+todayMins.evening;
+  const slotPct={}; Object.keys(todayMins).forEach(s=>slotPct[s]=Math.round(todayMins[s]/(SLOT_HRS[s]*60)*100));
+  const fmt=m=>m>0?(m>=60?`${Math.floor(m/60)}h${m%60?` ${m%60}m`:""}`:`${m}m`):"—";
+  const ciTag=s=>String(s||"").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  const normS=(raw)=>{ const t=raw.slice(1).replace(/Prayed_\d+/,"Prayed");
+    if(/^Bible_Read/i.test(t))return "Bible_Read"; if(/^Bible_Memory/i.test(t))return "Bible_Memory"; if(/^Bible_Books/i.test(t))return "Bible_Books";
+    if(/^Names_Review_\d+/i.test(t))return "Names_Review"; if(/^Prayer_Request_Answered/i.test(t))return "Prayer_Request_Answered";
+    if(/^Prayer_Request/i.test(t))return "Prayer_Request"; if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
+    if(/^Look4Jesus/i.test(t))return "Look4Jesus"; if(/_\d{8,}$/.test(t))return null;
+    return ciTag(t.split("-")[0].replace(/_/g," ")); };
+  const deletedT=(()=>{try{return JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){return [];}})();
+  const tagSet=new Set(["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"]);
+  Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)tagSet.add(t);})));
+  (tags||[]).forEach(t=>tagSet.add(t));
+  const usedToday=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(raw=>{const t=normS(raw); if(t)usedToday.add(t);}));
+  const yest=(()=>{const d=new Date(today+"T00:00:00"); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10);})();
+  const sortVal=t=>usedToday.has(t)?computeStreak(t,entries,today):computeStreak(t,entries,yest);
+  const riskOf=t=>(!usedToday.has(t) && sortVal(t)>0)?1:0;
+  const allStreaks=Array.from(tagSet).filter(t=>!deletedT.includes(t)).sort((a,b)=>(riskOf(b)-riskOf(a))||(sortVal(b)-sortVal(a)));
+  const logTag=(tag,mins)=>{ addEntry(mins,{dur:`${mins}m`,notes:`#${tag.replace(/ /g,"_")}`,time:SLOT_TIME[sel]},today); setPick(null); };
+  // circle geometry — day = waking window
+  const now=new Date(); const h=now.getHours()+now.getMinutes()/60;
+  const nowFrac=Math.min(1,Math.max(0,(h-DAY_START)/(DAY_END-DAY_START)));
+  const S=300, cx=S/2, cy=S/2;
+  const RJ=126, WJ=10;   // outer Jesus ring
+  const RM=104, WM=22;   // inner "my time" ring
+  const circJ=2*Math.PI*RJ, circM=2*Math.PI*RM;
+  const nowA=nowFrac*2*Math.PI;
+  const jx=cx+RJ*Math.sin(nowA), jy=cy-RJ*Math.cos(nowA);
+  const segs=[["morning",SLOT_COLOR.morning],["midday",SLOT_COLOR.midday],["evening",SLOT_COLOR.evening]];
+  let accFrac=0;
+  const myArcs=segs.map(([slot,col])=>{ const f=Math.min(1,todayMins[slot]/DAY_MIN); const a={col,off:accFrac,len:f}; accFrac=Math.min(1,accFrac+f); return a; });
+  const slotIconPos=(midHour)=>{ const f=(midHour-DAY_START)/(DAY_END-DAY_START); const a=f*2*Math.PI; return {left:`calc(50% + ${Math.sin(a)*47}% - 19px)`,top:`calc(50% - ${Math.cos(a)*47}% - 19px)`}; };
+  const ICON_POS={morning:slotIconPos(8.5),midday:slotIconPos(13.5),evening:slotIconPos(19)};
+  return (
+  <div style={{width:"100%",display:"flex",flexDirection:"column",alignItems:"center",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
+    <div style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"32%",overflowY:"auto"}}>
+      <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+        {allStreaks.map(tag=>{ const done=usedToday.has(tag); const st=sortVal(tag); const atRisk=!done && st>0; return (
+          <button key={tag} onClick={()=>setPick(p=>p===tag?null:tag)} style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
+            <span>{tag.replace(/_/g," ")}</span>{st>0 && <span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
+          </button>
+        );})}
+      </div>
+    </div>
+    <div style={{flex:1,minHeight:0,width:"100%",maxWidth:420,position:"relative",display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{position:"relative",width:"min(100%, 82vw, 60vh)",aspectRatio:"1 / 1"}}>
+        <svg viewBox={`0 0 ${S} ${S}`} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}>
+          <circle cx={cx} cy={cy} r={RJ} fill="none" stroke={C.border} strokeWidth={WJ}/>
+          <circle cx={cx} cy={cy} r={RM} fill="none" stroke={C.border} strokeOpacity="0.6" strokeWidth={WM}/>
+          <circle cx={cx} cy={cy} r={RJ} fill="none" stroke="#d4a017" strokeWidth={WJ} strokeLinecap="round"
+            strokeDasharray={`${Math.max(0.001,nowFrac)*circJ} ${circJ}`} transform={`rotate(-90 ${cx} ${cy})`}/>
+          {myArcs.map((a,i)=>a.len>0&&(
+            <circle key={i} cx={cx} cy={cy} r={RM} fill="none" stroke={a.col} strokeWidth={WM}
+              strokeDasharray={`${a.len*circM} ${circM}`} strokeDashoffset={`${-a.off*circM}`} transform={`rotate(-90 ${cx} ${cy})`}/>
+          ))}
+          <g transform={`translate(${jx},${jy})`}>
+            <g transform="translate(-19,-21) scale(0.32)" strokeLinejoin="round" strokeLinecap="round">
+              <path d="M 49 36 Q 65 31 81 36 L 88 107 L 41 107 Z" fill="#000" stroke="#fff" strokeWidth="4"/>
+              <path d="M 50 42 C 40 36 30 27 24 19" fill="none" stroke="#fff" strokeWidth="4.6"/>
+              <path d="M 80 42 C 90 36 100 27 106 19" fill="none" stroke="#fff" strokeWidth="4.6"/>
+              <path d="M 22 20 c -3.2 -4.2 -8.6 -1 -6.4 3.2 c 1.6 3 6.4 5.2 6.4 5.2 c 0 0 4.8 -2.2 6.4 -5.2 c 2.2 -4.2 -3.2 -7.4 -6.4 -3.2 z" fill="#000" stroke="#fff" strokeWidth="3" transform="rotate(-38 22 22)"/>
+              <path d="M 104 20 c -3.2 -4.2 -8.6 -1 -6.4 3.2 c 1.6 3 6.4 5.2 6.4 5.2 c 0 0 4.8 -2.2 6.4 -5.2 c 2.2 -4.2 -3.2 -7.4 -6.4 -3.2 z" fill="#000" stroke="#fff" strokeWidth="3" transform="rotate(38 104 22)"/>
+              <path d="M 64 35 L 77 36 L 52 90 Q 46 84 41 80 Z" fill="#7c3aed" stroke="#fff" strokeWidth="2.4"/>
+              <path d="M 72 48 L 80 50 L 83 107 L 73 107 Z" fill="#7c3aed" stroke="#fff" strokeWidth="2.4"/>
+              <circle cx="61" cy="19" r="13" fill="#000" stroke="#fff" strokeWidth="4"/>
+            </g>
+          </g>
+        </svg>
+        <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }}
+          style={{position:"absolute",left:"24%",right:"24%",top:"24%",bottom:"24%",borderRadius:"50%",background:"#000",border:`1px solid ${C.border}`,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:5,textAlign:"center",cursor:"pointer",overflow:"hidden",padding:"6%"}}>
+          <span style={{fontSize:`calc(clamp(14px,4vw,22px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.2,fontFamily:nmFont||"Georgia, serif"}}>{curSlide.n}</span>
+          {curSlide.a && !hideAuthor && <span style={{fontSize:"clamp(10px,2.6vw,13px)",fontWeight:700,color:C.gold}}>{curSlide.a}</span>}
+        </div>
+        {Object.keys(ICON_POS).map(slot=>(
+          <button key={slot} onClick={()=>setSel(slot)} title={META[slot][1]}
+            style={{position:"absolute",...ICON_POS[slot],width:38,height:38,borderRadius:"50%",cursor:"pointer",fontSize:19,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center",padding:0,
+              background:sel===slot?"rgba(212,160,23,0.18)":"#000",border:`${sel===slot?2:1}px solid ${sel===slot?"#d4a017":C.border}`,boxShadow:sel===slot?"0 0 10px rgba(212,160,23,0.55)":"none"}}>{META[slot][0]}</button>
+        ))}
+        <div style={{position:"absolute",left:0,top:0,lineHeight:1.15,pointerEvents:"none"}}>
+          <div style={{fontSize:14,fontWeight:800,color:SLOT_COLOR.morning}}>{slotPct.morning}%</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textFaint}}>{fmt(todayMins.morning)}</div>
+        </div>
+        <div style={{position:"absolute",right:0,top:0,textAlign:"right",lineHeight:1.15,pointerEvents:"none"}}>
+          <div style={{fontSize:14,fontWeight:800,color:SLOT_COLOR.midday}}>{slotPct.midday}%</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textFaint}}>{fmt(todayMins.midday)}</div>
+        </div>
+        <div style={{position:"absolute",left:0,bottom:0,lineHeight:1.15,pointerEvents:"none"}}>
+          <div style={{fontSize:14,fontWeight:800,color:SLOT_COLOR.evening}}>{slotPct.evening}%</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textFaint}}>{fmt(todayMins.evening)}</div>
+        </div>
+        <div style={{position:"absolute",right:0,bottom:0,textAlign:"right",lineHeight:1.15,pointerEvents:"none"}}>
+          <div style={{fontSize:14,fontWeight:800,color:"#d4a017"}}>{fmt(totalMins)}</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textFaint}}>{Math.round(Math.min(1,totalMins/DAY_MIN)*100)}% of day</div>
+        </div>
+      </div>
+    </div>
+    {pick && (<>
+      <div onClick={()=>setPick(null)} style={{position:"fixed",inset:0,zIndex:100079}}/>
+      <div style={{position:"fixed",left:"50%",bottom:"calc(var(--jt-tab-h,70px) + 12px)",transform:"translateX(-50%)",zIndex:100080,background:C.bg,border:`1px solid ${C.gold}`,borderRadius:14,padding:12,width:"min(340px,92vw)",boxShadow:"0 8px 28px rgba(0,0,0,0.6)",display:"flex",flexDirection:"column",gap:8}}>
+        <div style={{fontSize:13,fontWeight:800,color:C.gold,textAlign:"center"}}>{pick.replace(/_/g," ")} · {META[sel][1]}</div>
+        {tagHasPage(pick) && <button onClick={()=>{ onOpenTag(pick); setPick(null); }}
+          style={{padding:"11px 4px",borderRadius:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.18)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>Open →</button>}
+        <div style={{display:"flex",gap:6}}>
+          {[["1m",1],["5m",5],["15m",15],["30m",30],["1h",60]].map(([lbl,m])=>(
+            <button key={lbl} onClick={()=>logTag(pick,m)} style={{flex:1,padding:"11px 0",borderRadius:8,border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>{lbl}</button>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={()=>{ onDeleteToday(pick); setPick(null); }}
+            style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>🗑 Delete today's time</button>
+          <button onClick={()=>{ onDeleteTag(pick); setPick(null); }}
+            style={{flex:1,padding:"9px 4px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer"}}>✕ Delete tag</button>
+        </div>
+      </div>
+    </>)}
+  </div>);
+}
+
+function JesusNameBubble({ C, inset="15%" }) {
+  const [styleTick,setStyleTick]=React.useState(0); void styleTick;
+  React.useEffect(()=>{ const f=()=>setStyleTick(t=>t+1); window.addEventListener("jtNameStyle",f); window.addEventListener("storage",f); return ()=>{window.removeEventListener("jtNameStyle",f);window.removeEventListener("storage",f);}; },[]);
+  const nmColor=(()=>{try{return localStorage.getItem("jtNameColor")||"#4ade80";}catch(e){return "#4ade80";}})();
+  const nmScale=(()=>{try{const v=parseFloat(localStorage.getItem("jtTitleScale"));return v>0?v:1;}catch(e){return 1;}})();
+  const nmFont=(()=>{try{return localStorage.getItem("jtTitleFont")||"";}catch(e){return "";}})();
+  const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
+  const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
+  const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
+  const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
+  const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
+    if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
+    const out=[]; const idx=g.map(()=>0); let rem=g.reduce((s,x)=>s+x.length,0); let gi=0;
+    while(rem>0){const k=gi%g.length; const arr=g[k]; if(idx[k]<arr.length){out.push(arr[idx[k]]); idx[k]++; rem--;} gi++;}
+    return out.length?out:[{n:"",a:""}]; })();
+  const [si,setSi]=React.useState(0);
+  React.useEffect(()=>{ const t=setInterval(()=>setSi(s=>(s+1)%Math.max(1,slides.length)),Math.max(2,rotateSec)*1000); return ()=>clearInterval(t); },[slides.length,rotateSec]); // eslint-disable-line
+  const cs=slides[si%Math.max(1,slides.length)]||{n:"",a:""};
+  return (
+    <div onClick={(e)=>{ e.stopPropagation(); try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e2){} }}
+      style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",maxWidth:"72%",maxHeight:"70%",zIndex:8,borderRadius:14,background:"#000",border:`1px solid ${C.border}`,
+        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,textAlign:"center",cursor:"pointer",overflow:"hidden",padding:"16px 20px"}}>
+      <span style={{fontSize:`calc(clamp(17px,5vw,28px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{cs.n}</span>
+      {cs.a && !hideAuthor && <span style={{fontSize:"clamp(11px,3vw,14px)",fontWeight:700,color:C.gold}}>{cs.a}</span>}
+    </div>
+  );
+}
+
 function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry=()=>{}, onSlideshow=()=>{}, onOpenTag=()=>{}, onDeleteToday=()=>{}, onDeleteTag=()=>{}, onOpenStreaks=()=>{}, onOpenMenu=()=>{} }) {
   const SLOT_HRS={morning:11,midday:5,evening:8};
   const SLOT_TIME={morning:"8a",midday:"1p",evening:"7p"};
@@ -10396,8 +10573,8 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
 }
 
 function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bottomTabVisible={}, saveBottomTabVisible=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, onClose=()=>{} }) {
-  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:home2":["🏠","Home"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
-  const GRAPHS = ["g:home2","g:today","g:square","g:dayline","g:week","g:month","g:year"];
+  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:home2":["🏠","Home"],"g:today2":["🎯","Today 2"],"g:circle2":["🔵","Day Circle 2"],"g:today":["⭕","Day Circle"],"g:square":["☀️","Today"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
+  const GRAPHS = ["g:home2","g:today2","g:circle2","g:today","g:square","g:dayline","g:week","g:month","g:year"];
   const BIBLE_SUB = ["bible:mem","bible:drill"];
   const EXCLUDE = new Set(["abide","today","chart"]);
   const CANDIDATES = [...new Set([...(allTabIds&&allTabIds.length?allTabIds:["streaks","bible","prayer","catechism","reader","log"]), ...BIBLE_SUB, ...GRAPHS])].filter(id=>TAB_META[id] && !EXCLUDE.has(id));
@@ -11633,6 +11810,7 @@ export default function App() {
   const [selectedCenterTag, setSelectedCenterTag] = useState(null);
   const [showAddToCircle, setShowAddToCircle] = useState(false);
   const [circlePopupTag, setCirclePopupTag] = useState(null);
+  const [circleSlot, setCircleSlot] = useState(null);
   const [chipPopup, setChipPopup] = useState(null); // {tag,label,icon,iconFilter} for the activity-chip popup card
   const [circlePopupMins, setCirclePopupMins] = useState("");
   const [backupOpen,setBackup]   = useState(false);
@@ -11809,24 +11987,15 @@ export default function App() {
       else if (w >= 820) z = 1.15;
       try {
         const de = document.documentElement;
-        const vh = (document.body && document.body.clientHeight) || window.innerHeight || de.clientHeight;
-        if (!vh) return;
-        if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", vh + "px"); }
+        if (z === 1) { de.style.zoom = ""; de.style.setProperty("--jt-vh", window.innerHeight + "px"); }
         else { de.style.zoom = String(z); de.style.setProperty("--jt-vh", `calc(100dvh / ${z})`); }
       } catch(e){}
     };
     apply();
     const applyLater = () => { apply(); setTimeout(apply, 300); };
-    const applySettle = () => { apply(); setTimeout(apply, 120); setTimeout(apply, 400); setTimeout(apply, 1000); };
-    applySettle();
     window.addEventListener("resize", apply);
     window.addEventListener("orientationchange", applyLater);
-    window.addEventListener("pageshow", applySettle);
-    window.addEventListener("load", applySettle);
-    window.addEventListener("focus", apply);
-    const vv = window.visualViewport;
-    if (vv) vv.addEventListener("resize", apply);
-    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); window.removeEventListener("pageshow", applySettle); window.removeEventListener("load", applySettle); window.removeEventListener("focus", apply); if (vv) vv.removeEventListener("resize", apply); };
+    return () => { window.removeEventListener("resize", apply); window.removeEventListener("orientationchange", applyLater); };
   }, []);
 
   const [userInitials, setUserInitials] = useState(() => localStorage.getItem("ofInitials")||"");
@@ -12119,7 +12288,7 @@ export default function App() {
   const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
   React.useEffect(() => {
     // On each app open, land on the Square Graph.
-    setTodayView("home2"); try{ localStorage.setItem("jtTodayView","home2"); }catch(e){}
+    setTodayView("circle2"); try{ localStorage.setItem("jtTodayView","circle2"); }catch(e){}
     setChartTab("day");
     setActiveMainTab("today"); try{ localStorage.setItem("jtMainTab","today"); }catch(e){}
   }, []);
@@ -12423,9 +12592,9 @@ export default function App() {
   };
 
   // One-tap preset logging from the circle tag popup
-  const quickAddPreset = (tag, mins) => {
+  const quickAddPreset = (tag, mins, timeStr) => {
     const t2 = "#" + tag.replace(/ /g, "_");
-    const form = {...emptyForm(), dur: fmtMRaw(mins), time: nowTimeStr(), notes: t2};
+    const form = {...emptyForm(), dur: fmtMRaw(mins), time: timeStr || nowTimeStr(), notes: t2};
     const targetDay = chartTab === "day" ? viewDay : today;
     addEntry(mins, form, targetDay);
     const baseTag = tag.startsWith("Bible_Memory_") ? "Bible_Memory" : tag.startsWith("Bible_Read_") ? "Bible_Read" : tag;
@@ -12440,7 +12609,7 @@ export default function App() {
   };
 
   return (
-    <div className="jt-app" style={{height:"100%",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
+    <div className="jt-app" style={{height:"var(--jt-vh,100dvh)",background:C.bg,color:C.text,display:"flex",flexDirection:"column",position:"relative",
       overflowX:"hidden",width:"100%",maxWidth:"100vw",boxSizing:"border-box",margin:0,paddingTop:0,paddingBottom:0,paddingLeft:"env(safe-area-inset-left)",paddingRight:"env(safe-area-inset-right)"}}>
       {/* Title/stats row */}
       <div ref={el=>{ if(el){ const h=el.offsetHeight; if(h && typeof document!=="undefined") document.documentElement.style.setProperty("--jt-title-h", h+"px"); } }}
@@ -12452,7 +12621,7 @@ export default function App() {
           {APP_VERSION.split("·").map((p,i)=>(<div key={i}>{i===0?p:"·"+p}</div>))}
         </div>
         {/* Times with Jesus header (tap to open the names menu) */}
-        <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("home2"); setChartTab("day"); saveMainTab("today"); }}
+        <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("circle2"); setChartTab("day"); saveMainTab("today"); }}
           style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
             border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
             alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
@@ -12504,7 +12673,7 @@ export default function App() {
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
-          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today2"){pickTodayView("today2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:circle2"){pickTodayView("circle2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
           </div>
         </div>
       </div>
@@ -12819,6 +12988,144 @@ export default function App() {
                     </div>
                   ) : null;
 
+                  const circle2El = visible.circle ? (
+                    <div key="circ2" ref={el=>{
+                      if(!el){ if(circleRORef.current){circleRORef.current.disconnect();circleRORef.current=null;} return; }
+                      const measure = () => {
+                        if(!el.getBoundingClientRect) return;
+                        const w = el.getBoundingClientRect().width;
+                        if (w>0 && Math.abs(w-circleBoxWRef.current)>2){ circleBoxWRef.current=w; setCircleBoxW(w); }
+                      };
+                      measure();
+                      if (typeof ResizeObserver!=="undefined" && !circleRORef.current){
+                        circleRORef.current = new ResizeObserver(measure);
+                        circleRORef.current.observe(el);
+                      }
+                    }} style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginBottom:0,marginTop:0,
+                      width:"calc(100% + 16px)",marginLeft:-8,marginRight:-8}}>
+                      {(()=>{
+                        const maxByHeight = (typeof window!=="undefined" ? window.innerHeight : 800) * 0.78;
+                        const containerW = Math.max(280, Math.min(circleBoxW || Math.min(window.innerWidth, 500), maxByHeight, 760));
+                        // Compact layout
+                        if (COMPACT_CIRCLE) {
+                          const compactSize = Math.min(containerW * 0.4, 160);
+                          return (
+                            <CircleSwipeWrapper
+                              style={{position:"relative",width:compactSize,height:compactSize,overflow:"visible"}}
+                              >
+                              <CompactArc morningMins={morningMins} middayMins={middayMins} eveningMins={eveningMins} size={compactSize} stroke={22}/>
+                            </CircleSwipeWrapper>
+                          );
+                        }
+                        // Responsive large circle — fills available width
+                        const arcSize = Math.floor(containerW - 6); const stroke = Math.max(22, Math.floor(arcSize * 0.07));
+                        const r = (arcSize - stroke) / 2;
+                        const cx = arcSize / 2, cy = arcSize / 2;
+                        const badgeR = r;
+                        const badgeData = [
+                          {icon:"☀️", mins:morningMins, border:"#1a3a6b", bg:C.arcBg, color:C.ink==="0,0,0"?"#2a5ab8":"#6a9fe8", angleDeg:-90, slot:"morning"},
+                          {icon:"🕛", mins:middayMins,  border:"#2d7a3a", bg:C.arcBg, color:C.ink==="0,0,0"?"#2d8a3a":"#5eda7a", angleDeg:40,  slot:"midday"},
+                          {icon:"🌙", mins:eveningMins, border:"#b84a10", bg:C.arcBg, color:C.ink==="0,0,0"?"#c45510":"#f07a40", angleDeg:140, slot:"evening"},
+                        ];
+                        return (
+                          <CircleSwipeWrapper
+                            style={{position:"relative",width:arcSize,height:arcSize,overflow:"visible",flexShrink:0}}
+                            onClick={()=>{ setSelectedCenterTag(null); setShowAddToCircle(o=>!o); }}>
+                            <TripleArc morningMins={morningMins} middayMins={middayMins} eveningMins={eveningMins}
+                              totalPct={viewPct} totalMins={viewMin} size={arcSize} stroke={stroke} numDays={periodDays.length}
+                              timeline={chartTab==="day" ? filteredViewArr : null}
+                              showNow={chartTab==="day" && viewDay===today}
+                              elapsedGray={chartTab==="day" && viewDay===today}
+                              onSlotTap={handleSlotTap}/>
+
+                            {showAddToCircle && (()=>{
+                              const tagsFromEntries = [...new Set(
+                                Object.values(entries).flatMap(day=>(day||[]).flatMap(e=>
+                                  ((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[])
+                                    .map(t=>t.slice(1))
+                                    .filter(t=>!/^\d+$/.test(t)&&!/_\d{8,}$/.test(t))
+                                    .map(t=>/^Bible_Read/i.test(t)?"Bible_Read":/^Bible_Memory/i.test(t)?"Bible_Memory":/^Prayed/i.test(t)?"Prayed":/^Names_Review/i.test(t)?"Names_Review":t)
+                                ))
+                              )].filter(t=>
+                                !starredTags.includes(t)&&
+                                !t.startsWith("Bible_Memory_")&&!t.startsWith("Bible_Read_")&&
+                                !t.startsWith("Prayer_Request")&&!t.startsWith("Names_Memorize")&&
+                                !/_\d{8,}$/.test(t)
+                              );
+                
+                              const sortedTags = [...tagsFromEntries].sort((a,b)=>computeStreak(b,entries,today)-computeStreak(a,entries,today));
+                              return (
+                                <>
+                                <div style={{position:"fixed",inset:0,zIndex:19}} onClick={e=>{e.stopPropagation();setShowAddToCircle(false);}}/>
+                                <div style={{position:"fixed",left:"max(45px, calc(50vw - var(--jt-col)/2 + 45px))",right:"max(45px, calc(50vw - var(--jt-col)/2 + 45px))",top:"20%",
+                                  zIndex:20,background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,
+                                  padding:"10px",maxHeight:"55vh",overflowY:"auto",
+                                  boxShadow:"0 4px 24px rgba(0,0,0,0.9)"}}
+                                  onClick={e=>e.stopPropagation()}>
+                                  <input autoFocus placeholder="Search tags…" id="circleSearch"
+                                    onChange={e=>{const el=document.getElementById("circleTagList");if(el)el.dataset.q=e.target.value.toLowerCase();Array.from(el?.children||[]).forEach(c=>{c.style.display=c.dataset.tag?.includes(e.target.value.toLowerCase())!==false?"":"none";});}}
+                                    style={{width:"100%",padding:"6px 10px",borderRadius:8,border:`1px solid ${C.borderHi}`,
+                                      background:`rgba(${C.ink},0.07)`,color:C.text,fontSize:16,outline:"none",
+                                      boxSizing:"border-box",marginBottom:8}}/>
+                                  <div id="circleTagList" style={{display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
+                                    {tagsFromEntries.length===0
+                                      ? <div style={{color:C.textFaint,fontSize:14,padding:"8px"}}>No more tags to add</div>
+                                      : sortedTags.map(t=>{
+                                          const s=computeStreak(t,entries,today);
+                                          return (
+                                            <button key={t} data-tag={t.toLowerCase()} onClick={e=>{e.stopPropagation();
+                                              const n=[...starredTags,t];setStarredTags(n);
+                                              setSelectedFilterTags(prev=>prev.includes(t)?prev:[...prev,t]);
+                                              setShowAddToCircle(false);
+                                            }}
+                                              style={{padding:"4px 12px",borderRadius:10,fontSize:15,fontWeight:700,cursor:"pointer",
+                                                border:`1px solid ${C.border}`,background:`rgba(${C.ink},0.06)`,color:C.text,
+                                                display:"flex",alignItems:"center",gap:5}}>
+                                              <span>{t}</span>
+                                              {s>0&&<span style={{fontSize:12,color:"#f07a40",fontWeight:800}}>🔥{s}d</span>}
+                                            </button>
+                                          );
+                                        })
+                                    }
+                                  </div>
+                                </div>
+                                </>
+                              );
+                            })()}
+                            {badgeData.map(({icon,mins,border,bg,color,angleDeg,slot})=>{
+                              const rad = angleDeg * Math.PI / 180;
+                              const isSun = angleDeg === -90;
+                              const bR = isSun ? badgeR : badgeR + 26;
+                              const bx = cx + bR * Math.cos(rad);
+                              const by = isSun ? 19 : cy + bR * Math.sin(rad);
+                              const h = Math.floor(mins/60), m = mins%60;
+                              const isNow = chartTab==="day" && viewDay===today && getTimeSlot(Date.now())===slot;
+                              return (
+                                <div key={icon}
+                                  onClick={e=>{e.stopPropagation();setCircleSlot(slot);}}
+                                  style={{position:"absolute",left:bx,top:by,
+                                  transform:"translate(-50%,-50%)",
+                                  padding:"1px 5px 3px",borderRadius:20,border:`2px solid ${circleSlot===slot?"#d4a017":border}`,
+                                  boxShadow:(circleSlot===slot||isNow)?`0 0 0 2px ${C.gold}, 0 0 10px rgba(212,160,23,0.55)`:"none",
+                                  background:bg,display:"flex",flexDirection:isSun?"row":"column",alignItems:"center",gap:isSun?4:0,
+                                  zIndex:10,whiteSpace:"nowrap",cursor:"pointer"}}>
+
+                                  <span style={{fontSize:30}}>{icon}</span>
+                                  <div style={{display:"flex",alignItems:"baseline",gap:2}}>
+                                    <span style={{fontSize:24,color,fontWeight:700,lineHeight:1}}>
+                                      {h>0?`${h}:${String(m).padStart(2,'0')}`:`:${String(m).padStart(2,'0')}`}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            <JesusNameBubble C={C}/>
+                          </CircleSwipeWrapper>
+                        );
+                      })()}
+                    </div>
+                  ) : null;
+
                   const quickAddEl = visible.quickadd !== false ? (
                     <div key="quickadd" style={{marginBottom:8}}>
                       <div style={{borderRadius:16,border:`1px solid ${C.borderHi}`,
@@ -12980,6 +13287,7 @@ export default function App() {
                           {todayView==="dayline" && lineGraphEl && <div style={{width:"100%",marginBottom:0}}>{lineGraphEl}</div>}
                           {todayView==="year" && <YearGridBody entries={entries} today={today} fill={true} hideTitle={true} zoom={heatZoom} onZoom={setHeatZoomP}
                             onPick={iso=>{ setChartTab("day"); setViewDay(iso); }}/>}
+                          {todayView==="today2" && <Today2Body entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} />}
                           {todayView==="home2" && <HomeBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} />}
                           {todayView==="square" && <SquareGraphBody entries={entries} today={today} C={C} tags={starredTags} computeStreak={computeStreak} addEntry={addEntry} onSlideshow={()=>{ try{window.dispatchEvent(new Event("jtStartSlideshow"));}catch(e){} }} onOpenTag={(tag)=>{ const t=(tag||"").replace(/ /g,"_"); if(/^Bible_Memory/i.test(t)){ saveBibleView("mem"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Read/i.test(t)){ saveBibleView("read"); setBibleChosen(true); saveMainTab("bible"); } else if(/^Bible_Books/i.test(t)){ setBibleChosen(true); saveMainTab("bible"); setDrillSignal(x=>x+1); } else if(/^(Prayed|Prayer)/i.test(t)){ saveMainTab("prayer"); } else if(/^Names_Review/i.test(t)){ saveMainTab("names"); } else if(/^(Catechism|Teaching)/i.test(t)){ saveMainTab("catechism"); } }} onDeleteToday={(tag)=>{ const tg="#"+(tag||"").replace(/ /g,"_"); (entries[today]||[]).slice().forEach(e=>{ if((e.notes||"").includes(tg)) deleteEntry(today, e.ts); }); }} onDeleteTag={(tag)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(tag)){ cur.push(tag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){} }} onOpenStreaks={()=>{ saveMainTab("streaks"); }} onOpenMenu={()=>{ setAppMenuOpen(true); setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); }} />}
                           {todayView==="today" && (
@@ -12998,6 +13306,31 @@ export default function App() {
                               )}
                               {circleEl}
                               {weekRibbonEl}
+                            </div>
+                          )}
+                          {todayView==="circle2" && (
+                            <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:6}}>
+                              {circle2El}
+                              {(()=>{
+                                const norm=t=>/^Bible_Read/i.test(t)?"Bible_Read":/^Bible_Memory/i.test(t)?"Bible_Memory":/^Bible_Books/i.test(t)?"Bible_Books":/^Prayed/i.test(t)?"Prayed":/^Names_Review/i.test(t)?"Names_Review":t;
+                                let del=[]; try{del=JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){}
+                                const set=new Set(["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"]);
+                                starredTags.forEach(t=>set.add(t.replace(/ /g,"_")));
+                                Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) set.add(norm(t));})));
+                                const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) usedT.add(norm(t));}));
+                                const sv=t=>computeStreak(t,entries,today);
+                                const arr=[...set].filter(t=>!del.includes(t)&&!del.includes(t.replace(/_/g," "))).sort((a,b)=>{const ra=(!usedT.has(a)&&sv(a)>0)?1:0,rb=(!usedT.has(b)&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
+                                return (
+                                  <div style={{width:"100%",maxWidth:420,marginTop:10,display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center"}}>
+                                    {arr.map(tag=>{ const done=usedT.has(tag); const st=sv(tag); const atRisk=!done&&st>0; return (
+                                      <button key={tag} onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
+                                        style={{display:"flex",alignItems:"center",gap:6,padding:"8px 7px",borderRadius:11,cursor:"pointer",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
+                                        <span>{tag.replace(/_/g," ")}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85}}>{st}🔥</span>}
+                                      </button>
+                                    );})}
+                                  </div>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>
@@ -13312,7 +13645,7 @@ export default function App() {
             background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:14,padding:"8px",
             animation:"jtPopUp .18s ease both",boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"column",gap:4,minWidth:190}}>
-            {[["home2","🏠","Home (test)","day"],["square","🔲","Square Graph","day"],["year","🌍","Year Chart","year"],["month","📆","Month Line","month"],["week","📈","Week Line","week"],["dayline","📊","Day Line","day"],["today","☀️","Day Circle","day"]].filter(([key])=>!todayViewHidden[key]).map(([key,icon,label,ct])=>{
+            {[["home2","🏠","Home (test)","day"],["today2","🎯","Today 2","day"],["circle2","🔵","Day Circle 2","day"],["square","🔲","Square Graph","day"],["year","🌍","Year Chart","year"],["month","📆","Month Line","month"],["week","📈","Week Line","week"],["dayline","📊","Day Line","day"],["today","☀️","Day Circle","day"]].filter(([key])=>!todayViewHidden[key]).map(([key,icon,label,ct])=>{
               const active = activeMainTab==="today" && todayView===key;
               return (
                 <button key={key} onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView(key); setChartTab(ct); saveMainTab("today"); }}
@@ -13546,13 +13879,23 @@ export default function App() {
             })()}
             <div style={{display:"flex",gap:6,marginBottom:8}}>
               {[["1m",1],["5m",5],["15m",15],["30m",30],["1h",60]].map(([lbl,mins])=>(
-                <button key={lbl} onClick={()=>quickAddPreset(circlePopupTag,mins)}
+                <button key={lbl} onClick={()=>quickAddPreset(circlePopupTag,mins,(todayView==="circle2"&&circleSlot)?({morning:"8a",midday:"12p",evening:"7p"}[circleSlot]):undefined)}
                   style={{flex:1,padding:"10px 0",borderRadius:10,border:`1px solid ${C.borderHi}`,
                     background:C.buttonFill,color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>
                   {lbl}
                 </button>
               ))}
             </div>
+            {todayView==="circle2" && (
+              <div style={{display:"flex",gap:6,marginBottom:8,alignItems:"center"}}>
+                <span style={{fontSize:12,fontWeight:700,color:C.textFaint,flexShrink:0}}>Log at</span>
+                {[["morning","☀️","Morn"],["midday","🕛","Noon"],["evening","🌙","Night"]].map(([sl,ic,lb])=>(
+                  <button key={sl} onClick={()=>setCircleSlot(s=>s===sl?null:sl)}
+                    style={{flex:1,padding:"7px 4px",borderRadius:9,fontSize:12,fontWeight:800,cursor:"pointer",lineHeight:1,
+                      border:`1px solid ${circleSlot===sl?"#d4a017":C.border}`,background:circleSlot===sl?"rgba(212,160,23,0.18)":"transparent",color:circleSlot===sl?C.gold:C.textFaint}}>{ic} {lb}</button>
+                ))}
+              </div>
+            )}
             {/* Inline custom time entry for this tag */}
             <div style={{display:"flex",gap:6,marginBottom:8}}>
               <input type="tel" inputMode="numeric" pattern="[0-9]*"
@@ -13566,7 +13909,7 @@ export default function App() {
                 const d=(circlePopupMins||"").replace(/\D/g,""); if(!d)return;
                 let mins; if(d.length<=2){mins=parseInt(d);}else{const h=parseInt(d.slice(0,-2))||0;const m=parseInt(d.slice(-2))||0;mins=h*60+m;}
                 if(!mins||mins<=0)return;
-                quickAddPreset(circlePopupTag, mins);
+                quickAddPreset(circlePopupTag, mins, (todayView==="circle2"&&circleSlot)?({morning:"8a",midday:"12p",evening:"7p"}[circleSlot]):undefined);
                 setCirclePopupMins("");
               }} style={{flex:1,padding:"10px",borderRadius:10,border:"none",
                 background:C.goldBright,color:C.onAccent,fontSize:14,fontWeight:800,cursor:"pointer"}}>
@@ -13703,9 +14046,9 @@ export default function App() {
       )}
 
       <style>{`
-        html { height: 100%; background: ${C.bg}; overflow: hidden; overscroll-behavior: none; }
-        body { margin:0; padding:0; overflow:hidden; background:${C.bg}; position:fixed; top:0; left:0; right:0; bottom:0; overscroll-behavior:none; }
-        #root { height: 100%; overflow: hidden; }
+        html { height: var(--jt-vh,100dvh); background: ${C.bg}; overflow: hidden; }
+        body { margin:0; padding:0; width:100%; height:var(--jt-vh,100dvh); overflow:hidden; background:${C.bg}; }
+        #root { height: var(--jt-vh,100dvh); overflow: hidden; }
         * { -webkit-tap-highlight-color:transparent; box-sizing:border-box; }
         button { transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease, transform .1s ease; }
         button:active { transform: scale(0.96); }
