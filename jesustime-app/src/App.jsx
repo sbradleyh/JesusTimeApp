@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v324";
+const APP_VERSION = "v330";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -506,7 +506,11 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const tot = anim.m + anim.d + anim.e;
         if (tot <= 0) return null;
         const deg = Math.min(360, tot/(15*60)*360);
-        const isz = Math.max(18, Math.max(26, size*0.12) - 25);
+        const nwR = new Date();
+        const elapsedR = Math.min(900, Math.max(0, (nwR.getHours()*60 + nwR.getMinutes()) - 420));
+        const gapR = Math.max(0, elapsedR - tot);   // minutes behind "now"
+        const fR = 1.35 - 0.7 * Math.min(1, gapR/900);
+        const isz = Math.max(14, (Math.max(26, size*0.12) - 25) * fR);
         const p = polar(deg, r - isz/2 - 4);
         return <image href={RUNNER_ICON} x={p.x - isz/2} y={p.y - isz/2} width={isz} height={isz}
           pointerEvents="none" style={{filter:"drop-shadow(0 0 4px rgba(0,0,0,0.7))"}}/>;
@@ -518,12 +522,16 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const p = polar(a, r);
         const lp = polar(a, r - 22);
         if (nowIcon) {
-          const isz = Math.max(30, size*0.14) + 25;
+          const totJ = anim.m + anim.d + anim.e;
+          const elapsedJ = Math.min(900, Math.max(0, (nw.getHours()*60 + nw.getMinutes()) - 420));
+          const gapJ = Math.max(0, elapsedJ - totJ);
+          const fJ = totJ <= 0 ? 0.65 : (1.35 - 0.7 * Math.min(1, gapJ/900));
+          const isz = (Math.max(30, size*0.14) + 25) * fJ;
           const ip = polar(a, r - isz/2 + 6);
           return <g pointerEvents="none">
             <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
               style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>
-            {nowIconLabel && <text x={ip.x + (a<=180 ? isz*0.36 : -isz*0.36)} y={ip.y + isz/2 - 30} textAnchor="middle" fontSize="12.5" fontWeight="800"
+            {nowIconLabel && <text x={ip.x + (a<=180 ? isz*0.36 : -isz*0.36)} y={ip.y + isz*0.21} textAnchor="middle" fontSize={Math.max(8, isz*0.12)} fontWeight="800"
               fill="#d4a017" style={{filter:"drop-shadow(0 0 3px rgba(0,0,0,0.9))"}}>{nowIconLabel}</text>}
           </g>;
         }
@@ -6432,7 +6440,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
               return (
               <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
                 <span style={{fontSize:16,fontWeight:800,color:C.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",maxWidth:"42%"}}>{aref}</span>
-                {cur && <button onClick={loadCardEsv} disabled={revEsvBusy} title="Use the ESV" style={{flexShrink:0,padding:"4px 10px",borderRadius:8,fontSize:12,fontWeight:800,cursor:revEsvBusy?"default":"pointer",whiteSpace:"nowrap",border:`1px solid ${effSrc==="esv"?PU:C.border}`,background:effSrc==="esv"?PU:"transparent",color:effSrc==="esv"?"#fff":C.textFaint,opacity:revEsvBusy?0.6:1}}>{revEsvBusy?"…":"ESV"}</button>}
+                {cur && <button onClick={loadCardEsv} disabled={revEsvBusy} title="Use the ESV" style={{flexShrink:0,padding:"4px 8px",borderRadius:8,fontSize:12,fontWeight:800,cursor:revEsvBusy?"default":"pointer",whiteSpace:"nowrap",border:`1px solid ${effSrc==="esv"?PU:C.border}`,background:effSrc==="esv"?PU:"transparent",color:effSrc==="esv"?"#fff":C.textFaint,opacity:revEsvBusy?0.6:1,display:"inline-flex",alignItems:"center",gap:5}}>{revEsvBusy?"…":"ESV"}<span onClick={(e)=>{e.stopPropagation();setVerseMenu({card:cur});}} title="Verse options" style={{padding:"2px 3px",margin:"-2px -3px",fontSize:12,lineHeight:1}}>▾</span></button>}
                 <button onClick={()=>bumpRevFont(-2)} title="Smaller text" style={{flexShrink:0,width:30,height:26,borderRadius:7,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",lineHeight:1}}>A−</button>
                 <button onClick={()=>bumpRevFont(2)} title="Larger text" style={{flexShrink:0,width:30,height:26,borderRadius:7,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer",lineHeight:1}}>A+</button>
                 <span style={{flex:1}}/>
@@ -10382,8 +10390,8 @@ function JesusNameBubble({ C }) {
   return (
     <div onClick={(e)=>{ e.stopPropagation(); try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e2){} }}
       style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",maxWidth:"72%",maxHeight:"70%",zIndex:8,borderRadius:14,background:"rgba(0,0,0,0.9)",border:"none",
-        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:6,textAlign:"center",cursor:"pointer",overflow:"hidden",padding:"16px 20px"}}>
-      <span style={{fontSize:`calc(clamp(17px,5vw,240px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.22,fontFamily:nmFont||"Georgia, serif"}}>{cs.n}</span>
+        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,textAlign:"center",cursor:"pointer",overflow:"hidden",padding:"4px 8px"}}>
+      <span style={{fontSize:`calc(clamp(17px,5vw,240px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.12,fontFamily:nmFont||"Georgia, serif"}}>{cs.n}</span>
       {cs.a && !hideAuthor && <span style={{fontSize:"clamp(11px,3vw,14px)",fontWeight:700,color:C.gold}}>{cs.a}</span>}
     </div>
   );
