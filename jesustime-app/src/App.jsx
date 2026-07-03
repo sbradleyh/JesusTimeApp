@@ -13430,7 +13430,7 @@ export default function App() {
                                 ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"].forEach(add);
                                 starredTags.forEach(t=>add(t.replace(/ /g,"_")));
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) add(t);})));
-                                const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); if(!/_\d{8,}$/.test(t)) usedT.add(norm(t).toLowerCase());}));
+                                const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
                                 const arr=[...map.values()].filter(t=>!del.includes(t)&&!del.includes(t.replace(/_/g," "))).sort((a,b)=>{const ra=(!usedT.has(a.toLowerCase())&&sv(a)>0)?1:0,rb=(!usedT.has(b.toLowerCase())&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
                                 return (
