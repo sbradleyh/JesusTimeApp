@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v302";
+const APP_VERSION = "v312";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -359,7 +359,7 @@ function CelebrationBurst() {
 }
 
 
-function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false, elapsedGray=false, stackTop=false, nowIcon=null, avgLineMins=null, showRunner=false, baseFill=null}) {
+function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, size=110, stroke=10, numDays=1, onSlotTap=null, timeline=null, showNow=false, elapsedGray=false, stackTop=false, nowIcon=null, avgLineMins=null, showRunner=false, baseFill=null, nowIconLabel=null}) {
   const cx = size/2, cy = size/2, r = (size-stroke)/2;
   const mc = "#2a5ab8", dc = "#3aaa55", ec = "#e05a18";
   const total = morningMins + middayMins + eveningMins;
@@ -520,8 +520,12 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         if (nowIcon) {
           const isz = Math.max(30, size*0.14);
           const ip = polar(a, r - isz/2 + 6);
-          return <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz} pointerEvents="none"
-            style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>;
+          return <g pointerEvents="none">
+            <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
+              style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>
+            {nowIconLabel && <text x={ip.x} y={ip.y + isz/2 + 12} textAnchor="middle" fontSize="12.5" fontWeight="800"
+              fill="#d4a017" style={{filter:"drop-shadow(0 0 3px rgba(0,0,0,0.9))"}}>{nowIconLabel}</text>}
+          </g>;
         }
         return <g pointerEvents="none">
           <circle cx={p.x} cy={p.y} r={5} fill="#ffffff" stroke="#d4a017" strokeWidth={2.2}
@@ -1198,6 +1202,7 @@ function dispLabel(t) {
   const s = String(t||"");
   const key = s.replace(/[_ ]/g,"").toLowerCase();
   if (key === "familyworship") return "FamWorship";
+  if (key === "biblememory") return "BibleMem";
   const parts = s.split(/[_ ]+/).filter(Boolean);
   return parts.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join("");
 }
@@ -3451,7 +3456,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
           {visOpen && (
             <div style={{padding:"0 8px 0 4px",userSelect:"none"}}>
               {(() => {
-                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible Log"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
+                const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","BibleRead"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
                 const lockIdx = bottomTabOrder.indexOf("LOCK");
                 const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
                 const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -3531,7 +3536,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                 const out = [];
                 const ctrlBtn = {width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"6px 8px",minHeight:34,borderRadius:10,background:"transparent",border:`1px solid ${C.border}`,color:C.text,fontSize:15,fontWeight:700,cursor:"pointer"};
                 const _graphs = [["circle2","🔵","Today"],["home2","🏠","zHome"],["today","⭕","zDay Circle"],["square","☀️","zToday"],["dayline","📊","Day Line"],["week","📈","Week Line"],["month","📆","Month Line"],["year","🌍","Year Chart"]];
-                const _bibleExtra = [["bible:mem","🧠","Bible Memory"],["bible:drill","📚","Bible Books"]];
+                const _bibleExtra = [["bible:mem","❤️","Bible Memory"],["bible:drill","📚","Bible Books"]];
                 const _appItems = [
                   ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
                   ..._bibleExtra.map(b=>({key:b[0], icon:b[1], label:b[2], tap:()=>{onSelectTab(b[0]);setMenuOpen(false);}}))
@@ -10313,7 +10318,7 @@ function HomeBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry
         </div>
       </div>
     ); };
-  const quick=[["🙏","Prayer",()=>onOpenTag("Prayed")],["📖","Bible",()=>onOpenTag("Bible_Read")],["🧠","Memory",()=>onOpenTag("Bible_Memory")],["🌅","Slides",()=>onSlideshow()]];
+  const quick=[["🙏","Prayer",()=>onOpenTag("Prayed")],["📖","Bible",()=>onOpenTag("Bible_Read")],["❤️","Memory",()=>onOpenTag("Bible_Memory")],["🌅","Slides",()=>onSlideshow()]];
   return (
     <div style={{display:"flex",flexDirection:"column",alignItems:"center",width:"100%",paddingTop:2,gap:8,height:"calc(var(--jt-vh,100dvh) - var(--jt-title-h,116px) - var(--jt-tab-h,64px) - 6px)",minHeight:360,boxSizing:"border-box"}}>
       <div onClick={()=>{ try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e){} }} style={{width:"100%",maxWidth:380,flexShrink:0,maxHeight:"38vh",overflowY:"auto",cursor:"pointer",borderRadius:16,border:`1px solid ${C.border}`,background:C.card,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,padding:"20px 18px",textAlign:"center"}}>
@@ -10518,7 +10523,7 @@ function SquareGraphBody({ entries={}, today, C, tags=[], computeStreak=()=>0, a
 }
 
 function TabLayoutEditor({ C, barLayout, saveBarLayout=()=>{}, allTabIds=[], bottomTabVisible={}, saveBottomTabVisible=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, onClose=()=>{} }) {
-  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","Bible Log"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["🧠","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:home2":["🏠","zHome"],"g:circle2":["🔵","Today"],"g:today":["⭕","zDay Circle"],"g:square":["☀️","zToday"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
+  const TAB_META = {chart:["☀️","Today"],today:["📅","Day"],streaks:["🔥","Streaks"],bible:["📖","BibleRead"],abide:["🍇","Abide"],names:["🌅","Jesus"],prayer:["🙏","Prayer"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],friends:["👥","Friends"],looking:["🔭","Looking"],"bible:mem":["❤️","Bible Memory"],"bible:drill":["📚","Bible Books"],"g:home2":["🏠","zHome"],"g:circle2":["🔵","Today"],"g:today":["⭕","zDay Circle"],"g:square":["☀️","zToday"],"g:dayline":["📊","Day Line"],"g:week":["📈","Week Line"],"g:month":["📆","Month Line"],"g:year":["🌍","Year Chart"]};
   const GRAPHS = ["g:circle2","g:home2","g:today","g:square","g:dayline","g:week","g:month","g:year"];
   const BIBLE_SUB = ["bible:mem","bible:drill"];
   const EXCLUDE = new Set(["abide","today","chart"]);
@@ -12590,7 +12595,7 @@ export default function App() {
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
 
           <div style={{flex:1,display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
-            <button onClick={goBack} title="Back" style={{pointerEvents:"auto",position:"absolute",left:2,top:"50%",transform:"translateY(-50%)",fontSize:20,fontWeight:800,color:"#d4a017",background:"#000",border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 11px",cursor:"pointer",lineHeight:1.1}}>‹</button>
+            <button onClick={goBack} title="Back" style={{pointerEvents:"auto",position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",fontSize:32,fontWeight:800,color:"#d4a017",background:"transparent",border:"none",padding:"0px 12px",cursor:"pointer",lineHeight:1}}>‹</button>
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
                 style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
@@ -12981,7 +12986,7 @@ export default function App() {
                           );
                         }
                         // Responsive large circle — fills available width
-                        const arcSize = Math.floor(containerW - 6); const stroke = Math.max(22, Math.floor(arcSize * 0.07));
+                        const arcSize = Math.floor(containerW + 6); const stroke = Math.max(22, Math.floor(arcSize * 0.07));
                         const r = (arcSize - stroke) / 2;
                         const cx = arcSize / 2, cy = arcSize / 2;
                         const badgeR = r;
@@ -13002,6 +13007,7 @@ export default function App() {
                               stackTop={true}
                               baseFill={C.bg}
                               nowIcon={JESUS_ICON}
+                              nowIconLabel={`${titleStats.count||0}x`}
                               showRunner={chartTab==="day" && viewDay===today}
                               avgLineMins={(()=>{ const days=Object.keys(entries).filter(d=>d!==today); let tot=0,cnt=0; days.forEach(d=>{ const m=(entries[d]||[]).reduce((s,e)=>s+(e.minutes||0),0); if(m>0){tot+=m;cnt++;} }); if(!cnt) return null; return tot/cnt; })()}
                               onSlotTap={handleSlotTap}/>
@@ -13062,19 +13068,18 @@ export default function App() {
                             })()}
                             {badgeData.map(({icon,mins,border,bg,color,angleDeg,slot})=>{
                               const rad = angleDeg * Math.PI / 180;
-                              const isTop = angleDeg === -90;
-                              const useDeg = isTop ? -50 : angleDeg;
-                              const rad2 = useDeg * Math.PI / 180;
-                              const bR = badgeR + 32;
-                              const bx = cx + bR * Math.cos(rad2);
-                              const by = cy + bR * Math.sin(rad2);
+                              const DIAG = {morning:-45, midday:45, evening:135};
+                              const NUDGE = {morning:[25,-25], midday:[25,25], evening:[-25,25]};
+                              const rad2 = DIAG[slot] * Math.PI / 180;
+                              const bR = r + 4;
+                              const bx = cx + bR * Math.cos(rad2) + NUDGE[slot][0];
+                              const by = cy + bR * Math.sin(rad2) + NUDGE[slot][1];
                               const h = Math.floor(mins/60), m = mins%60;
                               const isNow = chartTab==="day" && viewDay===today && getTimeSlot(Date.now())===slot;
                               return (
                                 <div key={icon}
                                   onClick={e=>{e.stopPropagation();setCircleSlot(slot);}}
-                                  style={{position:"absolute",left:bx,top:by,
-                                  transform:"translate(-50%,-50%)",
+                                  style={{position:"absolute",left:bx,top:by,transform:"translate(-50%,-50%)",
                                   padding:"1px 5px 3px",borderRadius:20,border:`2px solid ${circleSlot===slot?"#d4a017":border}`,
                                   boxShadow:circleSlot===slot?"0 0 0 2px #d4a017, 0 0 10px rgba(212,160,23,0.55)":"none",
                                   background:bg,display:"flex",flexDirection:"column",alignItems:"center",gap:0,
@@ -13293,10 +13298,10 @@ export default function App() {
                                 const sv=t=>computeStreak(t,entries,today);
                                 const arr=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>{const ra=(!usedT.has(a.toLowerCase())&&sv(a)>0)?1:0,rb=(!usedT.has(b.toLowerCase())&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
                                 return (
-                                  <div style={{width:"100%",maxWidth:420,marginTop:10,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+                                  <div style={{width:"100%",maxWidth:420,marginTop:10,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
                                     {arr.map(tag=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (
                                       <button key={tag} onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
-                                        style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1.5}px solid ${hasApp?"#4a90d9":done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
+                                        style={{gridColumn:hasApp?"3":"auto",display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1.5}px solid ${hasApp?"#4a90d9":done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
                                         <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dispLabel(tag)}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85,flexShrink:0}}>🔥{st}</span>}
                                       </button>
                                     );})}
@@ -13505,7 +13510,7 @@ export default function App() {
         paddingBottom:"max(2px, calc(env(safe-area-inset-bottom) - 20px))"}}>
         <div ref={barRef} style={{display:"flex",width:"100%",gap:4,padding:"4px 4px 2px",boxSizing:"border-box"}}>
         {(() => {
-          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","Bible Log"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
+          const TAB_META = {today:["☀️","Day"],streaks:["🔥","Streaks"],friends:["👥","Friends"],prayer:["🙏","Prayer"],names:["👤","Names"],bible:["📖","BibleRead"],catechism:["📜","Teaching"],reader:["📕","Reader"],log:["📋","History"],abide:["🍇","Abide"],chart:["☀️","Today"],names:["🌅","Jesus"]};
           const lockIdx = bottomTabOrder.indexOf("LOCK");
           const lockedTabIds = lockIdx>=0 ? bottomTabOrder.slice(lockIdx+1) : [];
           const todayGroupIds = groupRange(bottomTabOrder, "TODAY");
@@ -13641,7 +13646,7 @@ export default function App() {
               );
             })}
             {groupRange(bottomTabOrder,"TODAY").filter(gid=>bottomTabVisible[gid]!==false).map(gid=>{
-              const META={prayer:["🙏","Prayer"],names:["👤","Names"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],bible:["📖","Bible Log"],friends:["👥","Friends"]};
+              const META={prayer:["🙏","Prayer"],names:["👤","Names"],catechism:["📜","Teaching"],log:["📋","History"],streaks:["🔥","Streaks"],bible:["📖","BibleRead"],friends:["👥","Friends"]};
               const [gicon,glabel]=META[gid]||["•",gid];
               return (
                 <button key={gid} onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); saveMainTab(gid); }}
@@ -13675,7 +13680,7 @@ export default function App() {
             boxShadow:"0 -4px 24px rgba(0,0,0,0.7)",
             display:"flex",flexDirection:"row",flexWrap:"nowrap",gap:6,maxWidth:"96vw",overflowX:"auto",justifyContent:"center"}}>
             {(() => {
-              const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],bible:["📖","Bible Log"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
+              const TAB_META = {friends:["👥","Friends"],names:["👤","Names"],bible:["📖","BibleRead"],catechism:["📜","Teaching"],prayer:["🙏","Prayer"],reader:["📕","Reader"],log:["📋","History"]};
               const lockIdx = bottomTabOrder.indexOf("LOCK");
               const abideIdx = bottomTabOrder.indexOf("ABIDE");
               const abideEnd = lockIdx>=0 ? lockIdx : bottomTabOrder.length;
@@ -13869,16 +13874,6 @@ export default function App() {
                 </div>
               </>);
             })()}
-            {todayView==="circle2" && (()=>{
-              const t=matchTagFor(circlePopupTag);
-              const page=appPageFor(t);
-              if(!page) return null;
-              return <button onClick={()=>{ page.fn(); setCirclePopupTag(null); }}
-                style={{display:"block",width:"100%",padding:"12px",borderRadius:10,border:`1px solid ${C.gold}`,
-                  background:"rgba(212,160,23,0.18)",color:C.gold,fontSize:15,fontWeight:800,cursor:"pointer",marginBottom:8,textAlign:"center"}}>
-                {page.label} →
-              </button>;
-            })()}
             {todayView==="circle2" && (
               <div style={{display:"flex",gap:6,marginBottom:8,alignItems:"stretch"}}>
                 {[["morning","☕","Morn"],["midday","☀️","Noon"],["evening","🌙","Night"]].map(([sl,ic,lb])=>(
@@ -13937,21 +13932,31 @@ export default function App() {
                 </button>
               );
             })()}
-            <button onClick={()=>{
-              setStarredTags(prev=>prev.filter(t=>t!==circlePopupTag));
-              try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(circlePopupTag)){ cur.push(circlePopupTag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){}
-              setCirclePopupTag(null);
-            }} style={{display:"block",width:"100%",padding:"10px",borderRadius:10,
-              border:`1px solid #c06060`,background:"transparent",
-              color:"#f87171",fontSize:14,cursor:"pointer",marginBottom:8,textAlign:"left"}}>
-              ✕ Remove Tag
-            </button>
-            <button onClick={()=>setCirclePopupTag(null)}
-              style={{display:"block",width:"100%",padding:"8px",borderRadius:10,
-                border:`1px solid ${C.border}`,background:"transparent",
-                color:C.textFaint,fontSize:13,cursor:"pointer",textAlign:"center"}}>
-              Cancel
-            </button>
+            {(()=>{ const page=(todayView==="circle2")?appPageFor(matchTagFor(circlePopupTag)):null; return (
+            <div style={{display:"flex",gap:6}}>
+              <button onClick={()=>{
+                if(!window.confirm(`Remove tag "${dispLabel(circlePopupTag)}"? Logged time is kept.`)) return;
+                setStarredTags(prev=>prev.filter(t=>t!==circlePopupTag));
+                try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]"); if(!cur.includes(circlePopupTag)){ cur.push(circlePopupTag); localStorage.setItem("deletedTags",JSON.stringify(cur)); } }catch(e){}
+                setCirclePopupTag(null);
+              }} style={{flex:1,padding:"11px 4px",borderRadius:10,
+                border:`1px solid #c06060`,background:"transparent",
+                color:"#f87171",fontSize:13.5,fontWeight:700,cursor:"pointer",textAlign:"center"}}>
+                ✕ Remove
+              </button>
+              <button onClick={()=>setCirclePopupTag(null)}
+                style={{flex:1,padding:"11px 4px",borderRadius:10,
+                  border:`1px solid ${C.border}`,background:"transparent",
+                  color:C.textFaint,fontSize:13.5,fontWeight:700,cursor:"pointer",textAlign:"center"}}>
+                Cancel
+              </button>
+              {page && <button onClick={()=>{ page.fn(); setCirclePopupTag(null); }}
+                style={{flex:1,padding:"11px 4px",borderRadius:10,border:`1px solid #4a90d9`,
+                  background:"rgba(74,144,217,0.15)",color:"#7ab4f0",fontSize:13.5,fontWeight:800,cursor:"pointer",textAlign:"center"}}>
+                Open →
+              </button>}
+            </div>
+            ); })()}
           </div>
         </>
         );
