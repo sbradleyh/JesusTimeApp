@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v350";
+const APP_VERSION = "v353";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -222,6 +222,13 @@ function YearHeat2({entries, today, onOpenDay=()=>{}}) {
   const moTot={}; withData.forEach(k=>{ if(k>=firstIso&&k<=today) moTot[k.slice(0,7)]=(moTot[k.slice(0,7)]||0)+sum(k); });
   const topMoKey = Object.keys(moTot).sort((a,b)=>moTot[b]-moTot[a])[0];
   const topMo = topMoKey ? new Date(topMoKey+"-01T00:00:00").toLocaleDateString("en-US",{month:"short"}) : "—";
+  let maxIso=null, maxM=0;
+  withData.forEach(k=>{ if(k>=firstIso&&k<=today){ const m=sum(k); if(m>maxM){maxM=m; maxIso=k;} } });
+  const wdTot=[0,0,0,0,0,0,0];
+  withData.forEach(k=>{ if(k>=firstIso&&k<=today){ wdTot[new Date(k+"T00:00:00").getDay()]+=sum(k); } });
+  const bestWd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][wdTot.indexOf(Math.max(...wdTot))];
+  const totalM = winVals.reduce((a,b)=>a+b,0);
+  const avgActive = active ? Math.round(totalM/active) : 0;
   const DAYS=["S","M","T","W","T","F","S"];
   const selMins = sel!=null ? sum(sel) : 0;
   return (
@@ -247,6 +254,9 @@ function YearHeat2({entries, today, onOpenDay=()=>{}}) {
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginTop:8,flexWrap:"wrap"}}>
         <div style={{fontSize:12.5,fontWeight:700,color:C.textMid}}>
           {active}/{daysWindow} days · 🔥{cur} streak · longest {longest} · top {topMo}
+          <div style={{fontWeight:600,color:C.textFaint,marginTop:2}}>
+            total {fmtM(totalM)} · most {fmtM(maxM)}{maxIso?` (${parseInt(maxIso.slice(5,7))}/${parseInt(maxIso.slice(8,10))})`:""} · best day {bestWd} · avg {fmtM(avgActive)}/day
+          </div>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:3}}>
           <span style={{fontSize:10,color:C.textFaint}}>Less</span>
@@ -612,7 +622,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
           const elapsedJ = Math.min(900, Math.max(0, (nw.getHours()*60 + nw.getMinutes()) - 420));
           const gapJ = Math.max(0, elapsedJ - totJ);
           const isz = totJ <= 0 ? 48 : Math.max(48, 100 - 80 * Math.min(1, gapJ/900));
-          const ip = polar(a, r - isz/2 + 6);
+          const ip = polar(a, r - isz/2 + 1);
           return <g pointerEvents="none">
             <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
               style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>
@@ -1299,18 +1309,22 @@ function normTag(t0) {
   if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
   if(/^Look4Jesus/i.test(t))return "Look4Jesus";
   if(/^Reader/i.test(t))return "Reader";
+  if(/^JesusDays$/i.test(t))return "JesusDays";
+  if(/^JesusYear$/i.test(t))return "JesusYear";
   if(/_\d{8,}$/.test(t))return null;
   t=t.replace(/_\d{4}-\d{2}-\d{2}$/,"");
   return ciTagWords(t.split("-")[0].replace(/_/g," "));
 }
 function isDeletedTag(t, del){ if(!t) return true; return del.includes(t)||del.includes(t.replace(/_/g," "))||del.includes(t.replace(/ /g,"_")); }
-const TAG_PAGE_RE = /^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching|Reader)/i;
+const TAG_PAGE_RE = /^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching|Reader|JesusDays|JesusYear)/i;
 function dispLabel(t) {
   const s = String(t||"");
   const key = s.replace(/[_ ]/g,"").toLowerCase();
   if (key === "familyworship") return "FamWorship";
   if (key === "biblememory") return "BibleMem";
   if (key === "prayed") return "Pray";
+  if (key === "jesusdays") return "JesusDays";
+  if (key === "jesusyear") return "JesusYear";
   const parts = s.split(/[_ ]+/).filter(Boolean);
   return parts.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join("");
 }
@@ -13541,23 +13555,26 @@ export default function App() {
                                 let del=[]; try{del=JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){}
                                 const map=new Map();
                                 const add=t=>{const n=norm(t); if(!n) return; const k=n.toLowerCase(); if(!map.has(k)) map.set(k,n);};
-                                ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review","Teaching","Reader"].forEach(add);
+                                ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review","Teaching","Reader","JesusDays","JesusYear"].forEach(add);
                                 starredTags.forEach(t=>add(t.replace(/ /g,"_")));
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{add(m.slice(1));})));
                                 const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
-                                const arr=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>sv(b)-sv(a));
-                                const zeroIdx=arr.findIndex(t=>sv(t)<=0);
+                                const arrU=[...map.values()].filter(t=>!isDeletedTag(t,del));
+                                const dayStreakAll=(()=>{ let n=0; const d=new Date(today+"T00:00:00"); const s0=(entries[today]||[]).reduce((t,e)=>t+(e.minutes||0),0); if(s0<=0) d.setDate(d.getDate()-1); for(;;){ const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; const m=(entries[iso]||[]).reduce((t,e)=>t+(e.minutes||0),0); if(m>0){n++; d.setDate(d.getDate()-1);} else break; } return n; })();
+                                const svJ=t=>(t==="JesusDays"||t==="JesusYear")?dayStreakAll:sv(t);
+                                const arr=arrU.sort((a,b)=>svJ(b)-svJ(a));
+                                const zeroIdx=arr.findIndex(t=>svJ(t)<=0);
                                 return (
                                   <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
-                                    {arr.map((tag,ti)=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
+                                    {arr.map((tag,ti)=>{ const done=usedT.has(tag.toLowerCase()); const st=svJ(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
                                       {ti===zeroIdx && zeroIdx>0 && <div style={{gridColumn:"1 / -1",height:0,borderTop:"2px solid rgba(74,144,217,0.65)",margin:"3px 0 1px"}}/>}
-                                      (
+                                      
                                       <button onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
                                         style={{gridColumn:hasApp?"3":"auto",display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
                                         <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:hasApp?"underline":"none",textDecorationColor:hasApp?"#4a90d9":undefined,textDecorationThickness:hasApp?"2px":undefined,textUnderlineOffset:hasApp?"3px":undefined}}>{dispLabel(tag)}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85,flexShrink:0}}>🔥{st}</span>}
                                       </button>
-                                    )</React.Fragment>);})}
+                                    </React.Fragment>);})}
                                   </div>
                                 );
                               })()}
@@ -14097,6 +14114,8 @@ export default function App() {
           if(/^Names_Review/i.test(t)) return {label:"Open Names", fn:()=>{ saveMainTab("names"); }};
           if(/^(Catechism|Teaching)/i.test(t)) return {label:"Open Teaching", fn:()=>{ saveMainTab("catechism"); }};
               if(/^Reader/i.test(t)) return {label:"Open Reader", fn:()=>{ saveMainTab("reader"); }};
+              if(/^JesusDays$/i.test(t)) return {label:"Open Day Line", fn:()=>{ setChartTab("day"); pickTodayView("dayline"); saveMainTab("today"); }};
+              if(/^JesusYear$/i.test(t)) return {label:"Open Year Heat", fn:()=>{ setChartTab("year"); pickTodayView("year2"); saveMainTab("today"); }};
           return null;
         };
         return (
