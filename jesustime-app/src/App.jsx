@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v312";
+const APP_VERSION = "v324";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -506,7 +506,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const tot = anim.m + anim.d + anim.e;
         if (tot <= 0) return null;
         const deg = Math.min(360, tot/(15*60)*360);
-        const isz = Math.max(26, size*0.12);
+        const isz = Math.max(18, Math.max(26, size*0.12) - 25);
         const p = polar(deg, r - isz/2 - 4);
         return <image href={RUNNER_ICON} x={p.x - isz/2} y={p.y - isz/2} width={isz} height={isz}
           pointerEvents="none" style={{filter:"drop-shadow(0 0 4px rgba(0,0,0,0.7))"}}/>;
@@ -518,12 +518,12 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const p = polar(a, r);
         const lp = polar(a, r - 22);
         if (nowIcon) {
-          const isz = Math.max(30, size*0.14);
+          const isz = Math.max(30, size*0.14) + 25;
           const ip = polar(a, r - isz/2 + 6);
           return <g pointerEvents="none">
             <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
               style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>
-            {nowIconLabel && <text x={ip.x} y={ip.y + isz/2 + 12} textAnchor="middle" fontSize="12.5" fontWeight="800"
+            {nowIconLabel && <text x={ip.x + (a<=180 ? isz*0.36 : -isz*0.36)} y={ip.y + isz/2 - 30} textAnchor="middle" fontSize="12.5" fontWeight="800"
               fill="#d4a017" style={{filter:"drop-shadow(0 0 3px rgba(0,0,0,0.9))"}}>{nowIconLabel}</text>}
           </g>;
         }
@@ -1203,6 +1203,7 @@ function dispLabel(t) {
   const key = s.replace(/[_ ]/g,"").toLowerCase();
   if (key === "familyworship") return "FamWorship";
   if (key === "biblememory") return "BibleMem";
+  if (key === "prayed") return "Pray";
   const parts = s.split(/[_ ]+/).filter(Boolean);
   return parts.map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join("");
 }
@@ -3541,7 +3542,7 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                   ...alphaTabs.filter(id=>!["abide","today","names"].includes(id)).map(id=>({key:id, icon:(TAB_META[id]||["?"])[0], label:(TAB_META[id]||["",id])[1], tap:()=>{onSelectTab(id);setMenuOpen(false);}})),
                   ..._bibleExtra.map(b=>({key:b[0], icon:b[1], label:b[2], tap:()=>{onSelectTab(b[0]);setMenuOpen(false);}}))
                 ].sort((a,b)=>a.label.localeCompare(b.label));
-                const _graphItems = _graphs.map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}));
+                const _graphItems = _graphs.filter(g=>lockVerified||!/^z/.test(g[2])).map(g=>({key:"g:"+g[0], icon:g[1], label:g[2], tap:()=>{onSelectTab("streaks:"+g[0]);setMenuOpen(false);}}));
                 const navRow = (it)=>(
                   <div key={it.key} onClick={it.tap} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 6px",borderRadius:8,cursor:"pointer",minWidth:0}}>
                     <span style={{fontSize:22,flexShrink:0}}>{it.icon}</span>
@@ -6416,9 +6417,10 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
           <button onClick={()=>{ const c=verseMenu.card; setVerseMenu(null); if(c.bk&&c.ch){ onSwitchView("read"); setOpenBook(c.bk); setSelChs(new Set([Number(c.ch)])); setReadingCh(Number(c.ch)); setGkJump({book:c.bk,ch:Number(c.ch),v:Number(c.v1)||1,t:Date.now()}); } }} style={{padding:"11px 12px",borderRadius:9,border:"none",background:`rgba(${C.ink},0.06)`,color:C.text,fontSize:16,fontWeight:700,textAlign:"left",cursor:"pointer"}}>📖 Open in Bible reader</button>
         </div>
       </>)}
+      {rev && rev.done && (()=>{ try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){} return null; })()}
       {rev && (<div style={{position:"fixed",inset:0,zIndex:99999,background:C.bg}}/>)}
       {rev && (
-        <div style={{position:"fixed",top:(isTesla||kbOverlay)?0:(revVv.top||0),left:0,right:0,height:(isTesla||kbOverlay)?"45vh":(revVv.h?`${revVv.h}px`:"100%"),zIndex:100000,maxWidth:revLand?"100%":540,margin:"0 auto",
+        <div style={{position:"fixed",top:(isTesla||kbOverlay)?0:(rev.done?0:(revVv.top||0)),left:0,right:0,height:(isTesla||kbOverlay)?(rev.done?"100%":"45vh"):(rev.done?"100%":(revVv.h?`${revVv.h}px`:"100%")),zIndex:100000,maxWidth:revLand?"100%":540,margin:"0 auto",
           boxSizing:"border-box",overflow:"hidden",
           background:C.modalBg,display:"flex",flexDirection:"column",
           paddingBottom:revVv.h?0:"env(safe-area-inset-bottom)",
@@ -11910,7 +11912,8 @@ export default function App() {
   const saveBibleViewHidden = (v) => { setBibleViewHidden(v); try{localStorage.setItem("jtBibleViewsHidden",JSON.stringify(v));}catch(e){} };
   const [todayViewHidden, setTodayViewHidden] = useState(() => { try { return JSON.parse(localStorage.getItem("jtTodayViewsHidden")||"{}")||{}; } catch { return {}; } });
   const saveTodayViewHidden = (v) => { setTodayViewHidden(v); try{localStorage.setItem("jtTodayViewsHidden",JSON.stringify(v));}catch(e){} };
-  const [lockVerified, setLockVerified] = useState(false);
+  const [lockVerified, setLockVerifiedRaw] = useState(()=>{ try{ return localStorage.getItem("jtLockVerified")==="1"; }catch(e){ return false; } });
+  const setLockVerified = (v)=>{ setLockVerifiedRaw(v); try{ localStorage.setItem("jtLockVerified", v?"1":"0"); }catch(e){} };
 
   const [themeName, setThemeName] = useState(() => localStorage.getItem("jtTheme")||"dark");
   C = THEMES[themeName] || THEMES.dark;
@@ -13862,7 +13865,24 @@ export default function App() {
               const hit=iso=>(entries[iso]||[]).some(e=>(e.notes||"").toLowerCase().includes(("#"+matchTag).toLowerCase()));
               return (<>
                 <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8,marginBottom:6}}>
-                  <span style={{fontSize:22,fontWeight:800,color:doneToday?C.gold:C.text,lineHeight:1.1,wordBreak:"break-word"}}>{dispLabel(matchTag)}</span>
+                  <span style={{fontSize:22,fontWeight:800,color:doneToday?C.gold:C.text,lineHeight:1.1,wordBreak:"break-word"}}>{dispLabel(matchTag)}
+                    <button onClick={()=>{
+                      if(TAG_PAGE_RE.test(matchTag)||/^Look4Jesus$/i.test(matchTag)){ window.alert("This is a system tag the app writes automatically — it can't be renamed."); return; }
+                      const cur=circlePopupTag;
+                      const inp=window.prompt("Rename tag (history will be rewritten):", cur.replace(/_/g," "));
+                      if(inp==null) return;
+                      const nn=inp.trim(); if(!nn) return;
+                      const newTag=nn.replace(/ /g,"_"); const oldTag=cur.replace(/ /g,"_");
+                      if(newTag.toLowerCase()===oldTag.toLowerCase()){ setCirclePopupTag(nn); return; }
+                      if(!window.confirm(`Rename "${dispLabel(oldTag)}" → "${dispLabel(newTag)}" across all history?`)) return;
+                      const re=new RegExp("#"+oldTag.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![A-Za-z0-9_])","gi");
+                      setEntries(prev=>{ const next={}; Object.keys(prev).forEach(day=>{ next[day]=(prev[day]||[]).map(e=>{ const notes=e.notes||""; return re.test(notes)?{...e,notes:notes.replace(re,"#"+newTag)}:e; }); }); persist(next); return next; });
+                      const swap=arr=>arr.map(t=>(t.replace(/ /g,"_").toLowerCase()===oldTag.toLowerCase())?nn:t);
+                      setStarredTags(prev=>swap(prev));
+                      try{ const del=JSON.parse(localStorage.getItem("deletedTags")||"[]"); localStorage.setItem("deletedTags",JSON.stringify(del.filter(t=>t.replace(/ /g,"_").toLowerCase()!==newTag.toLowerCase()))); }catch(e){}
+                      setCirclePopupTag(nn);
+                    }} title="Rename tag" style={{marginLeft:8,verticalAlign:"middle",background:"transparent",border:"none",cursor:"pointer",fontSize:17,padding:"0 2px",lineHeight:1}}>✏️</button>
+                  </span>
                   <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0,paddingTop:4}}>
                     {false&&inCircle&&<span style={{fontSize:13,fontWeight:800,padding:"2px 7px",borderRadius:6,color:"#d4a017",border:"1px solid #d4a017",background:"rgba(212,160,23,0.15)"}}>C</span>}
                     {streak>0&&<span style={{fontSize:18,fontWeight:800,color:doneToday?"#f07a40":C.textFaint,background:doneToday?"rgba(240,122,64,0.15)":`rgba(${C.ink},0.08)`,border:`1px solid ${doneToday?"rgba(240,122,64,0.4)":C.border}`,borderRadius:9,padding:"3px 8px",display:"flex",alignItems:"center",gap:3}}>🔥{streak}d</span>}
