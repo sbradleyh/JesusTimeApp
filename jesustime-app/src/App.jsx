@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v346";
+const APP_VERSION = "v347";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1357,7 +1357,7 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
   const maxP = topVal || 10;
   const minP = Math.max(0, botVal);
   const range = maxP - minP || 10;
-  const yLabels = [minP, Math.round(minP + range/2), maxP];
+  const yLabels = isDay ? [minP, maxP] : [minP, Math.round(minP + range/2), maxP];
   const y5Lines = [];
   const pts = isMonth ? 11 : isDay ? 6 : 3;
   const xOf = i => PL + (i / pts) * gW;
@@ -1377,6 +1377,9 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
   const setChartMode = m => { setChartModeState(m); try{localStorage.setItem("jtChartMode",m);}catch(e){} };
   const stacked = isDay && chartMode === "stacked";
   const [hoverDi, setHoverDi] = React.useState(null);
+  const [focusWi, setFocusWi] = React.useState(null);
+  const [histBand, setHistBandState] = React.useState(()=>{try{return localStorage.getItem("jtDayBand")==="1";}catch(e){return false;}});
+  const setHistBand = v => { setHistBandState(v); setFocusWi(null); try{localStorage.setItem("jtDayBand", v?"1":"0");}catch(e){} };
   const SLOTC = C.ink==="0,0,0" ? {m:"#2a5ab8",d:"#2d8a3a",e:"#c45510"} : {m:"#6a9fe8",d:"#5eda7a",e:"#f07a40"};
   const slotSumsFor = iso => {
     let m=0,d=0,e=0;
@@ -1394,6 +1397,14 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
             border:`1px solid ${C.border}`,background:stacked?C.buttonActive:"transparent",
             color:stacked?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
           {stacked?"📈 line":"📊 split"}
+        </button>
+      )}
+      {isDay && !stacked && (
+        <button onClick={()=>setHistBand(!histBand)}
+          style={{position:"absolute",top:-26,right:70,zIndex:5,padding:"3px 9px",borderRadius:8,
+            border:`1px solid ${C.border}`,background:histBand?C.buttonActive:"transparent",
+            color:histBand?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+          {histBand?"〰 lines":"▦ band"}
         </button>
       )}
       <div ref={wrapRef} style={{
@@ -1465,7 +1476,31 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
         return <text key={i} x={x} y={H-4} textAnchor="middle" fontSize="12"
           fill={hot ? "#d4a017" : `rgba(${C.ink},0.35)`} fontWeight={hot ? "800" : "600"}>{label}</text>;
       })}
+      {isDay && !stacked && histBand && (()=>{
+        const hist = activeWeeks.slice(1);
+        if (!hist.length) return null;
+        const stats = [];
+        for (let di=0; di<7; di++){
+          const vals = hist.map(w=>w[di]?.p).filter(v=>v!==null&&v!==undefined&&v>0);
+          if (vals.length){
+            const sorted=[...vals].sort((a,b)=>a-b);
+            const med = sorted.length%2 ? sorted[(sorted.length-1)/2] : (sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;
+            stats.push({di, min:Math.min(...vals), max:Math.max(...vals), med});
+          }
+        }
+        if (stats.length < 2) return null;
+        const topPath = stats.map((st,i)=>`${i?"L":"M"}${xOf(st.di)},${yOf(st.max)}`).join("");
+        const botPath = [...stats].reverse().map(st=>`L${xOf(st.di)},${yOf(st.min)}`).join("");
+        const medPath = stats.map((st,i)=>`${i?"L":"M"}${xOf(st.di)},${yOf(st.med)}`).join("");
+        return <g pointerEvents="none">
+          <path d={topPath+botPath+"Z"} fill={`rgba(${C.ink},0.08)`} stroke="none"/>
+          <path d={medPath} fill="none" stroke={`rgba(${C.ink},0.4)`} strokeWidth="1.8" strokeDasharray="5,4"/>
+        </g>;
+      })()}
       {!stacked && activeWeeks.map((week, wi) => {
+        if (isDay && histBand && wi > 0) return null;
+        const ghost = isDay && !histBand && wi > 0 && wi !== focusWi;
+        const focused = wi > 0 && wi === focusWi;
         const _wc = WEEK_COLORS[wi % WEEK_COLORS.length]; const color = _wc==="#ffffff" ? C.text : _wc;
         let path = "";
         let lastX = null, lastY = null, lastDi = null;
@@ -1507,10 +1542,14 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
         }
         return (
           <g key={wi}>
-            <path d={path} fill="none" stroke={wi===0?lineColor:color} strokeWidth={wi===0?3.5:2}
-              strokeOpacity={wi===0?1:0.5} strokeLinejoin="round" strokeLinecap="round"/>
+            <path d={path} fill="none" stroke={wi===0?lineColor:color}
+              strokeWidth={wi===0?3.5:(ghost?1.5:3)}
+              strokeOpacity={wi===0?1:(ghost?0.18:0.95)} strokeLinejoin="round" strokeLinecap="round"/>
+            {isDay && wi>0 && <path d={path} fill="none" stroke="transparent" strokeWidth="16"
+              style={{cursor:"pointer"}} onClick={()=>setFocusWi(f=>f===wi?null:wi)}/>}
             {week.map((day,di) => {
               if (day.p === null || day.p === 0) return null;
+              if (ghost) return null;
               const isToday = wi===0 && day.iso===today;
 
               let prevP = null;
@@ -1565,14 +1604,15 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
                 </g>
               );
             })}
-            {showLabel && wi !== 0 && <text x={lastX+8} y={lastY+4} fontSize="13" fill={wi===0?lineColor:color}
-              opacity={wi===0?1:0.6} fontWeight="700">{label}</text>}
+            {showLabel && wi !== 0 && (!isDay || focused) && <text x={lastX+8} y={lastY+4} fontSize="13" fill={wi===0?lineColor:color}
+              opacity={wi===0?1:0.85} fontWeight="700">{label}</text>}
           </g>
         );
       })}
       {!stacked && (() => {
         const top = allPcts.length ? Math.max(...allPcts) : -1;
         return activeWeeks.map((week, wi) => {
+          if (isDay && wi > 0 && wi !== focusWi) return null;
           const weekPcts = week.map(d=>d.p).filter(p=>p!==null&&p>0);
           if (!weekPcts.length) return null;
           const weekTop = Math.max(...weekPcts);
