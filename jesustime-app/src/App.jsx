@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v339";
+const APP_VERSION = "v346";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -518,7 +518,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
           return <g pointerEvents="none">
             <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
               style={{filter:"drop-shadow(0 0 5px rgba(212,160,23,0.85))"}}/>
-            {nowIconLabel && <text x={ip.x + (a<=180 ? isz*0.36 : -isz*0.36)} y={ip.y + isz*0.21} textAnchor="middle" fontSize={Math.max(8, isz*0.12)} fontWeight="800"
+            {nowIconLabel && <text x={ip.x + (a<=180 ? isz*0.36 : -isz*0.36)} y={ip.y + isz*0.21 - 5} textAnchor="middle" fontSize={Math.max(8, isz*0.12)} fontWeight="800"
               fill="#d4a017" style={{filter:"drop-shadow(0 0 3px rgba(0,0,0,0.9))"}}>{nowIconLabel}</text>}
           </g>;
         }
@@ -1200,12 +1200,13 @@ function normTag(t0) {
   if(/^Answered_\d{4}-\d{2}-\d{2}$/i.test(t))return "Prayer_Request_Answered";
   if(/^Workout[-_]/i.test(t)||/^Workout$/i.test(t))return "Workout";
   if(/^Look4Jesus/i.test(t))return "Look4Jesus";
+  if(/^Reader/i.test(t))return "Reader";
   if(/_\d{8,}$/.test(t))return null;
   t=t.replace(/_\d{4}-\d{2}-\d{2}$/,"");
   return ciTagWords(t.split("-")[0].replace(/_/g," "));
 }
 function isDeletedTag(t, del){ if(!t) return true; return del.includes(t)||del.includes(t.replace(/_/g," "))||del.includes(t.replace(/ /g,"_")); }
-const TAG_PAGE_RE = /^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching)/i;
+const TAG_PAGE_RE = /^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching|Reader)/i;
 function dispLabel(t) {
   const s = String(t||"");
   const key = s.replace(/[_ ]/g,"").toLowerCase();
@@ -11872,7 +11873,7 @@ export default function App() {
   const [showTodayMenu, setShowTodayMenu] = useState(false);
   const [bibleChosen, setBibleChosen] = useState(false); // page shows only after a menu pick
   const [drillSignal, setDrillSignal] = useState(0);
-  const TAB_DEFAULT_TAGS = {prayer:"Prayed",names:"Names_Review"};
+  const TAB_DEFAULT_TAGS = {prayer:"Prayed",names:"Names_Review",reader:"Reader"};
   const backStackRef = React.useRef([]);   // history of previous tabs (most recent last)
   const saveMainTab = (t, isBack=false) => {
     if (activeMainTab !== t && !isBack) {
@@ -13078,7 +13079,7 @@ export default function App() {
                         circleRORef.current = new ResizeObserver(measure);
                         circleRORef.current.observe(el);
                       }
-                    }} style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginBottom:0,marginTop:0,
+                    }} style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",marginBottom:0,marginTop:-5,
                       width:"calc(100% + 16px)",marginLeft:-8,marginRight:-8}}>
                       {(()=>{
                         const maxByHeight = (typeof window!=="undefined" ? window.innerHeight : 800) * 0.78;
@@ -13095,7 +13096,7 @@ export default function App() {
                           );
                         }
                         // Responsive large circle — fills available width
-                        const arcSize = Math.floor(containerW + 6); const stroke = Math.max(22, Math.floor(arcSize * 0.07));
+                        const arcSize = Math.floor(containerW + 10); const stroke = Math.max(22, Math.floor(arcSize * 0.07));
                         const r = (arcSize - stroke) / 2;
                         const cx = arcSize / 2, cy = arcSize / 2;
                         const badgeR = r;
@@ -13178,7 +13179,7 @@ export default function App() {
                             {badgeData.map(({icon,mins,border,bg,color,angleDeg,slot})=>{
                               const rad = angleDeg * Math.PI / 180;
                               const DIAG = {morning:-45, midday:45, evening:135};
-                              const NUDGE = {morning:[25,-25], midday:[25,25], evening:[-25,25]};
+                              const NUDGE = {morning:[25,-28], midday:[25,20], evening:[-25,20]};
                               const rad2 = DIAG[slot] * Math.PI / 180;
                               const bR = r + 4;
                               const bx = cx + bR * Math.cos(rad2) + NUDGE[slot][0];
@@ -13400,14 +13401,14 @@ export default function App() {
                                 let del=[]; try{del=JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){}
                                 const map=new Map();
                                 const add=t=>{const n=norm(t); if(!n) return; const k=n.toLowerCase(); if(!map.has(k)) map.set(k,n);};
-                                ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review"].forEach(add);
+                                ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review","Teaching","Reader"].forEach(add);
                                 starredTags.forEach(t=>add(t.replace(/ /g,"_")));
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{add(m.slice(1));})));
                                 const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
                                 const arr=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>{const ra=(!usedT.has(a.toLowerCase())&&sv(a)>0)?1:0,rb=(!usedT.has(b.toLowerCase())&&sv(b)>0)?1:0; return (rb-ra)||(sv(b)-sv(a));});
                                 return (
-                                  <div style={{width:"100%",maxWidth:420,marginTop:10,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
+                                  <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
                                     {arr.map(tag=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (
                                       <button key={tag} onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
                                         style={{gridColumn:hasApp?"3":"auto",display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
@@ -13952,6 +13953,7 @@ export default function App() {
           if(/^(Prayed|Prayer)/i.test(t)) return {label:"Open Prayer", fn:()=>{ saveMainTab("prayer"); }};
           if(/^Names_Review/i.test(t)) return {label:"Open Names", fn:()=>{ saveMainTab("names"); }};
           if(/^(Catechism|Teaching)/i.test(t)) return {label:"Open Teaching", fn:()=>{ saveMainTab("catechism"); }};
+              if(/^Reader/i.test(t)) return {label:"Open Reader", fn:()=>{ saveMainTab("reader"); }};
           return null;
         };
         return (
