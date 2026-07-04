@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v375";
+const APP_VERSION = "v377";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -648,7 +648,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const elapsedR = Math.min(900, Math.max(0, (nwR.getHours()*60 + nwR.getMinutes()) - 420));
         const gapR = Math.max(0, elapsedR - tot);   // minutes behind "now"
         const isz = Math.max(14, 50 - 40 * Math.min(1, gapR/900));   // 50px when with Jesus
-        const p = polar(deg, r - isz/2 - 4);
+        const p = polar(deg, r - isz/2 - 4 - (gapR <= 0 ? 30 : 0));   // duck inward when riding on Jesus
         return <image href={RUNNER_ICON} x={p.x - isz/2} y={p.y - isz/2} width={isz} height={isz}
           pointerEvents="none" style={{filter:"drop-shadow(0 0 4px rgba(0,0,0,0.7))"}}/>;
       })()}
@@ -3726,6 +3726,9 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                       <button onClick={()=>{ setMenuOpen(false); onEditLayout && onEditLayout(); }} style={{..._uBtn,color:C.gold,borderColor:C.gold}}>
                         <span style={{fontSize:18}}>✏️</span><span>Edit Tabs</span>
                       </button>
+                      {lockVerified && <button onClick={()=>{ setLockVerified(false); setMenuOpen(false); }} style={{..._uBtn,color:"#f0a060",borderColor:"#f0a060"}}>
+                        <span style={{fontSize:18}}>🔒</span><span>Relock</span>
+                      </button>}
                       </div>
                       <div style={{flex:1,display:"flex",flexDirection:"column",gap:6}}>
                       <button onClick={()=>{setMenuOpen(false);setLegendOpen(true);}} style={{..._uBtn,color:C.gold}}>
@@ -13545,6 +13548,15 @@ export default function App() {
                       {celebrate && <CelebrationBurst/>}
                       {activeMainTab === "today" && (
                         <div style={{overflowX:"hidden",width:"100%",position:"relative"}}>
+                          <select value={todayView}
+                            onChange={e=>{ const v=e.target.value; const cm={week:"week",month:"month",year:"year",year2:"year"}; pickTodayView(v); setChartTab(cm[v]||"day"); }}
+                            style={{position:"absolute",top:0,left:2,zIndex:5,padding:"4px 8px",borderRadius:8,
+                              border:`1px solid ${C.borderHi}`,background:C.buttonFill,color:C.gold,
+                              fontSize:12,fontWeight:800,cursor:"pointer",WebkitAppearance:"none",appearance:"none"}}>
+                            {[["circle2","🔵 Today"],["dayline","📊 Day Line"],["week","📈 Week Line"],["month","📆 Month Line"],["year","🌍 Year Chart"],["year2","🟩 Year Heat"],["home2","🏠 zHome"],["today","⭕ zDay Circle"],["square","☀️ zToday"]]
+                              .filter(([v,l])=>lockVerified||!/^z/.test(l.slice(l.indexOf(" ")+1)))
+                              .map(([v,l])=>(<option key={v} value={v} style={{background:"#1a1107",color:"#d4a017"}}>{l}</option>))}
+                          </select>
                           {todayView!=="square" && todayView!=="circle2" && <button onClick={()=>setShowGraphFilter(s=>!s)}
                             style={{position:"absolute",top:0,right:2,zIndex:5,padding:"4px 10px",borderRadius:8,
                               border:`1px solid ${selectedFilterTags.length?C.gold:C.borderHi}`,
@@ -14263,7 +14275,10 @@ export default function App() {
                   const MILES=[3,7,14,21,30,50,75,100,150,200,300,365,500,730,1000];
                   const nextM=MILES.find(m=>m>streak);
                   return (
-                    <div style={{margin:"0 0 10px",padding:"8px 10px",borderRadius:10,border:`1px solid ${C.border}`,background:`rgba(${C.ink},0.04)`,fontSize:12.5,lineHeight:1.6,color:C.textMid}}>
+                    <div style={{margin:"0 0 10px",padding:"8px 10px",borderRadius:10,border:`1px solid ${C.border}`,background:`rgba(${C.ink},0.04)`,fontSize:12.5,lineHeight:1.6,color:C.textMid,position:"relative"}}>
+                      <button onClick={()=>{ setSelectedFilterTags([matchTag]); setCirclePopupTag(null); setChartTab("day"); pickTodayView("dayline"); saveMainTab("today"); }}
+                        style={{position:"absolute",right:8,bottom:8,padding:"5px 12px",borderRadius:9,border:`1px solid ${C.gold}`,
+                          background:"rgba(212,160,23,0.12)",color:C.gold,fontSize:12.5,fontWeight:800,cursor:"pointer"}}>🧭 Journey</button>
                       <div><span style={{color:C.gold,fontWeight:800}}>🔥{streak}</span> · best {longest} · {daysDone}/{spanDays}d since {md(firstIso)} · {cons}%</div>
                       <div>{fmtM(totalM)} total · avg {fmtM(avgAct)}/day · best {bestWd} {bestSlotIc} · big {fmtM(maxM)} ({md(maxIso)})</div>
                       <details style={{marginTop:3}}>
