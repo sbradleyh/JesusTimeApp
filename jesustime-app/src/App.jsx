@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v353";
+const APP_VERSION = "v360";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1378,7 +1378,7 @@ function CircleSwipeWrapper({onSwipe, onClick, children, style}) {
 function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHeight=false}) {
   const [slideDir, setSlideDir] = React.useState(0);
   const swipeStartX = React.useRef(null);
-  const handleTouchStart = e => { swipeStartX.current = e.touches[0].clientX; };
+  const handleTouchStart = e => { const x = e.touches[0].clientX; swipeStartX.current = (x <= 28) ? null : x; };
   const handleTouchEnd   = e => {
     if (swipeStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - swipeStartX.current;
@@ -1504,20 +1504,20 @@ function WeeklyLineChart({entries, today, chartTab, onSwipe, onDotClick, fillHei
   return (
     <div style={{position:"relative",...(fillHeight ? {flex:1,minHeight:0,display:"flex",flexDirection:"column"} : {})}}>
       {isDay && (
-        <button onClick={()=>setChartMode(stacked?"line":"stacked")}
-          style={{position:"absolute",top:-26,left:2,zIndex:5,padding:"3px 9px",borderRadius:8,
-            border:`1px solid ${C.border}`,background:stacked?C.buttonActive:"transparent",
-            color:stacked?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
-          {stacked?"📈 line":"📊 split"}
-        </button>
-      )}
-      {isDay && !stacked && (
-        <button onClick={()=>setHistBand(!histBand)}
-          style={{position:"absolute",top:-26,left:78,zIndex:5,padding:"3px 9px",borderRadius:8,
-            border:`1px solid ${C.border}`,background:histBand?C.buttonActive:"transparent",
-            color:histBand?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
-          {histBand?"〰 lines":"▦ band"}
-        </button>
+        <div style={{display:"flex",gap:6,margin:"0 0 4px 2px",flexShrink:0}}>
+          <button onClick={()=>setChartMode(stacked?"line":"stacked")}
+            style={{padding:"3px 9px",borderRadius:8,
+              border:`1px solid ${C.border}`,background:stacked?C.buttonActive:"transparent",
+              color:stacked?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+            {stacked?"📈 line":"📊 split"}
+          </button>
+          {!stacked && <button onClick={()=>setHistBand(!histBand)}
+            style={{padding:"3px 9px",borderRadius:8,
+              border:`1px solid ${C.border}`,background:histBand?C.buttonActive:"transparent",
+              color:histBand?C.gold:C.textFaint,fontSize:12,fontWeight:700,cursor:"pointer"}}>
+            {histBand?"〰 lines":"▦ band"}
+          </button>}
+        </div>
       )}
       <div ref={wrapRef} style={{
         ...(fillHeight ? {flex:1, minHeight:0, display:"flex"} : {}),
@@ -4815,7 +4815,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     const existing = (box && box.cards) || [];
     const have = new Set(existing.map(c=>c.id));
     const additions = [];
-    ["baptist","heidelberg"].forEach(cat => {
+    ["baptist","heidelberg","spurgeon"].forEach(cat => {
       CATECHISMS[cat].data.forEach(c => {
         const id = `${cat}:${c.q}`;
         if (!have.has(id)) additions.push({id, cat, q:c.q, question:c.question, answer:c.answer, refs:c.refs, level:0, slot:null, n:0, last:""});
@@ -11211,12 +11211,15 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [bookId, setBookId] = React.useState(()=>{ try { return localStorage.getItem("jtReaderBook")||BOOKS[0].id; } catch(e){ return BOOKS[0].id; } });
   const [, setBookDataVer] = React.useState(0);
   const [bookLoading, setBookLoading] = React.useState(false);
+  const [bookLoadErr, setBookLoadErr] = React.useState("");
+  const [bookLoadTry, setBookLoadTry] = React.useState(0);
   React.useEffect(()=>{
     if(BOOK_DATA_URLS[bookId] && !_bookDataCache[bookId]){
-      setBookLoading(true);
-      loadBookData(bookId).then(()=>{ setBookLoading(false); setBookDataVer(v=>v+1); }).catch(()=>{ setBookLoading(false); });
-    }
-  }, [bookId]);
+      setBookLoading(true); setBookLoadErr("");
+      loadBookData(bookId).then(()=>{ setBookLoading(false); setBookDataVer(v=>v+1); })
+        .catch(err=>{ setBookLoading(false); setBookLoadErr(String((err&&err.message)||err||"load failed")); });
+    } else { setBookLoadErr(""); }
+  }, [bookId, bookLoadTry]);
   const [gkNav,setGkNav]=React.useState({top:{book:null,ch:null},bottom:{book:null,ch:null}});
   const [gkBusy,setGkBusy]=React.useState(false);
   const [gkErr,setGkErr]=React.useState("");
@@ -11627,6 +11630,13 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
         {bookLoading && (!book.paras || !book.paras.length) && (
           <div style={{padding:"28px 16px",textAlign:"center",color:C.textFaint,fontSize:14}}>Loading {book.title}…</div>
         )}
+        {!bookLoading && bookLoadErr && (!book.paras || !book.paras.length) && (
+          <div style={{padding:"24px 16px",textAlign:"center"}}>
+            <div style={{color:"#f87171",fontSize:14,fontWeight:700,marginBottom:6}}>Couldn't load {book.title}</div>
+            <div style={{color:C.textFaint,fontSize:12,marginBottom:12}}>{bookLoadErr} · {BOOK_DATA_URLS[bookId]}</div>
+            <button onClick={()=>setBookLoadTry(t=>t+1)} style={{padding:"8px 18px",borderRadius:9,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.15)",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>Retry</button>
+          </div>
+        )}
         {book.scenes.map((sc,si)=>(
           <div key={si} id={"rdsc-"+bookId+"-"+si} style={{marginBottom:16}}>
             {book.paras.slice(sc.s, sc.e+1).map((para,pi)=>{
@@ -12026,26 +12036,36 @@ export default function App() {
   const [bibleChosen, setBibleChosen] = useState(false); // page shows only after a menu pick
   const [drillSignal, setDrillSignal] = useState(0);
   const TAB_DEFAULT_TAGS = {prayer:"Prayed",names:"Names_Review",reader:"Reader"};
-  const backStackRef = React.useRef([]);   // history of previous tabs (most recent last)
+  const backStackRef = React.useRef([]);   // history of {tab, view, chart}, most recent last
+  const _pushHist = () => {
+    const st = backStackRef.current;
+    const cur = {tab:activeMainTab, view:todayView, chart:chartTab};
+    const top = st[st.length-1];
+    if (!top || top.tab!==cur.tab || top.view!==cur.view) st.push(cur);
+    if (st.length > 30) st.splice(0, st.length - 30);
+  };
   const saveMainTab = (t, isBack=false) => {
-    if (activeMainTab !== t && !isBack) {
-      const st = backStackRef.current;
-      if (st[st.length-1] !== activeMainTab) st.push(activeMainTab);
-      if (st.length > 30) st.splice(0, st.length - 30);
-    }
+    if (activeMainTab !== t && !isBack) _pushHist();
     setActiveMainTab(t);
     localStorage.setItem("jtMainTab",t);
     if (TAB_DEFAULT_TAGS[t]) {
       setSelectedFilterTags([TAB_DEFAULT_TAGS[t]]);
     }
   };
+  React.useEffect(()=>{
+    if (activeMainTab === "reader") {
+      const has = (entries[today]||[]).some(e=>/#Reader\b/i.test(e.notes||""));
+      if (!has) addEntry(0, {dur:"0m", notes:"#Reader", time:new Date().toTimeString().slice(0,5)}, today);
+    }
+  }, [activeMainTab]); // eslint-disable-line
   const goBack = () => {
     const st = backStackRef.current;
-    let t = st.pop();
-    while (t === activeMainTab && st.length) t = st.pop();   // skip self
-    if (!t) t = "today";
+    let e = st.pop();
+    while (e && e.tab===activeMainTab && e.view===todayView && st.length) e = st.pop();
     setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false);
-    saveMainTab(t, true);
+    if (!e) { saveMainTab("today", true); return; }
+    saveMainTab(e.tab, true);
+    if (e.tab === "today" && e.view) { setTodayView(e.view); localStorage.setItem("jtTodayView", e.view); if (e.chart) setChartTab(e.chart); }
   };
   React.useEffect(()=>{ const f=()=>{ saveMainTab("reader"); }; window.addEventListener("jtGoReader",f); return ()=>window.removeEventListener("jtGoReader",f); },[]); // eslint-disable-line
   const edgeSwipe = React.useRef(null);
@@ -12509,7 +12529,10 @@ export default function App() {
   // Completion moment: all three slots lit today → one-time celebration
   const [celebrate, setCelebrate] = useState(false);
   const [todayView, setTodayView] = useState("square");
-  const pickTodayView = v => { setTodayView(v); localStorage.setItem("jtTodayView", v); };
+  const pickTodayView = v => {
+    if (activeMainTab === "today" && todayView !== v) _pushHist();
+    setTodayView(v); localStorage.setItem("jtTodayView", v);
+  };
   React.useEffect(() => {
     // On each app open, land on the Square Graph.
     setTodayView("circle2"); try{ localStorage.setItem("jtTodayView","circle2"); }catch(e){}
@@ -12846,12 +12869,15 @@ export default function App() {
         </div>
         {/* Times with Jesus header (tap to open the names menu) */}
         <div onClick={()=>{ setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false); pickTodayView("circle2"); setChartTab("day"); saveMainTab("today"); }}
-          style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",
+          style={{width:"100%",margin:"1px 0 0",padding:"2px 8px",borderRadius:13,boxSizing:"border-box",position:"relative",
             border:`1px solid rgba(212,160,23,0.4)`,background:"#000",display:"flex",justifyContent:"center",
             alignItems:"baseline",gap:8,cursor:"pointer",whiteSpace:"nowrap"}}>
           <span style={{fontSize:"clamp(26px,7vw,36px)",fontWeight:800,color:"#d4a017"}}>{titleStats.count}</span>
           <span style={{fontSize:"clamp(17px,4vw,26px)",fontWeight:800,color:C.text}}>{titleStats.count===1?"time":"times"} with</span>
           <span style={{fontSize:"clamp(26px,7.5vw,42px)",fontWeight:800,color:"#d4a017"}}>Jesus</span>
+          <button onClick={e=>{ e.stopPropagation(); setAppMenuOpen(true); }} title="Menu"
+            style={{position:"absolute",right:2,top:"50%",transform:"translateY(-50%)",background:"transparent",border:"none",
+              color:"#d4a017",fontSize:26,fontWeight:800,lineHeight:1,padding:"6px 10px",cursor:"pointer"}}>☰</button>
         </div>
         {/* Stats — flex:1, shifts right as date expands */}
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
@@ -12898,7 +12924,7 @@ export default function App() {
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
-          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:circle2"){pickTodayView("circle2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="streaks:year2"){pickTodayView("year2");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={false} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
+          <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:circle2"){pickTodayView("circle2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="streaks:year2"){pickTodayView("year2");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={true} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
           </div>
         </div>
       </div>
@@ -13497,7 +13523,7 @@ export default function App() {
                             </div>
                           )}
                           {showGraphFilter && (()=>{
-                            const allUsedTags=(()=>{const s=new Set();Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#\S+/g)||[]).forEach(t=>{let n=t.slice(1);if(n.startsWith("Note_"))return;if(n.startsWith("Bible_Memory_"))n="Bible_Memory";else if(n.startsWith("Bible_Read_"))n="Bible_Read";s.add(n);})));return [...s].sort((a,b)=>a.localeCompare(b));})();
+                            const allUsedTags=(()=>{let del=[];try{del=JSON.parse(localStorage.getItem("deletedTags")||"[]");}catch(e){} const m=new Map();Object.values(entries).forEach(arr=>(arr||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(t=>{const raw=t.slice(1);if(/^Note_/i.test(raw))return;const n=normTag(raw);if(!n)return;const u=n.replace(/ /g,"_");const k=u.toLowerCase();if(!m.has(k))m.set(k,u);})));return [...m.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>a.localeCompare(b));})();
                             return (
                               <div style={{position:"absolute",top:34,right:2,zIndex:6,width:230,maxHeight:300,overflowY:"auto",
                                 background:C.bg,border:`1px solid ${C.borderHi}`,borderRadius:10,padding:8,boxShadow:"0 6px 20px rgba(0,0,0,0.28)"}}>
@@ -13510,7 +13536,7 @@ export default function App() {
                                     <button key={tag} onClick={()=>setSelectedFilterTags(prev=>prev.includes(tag)?prev.filter(t=>t!==tag):[...prev,tag])}
                                       style={{padding:"4px 9px",borderRadius:8,cursor:"pointer",
                                         border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",
-                                        color:on?C.gold:C.textMid,fontSize:12,fontWeight:700}}>{tag.replace(/ /g,"_")}</button>
+                                        color:on?C.gold:C.textMid,fontSize:12,fontWeight:700}}>{dispLabel(tag)}</button>
                                   );})}
                                   {allUsedTags.length===0 && <span style={{fontSize:12,color:C.textFaint}}>No tags yet</span>}
                                 </div>
@@ -13560,18 +13586,13 @@ export default function App() {
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{add(m.slice(1));})));
                                 const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
-                                const arrU=[...map.values()].filter(t=>!isDeletedTag(t,del));
-                                const dayStreakAll=(()=>{ let n=0; const d=new Date(today+"T00:00:00"); const s0=(entries[today]||[]).reduce((t,e)=>t+(e.minutes||0),0); if(s0<=0) d.setDate(d.getDate()-1); for(;;){ const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; const m=(entries[iso]||[]).reduce((t,e)=>t+(e.minutes||0),0); if(m>0){n++; d.setDate(d.getDate()-1);} else break; } return n; })();
-                                const svJ=t=>(t==="JesusDays"||t==="JesusYear")?dayStreakAll:sv(t);
-                                const arr=arrU.sort((a,b)=>svJ(b)-svJ(a));
-                                const zeroIdx=arr.findIndex(t=>svJ(t)<=0);
+                                const arr=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>sv(b)-sv(a));
                                 return (
                                   <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
-                                    {arr.map((tag,ti)=>{ const done=usedT.has(tag.toLowerCase()); const st=svJ(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
-                                      {ti===zeroIdx && zeroIdx>0 && <div style={{gridColumn:"1 / -1",height:0,borderTop:"2px solid rgba(74,144,217,0.65)",margin:"3px 0 1px"}}/>}
+                                    {arr.map((tag)=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
                                       
                                       <button onClick={()=>{ setShowAddToCircle(false); setCirclePopupTag(p=>p===tag?null:tag); }}
-                                        style={{gridColumn:hasApp?"3":"auto",display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
+                                        style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"8px 4px",borderRadius:11,cursor:"pointer",minWidth:0,overflow:"hidden",background:done?"rgba(74,222,128,0.18)":atRisk?"rgba(224,90,24,0.12)":"transparent",border:`${atRisk?2:1}px solid ${done?"rgba(74,222,128,0.45)":atRisk?"#e05a18":C.border}`,color:done?"#fff":atRisk?"#f0a060":C.textFaint,fontSize:13.5,fontWeight:700}}>
                                         <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:hasApp?"underline":"none",textDecorationColor:hasApp?"#4a90d9":undefined,textDecorationThickness:hasApp?"2px":undefined,textUnderlineOffset:hasApp?"3px":undefined}}>{dispLabel(tag)}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85,flexShrink:0}}>🔥{st}</span>}
                                       </button>
                                     </React.Fragment>);})}
@@ -14114,8 +14135,8 @@ export default function App() {
           if(/^Names_Review/i.test(t)) return {label:"Open Names", fn:()=>{ saveMainTab("names"); }};
           if(/^(Catechism|Teaching)/i.test(t)) return {label:"Open Teaching", fn:()=>{ saveMainTab("catechism"); }};
               if(/^Reader/i.test(t)) return {label:"Open Reader", fn:()=>{ saveMainTab("reader"); }};
-              if(/^JesusDays$/i.test(t)) return {label:"Open Day Line", fn:()=>{ setChartTab("day"); pickTodayView("dayline"); saveMainTab("today"); }};
-              if(/^JesusYear$/i.test(t)) return {label:"Open Year Heat", fn:()=>{ setChartTab("year"); pickTodayView("year2"); saveMainTab("today"); }};
+              if(/^JesusDays$/i.test(t)) return {label:"Open Day Line", fn:()=>{ const has=(entries[today]||[]).some(e=>/#JesusDays\b/i.test(e.notes||"")); if(!has) addEntry(0,{dur:"0m",notes:"#JesusDays",time:new Date().toTimeString().slice(0,5)},today); setChartTab("day"); pickTodayView("dayline"); saveMainTab("today"); }};
+              if(/^JesusYear$/i.test(t)) return {label:"Open Year Heat", fn:()=>{ const has=(entries[today]||[]).some(e=>/#JesusYear\b/i.test(e.notes||"")); if(!has) addEntry(0,{dur:"0m",notes:"#JesusYear",time:new Date().toTimeString().slice(0,5)},today); setChartTab("year"); pickTodayView("year2"); saveMainTab("today"); }};
           return null;
         };
         return (
