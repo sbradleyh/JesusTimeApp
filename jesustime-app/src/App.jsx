@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v365";
+const APP_VERSION = "v371";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -9023,7 +9023,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [titleScale, setTitleScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtTitleScale")); return v>0?v:1; } catch(e){ return 1; } });
   const [fitScale, setFitScale] = React.useState(() => { try { const v=parseFloat(localStorage.getItem("jtFitScale")); return v>0?Math.min(1,v):1; } catch(e){ return 1; } });
   const bumpFit = (d) => setFitScale(s=>{ const v=Math.min(1, Math.max(0.4, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtFitScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
-  const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(1.8, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
+  const bumpTitle = (d) => setTitleScale(s=>{ const v=Math.min(12, Math.max(0.6, Math.round((s+d)*100)/100)); try{localStorage.setItem("jtTitleScale", String(v)); window.dispatchEvent(new Event("jtNameStyle"));}catch(e){} return v; });
   React.useEffect(() => {
     const open = () => setMenuOpen(true);
     window.addEventListener("jtOpenNamesMenu", open);
@@ -9128,6 +9128,10 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const _bgHex = String(C.bg||"#000000").replace("#","");
   const _isDark = (()=>{ const h=_bgHex.length>=6?_bgHex:"000000"; const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16); return (0.299*r+0.587*g+0.114*b)<140; })();
   const [shadowColor, setShadowColor] = React.useState(() => { try { return localStorage.getItem("jtShadowColor") || (_isDark?"#ffffff":"#000000"); } catch(e){ return "#ffffff"; } });
+  const [nmGlow, setNmGlowS] = React.useState(() => { try { return localStorage.getItem("jtNameShadow")||""; } catch(e){ return ""; } });
+  const setNmGlow = v => { setNmGlowS(v); try{ localStorage.setItem("jtNameShadow", v); window.dispatchEvent(new Event("jtNameStyle")); }catch(e){} };
+  const [nmGlowColor, setNmGlowColorS] = React.useState(() => { try { return localStorage.getItem("jtNameShadowColor")||"#d4a017"; } catch(e){ return "#d4a017"; } });
+  const setNmGlowColor = c => { c=String(c).toLowerCase(); setNmGlowColorS(c); try{ localStorage.setItem("jtNameShadowColor", c); window.dispatchEvent(new Event("jtNameStyle")); }catch(e){} };
   const setShadowCol = c => { setShadowColor(c); try{localStorage.setItem("jtShadowColor",c);}catch(e){} };
   const PRES_SHADOWS = [["No shadow",""],["Soft glow","0 0 14px @"],["Strong glow","0 0 26px @"],["Halo","0 0 3px @,0 0 10px @"],["Double glow","0 0 6px @,0 0 22px @"],["3D offset","4px 4px 0 @"],["Drop","3px 5px 9px @"]];
   const shadowCss = pShadow ? pShadow.split("@").join(shadowColor) : undefined;
@@ -9302,6 +9306,18 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 <input type="color" value={nameColor} onChange={e=>pickColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
                 {recentColors.map(c=>(
                   <button key={c} onClick={()=>pickColor(c)} style={{width:20,height:20,borderRadius:"50%",cursor:"pointer",background:c,border:String(nameColor).toLowerCase()===String(c).toLowerCase()?`2px solid ${C.text}`:`1px solid ${C.border}`,padding:0,flexShrink:0}}/>
+                ))}
+              </div>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10,flexWrap:"nowrap"}}>
+              <span style={{fontSize:12,fontWeight:700,color:C.textMid,flexShrink:0}}>Glow</span>
+              <PDrop C={C} value={nmGlow} onChange={v=>setNmGlow(v)}
+                wrapStyle={{flex:1,minWidth:0}} btnStyle={{height:34,borderRadius:9,cursor:"pointer",width:"100%"}}
+                options={PRES_SHADOWS.map(([l,v])=>[v, l])}/>
+              <div style={{display:"flex",alignItems:"center",gap:4,flexShrink:1,minWidth:0,overflowX:"auto",maxWidth:"46%"}}>
+                <input type="color" value={nmGlowColor} onChange={e=>setNmGlowColor(e.target.value)} style={{width:28,height:26,padding:0,border:`1px solid ${C.border}`,borderRadius:6,background:"transparent",cursor:"pointer",flexShrink:0}}/>
+                {recentColors.map(c=>(
+                  <button key={"g"+c} onClick={()=>setNmGlowColor(c)} style={{width:20,height:20,borderRadius:"50%",cursor:"pointer",background:c,border:String(nmGlowColor).toLowerCase()===String(c).toLowerCase()?"2px solid #fff":`1px solid ${C.border}`,flexShrink:0}}/>
                 ))}
               </div>
             </div>
@@ -10638,12 +10654,13 @@ function JesusNameBubble({ C }) {
   const [nmOverride,setNmOverride]=React.useState(null);
   React.useEffect(()=>{ const t=setInterval(()=>{ setNmOverride(null); setSi(s=>(s+1)%Math.max(1,slides.length)); },Math.max(2,rotateSec)*1000); return ()=>clearInterval(t); },[slides.length,rotateSec]); // eslint-disable-line
   React.useEffect(()=>{ const f=(e)=>{ const d=e&&e.detail; if(d&&d.n) setNmOverride({n:d.n,a:d.a||""}); }; window.addEventListener("jtNameSet",f); return ()=>window.removeEventListener("jtNameSet",f); },[]);
+  const nmGlowCss=(()=>{try{const t=localStorage.getItem("jtNameShadow")||""; if(!t) return undefined; const c=localStorage.getItem("jtNameShadowColor")||"#d4a017"; return t.split("@").join(c);}catch(e){return undefined;}})();
   const cs=nmOverride||slides[si%Math.max(1,slides.length)]||{n:"",a:""};
   return (
     <div onClick={(e)=>{ e.stopPropagation(); try{window.dispatchEvent(new Event("jtOpenNamesMenu"));}catch(e2){} }}
       style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)",maxWidth:"72%",maxHeight:"70%",zIndex:8,borderRadius:14,background:"rgba(0,0,0,0.9)",border:"none",
         display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,textAlign:"center",cursor:"pointer",overflow:"hidden",padding:"4px 8px"}}>
-      <span style={{fontSize:`calc(clamp(17px,5vw,400px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.12,fontFamily:nmFont||"Georgia, serif"}}>{cs.n}</span>
+      <span style={{fontSize:`calc(clamp(17px,5vw,400px) * ${nmScale})`,fontWeight:800,color:nmColor,lineHeight:1.12,fontFamily:nmFont||"Georgia, serif",textShadow:nmGlowCss}}>{cs.n}</span>
       {cs.a && !hideAuthor && <span style={{fontSize:"clamp(11px,3vw,14px)",fontWeight:700,color:C.gold}}>{cs.a}</span>}
     </div>
   );
@@ -14199,6 +14216,65 @@ export default function App() {
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
                   {last7.map(iso=>{const h=hit(iso),isT=iso===today;return h ? <span key={iso} style={{fontSize:14,lineHeight:1,flexShrink:0,filter:isT?"none":"none"}}>🔥</span> : <span key={iso} style={{width:9,height:9,borderRadius:"50%",flexShrink:0,background:"transparent",border:`1px solid rgba(${C.ink},0.25)`}}/>;})}
                 </div>
+                {(()=>{
+                  const isoOf=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+                  const md=iso=>iso?`${parseInt(iso.slice(5,7))}/${parseInt(iso.slice(8,10))}`:"—";
+                  const tagLC=("#"+matchTag).toLowerCase();
+                  const inc=e=>(e.notes||"").toLowerCase().includes(tagLC);
+                  const dayM={}; let firstIso=null,totalM=0,sess=0,allM=0;
+                  const wd=[0,0,0,0,0,0,0]; const slotM={morning:0,midday:0,evening:0}; const starts=[];
+                  Object.keys(entries).sort().forEach(d=>{(entries[d]||[]).forEach(e=>{ allM+=(e.minutes||0); if(!inc(e))return; const m=e.minutes||0; dayM[d]=(dayM[d]||0)+m; totalM+=m; sess++; if(!firstIso)firstIso=d; if(e.ts){const dt=new Date(e.ts); wd[dt.getDay()]+=m; const sl=getTimeSlot(e.ts); if(slotM[sl]!=null)slotM[sl]+=m; starts.push(dt.getHours()*60+dt.getMinutes());}});});
+                  if(!firstIso) return null;
+                  let maxM=0,maxIso=null; Object.keys(dayM).forEach(d=>{if(dayM[d]>maxM){maxM=dayM[d];maxIso=d;}});
+                  const daysDone=Object.keys(dayM).filter(d=>dayM[d]>0).length;
+                  const spanDays=Math.max(1,Math.round((new Date(today+"T00:00:00")-new Date(firstIso+"T00:00:00"))/86400000)+1);
+                  let longest=0,run=0;{const d=new Date(firstIso+"T00:00:00"),end=new Date(today+"T00:00:00");while(d<=end){if(dayM[isoOf(d)]>0){run++;if(run>longest)longest=run;}else run=0;d.setDate(d.getDate()+1);}}
+                  const cons=Math.round(daysDone/spanDays*100);
+                  const avgAct=daysDone?Math.round(totalM/daysDone):0;
+                  const avgSess=sess?Math.round(totalM/sess):0;
+                  const WD=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+                  const bestWd=WD[wd.indexOf(Math.max(...wd))];
+                  const slotTot=slotM.morning+slotM.midday+slotM.evening||1;
+                  const sp={m:Math.round(slotM.morning/slotTot*100),d:Math.round(slotM.midday/slotTot*100),e:Math.round(slotM.evening/slotTot*100)};
+                  const bestSlotIc=slotM.morning>=slotM.midday&&slotM.morning>=slotM.evening?"☕":slotM.midday>=slotM.evening?"☀️":"🌙";
+                  starts.sort((a,b)=>a-b); const medS=starts.length?starts[Math.floor(starts.length/2)]:null;
+                  const startStr=medS==null?"—":(()=>{let h=Math.floor(medS/60),m=medS%60;const ap=h>=12?"p":"a";h=h%12||12;return `${h}:${String(m).padStart(2,"0")}${ap}`;})();
+                  const share=allM?Math.round(totalM/allM*100):0;
+                  let lastAgo=null;{const d=new Date(today+"T00:00:00");for(let i=0;i<3650;i++){if(dayM[isoOf(d)]>0){lastAgo=i;break;}d.setDate(d.getDate()-1);}}
+                  const lastStr=lastAgo===0?"today ✓":lastAgo==null?"—":lastAgo+"d ago";
+                  const weekStart=off=>{const d=new Date(today+"T00:00:00");d.setDate(d.getDate()-d.getDay()-off*7);return d;};
+                  const weekTot=off=>{const d=weekStart(off);let t=0;for(let i=0;i<7;i++){t+=dayM[isoOf(d)]||0;d.setDate(d.getDate()+1);}return t;};
+                  const tw=weekTot(0),lw=weekTot(1);
+                  const weeks12=[];for(let o=11;o>=0;o--)weeks12.push(weekTot(o));
+                  const wmax=Math.max(1,...weeks12);
+                  const spark=weeks12.map((v,i)=>`${i?"L":"M"}${(i/(11||1))*120},${22-(v/wmax)*20}`).join("");
+                  const MILES=[3,7,14,21,30,50,75,100,150,200,300,365,500,730,1000];
+                  const nextM=MILES.find(m=>m>streak);
+                  return (
+                    <div style={{margin:"0 0 10px",padding:"8px 10px",borderRadius:10,border:`1px solid ${C.border}`,background:`rgba(${C.ink},0.04)`,fontSize:12.5,lineHeight:1.6,color:C.textMid}}>
+                      <div><span style={{color:C.gold,fontWeight:800}}>🔥{streak}</span> · best {longest} · {daysDone}/{spanDays}d since {md(firstIso)} · {cons}%</div>
+                      <div>{fmtM(totalM)} total · avg {fmtM(avgAct)}/day · best {bestWd} {bestSlotIc} · big {fmtM(maxM)} ({md(maxIso)})</div>
+                      <details style={{marginTop:3}}>
+                        <summary style={{cursor:"pointer",color:C.gold,fontWeight:700,fontSize:12,listStyle:"none"}}>More ▾</summary>
+                        <div style={{marginTop:6,display:"grid",gridTemplateColumns:"1fr 1fr",gap:"3px 10px",fontSize:12}}>
+                          <span>Wk {fmtM(tw)} {tw>=lw?"▲":"▼"}{fmtM(Math.abs(tw-lw))}</span>
+                          <span>{sess} sessions · {fmtM(avgSess)} avg</span>
+                          <span>☕{sp.m}% ☀️{sp.d}% 🌙{sp.e}%</span>
+                          <span>Start ~{startStr}</span>
+                          <span>{share}% of all time</span>
+                          <span>Last: {lastStr}</span>
+                          {nextM && <span>Next: {nextM-streak}d → {nextM}🔥</span>}
+                          <span style={{gridColumn:"1 / -1",marginTop:2}}>
+                            <svg width="128" height="24" viewBox="0 0 128 24" style={{display:"block"}}>
+                              <path d={spark} fill="none" stroke="#d4a017" strokeWidth="1.8" strokeLinejoin="round"/>
+                            </svg>
+                            <span style={{fontSize:10,color:C.textFaint}}>12 weeks</span>
+                          </span>
+                        </div>
+                      </details>
+                    </div>
+                  );
+                })()}
               </>);
             })()}
             {todayView==="circle2" && (
