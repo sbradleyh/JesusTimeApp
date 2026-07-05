@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v441";
+const APP_VERSION = "v444";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1459,6 +1459,24 @@ function normTag(t0) {
   return ciTagWords(t.split("-")[0].replace(/_/g," "));
 }
 function isDeletedTag(t, del){ if(!t) return true; return del.includes(t)||del.includes(t.replace(/_/g," "))||del.includes(t.replace(/ /g,"_")); }
+function getTombs(){ try { return JSON.parse(localStorage.getItem("jtDeletedTs")||"[]"); } catch(e){ return []; } }
+function addTombs(arr){
+  try {
+    const cur = new Set(getTombs());
+    (arr||[]).forEach(t=>cur.add(t));
+    let list=[...cur]; if (list.length>3000) list=list.slice(list.length-3000);
+    localStorage.setItem("jtDeletedTs", JSON.stringify(list));
+    return list;
+  } catch(e){ return getTombs(); }
+}
+function stripTombs(obj, tombSet){
+  const out={};
+  Object.keys(obj||{}).forEach(day=>{
+    const list=(obj[day]||[]).filter(e=>!tombSet.has(e.ts));
+    if (list.length) out[day]=list;
+  });
+  return out;
+}
 const TAG_PAGE_RE = /^(Bible_Memory|Bible_Read|Bible_Books|Prayed|Prayer|Names_Review|Catechism|Teaching|Reader)/i;
 function dispLabel(t) {
   const s = String(t||"");
@@ -11301,7 +11319,25 @@ function CatechismEditor({ C, onClose=()=>{} }) {
   const add = () => commit([...items, {q:nextQ(), question:"", answer:"", review:true}]);
   const update = (i, patch) => setItems(items.map((it,j)=> j===i?{...it,...patch}:it));
   const blurSave = () => persist(items);
-  const del = (i) => commit(items.filter((_,j)=>j!==i));
+  const del = (i) => {
+    const victim = items[i];
+    const rest = items.filter((_,j)=>j!==i);
+    // renumber contiguously (Q1..Qn, keeping current order)
+    const sorted=[...rest].sort((a,b)=>(+a.q||0)-(+b.q||0));
+    const mapping={}; sorted.forEach((it,k)=>{ mapping[+it.q||0]=k+1; });
+    commit(rest.map(it=>({...it, q: mapping[+it.q||0] || it.q })));
+    // remap review-box ids so learning progress follows the new numbers
+    try{
+      const raw=localStorage.getItem("jtCatechismBox");
+      if(raw){ const box=JSON.parse(raw);
+        if(box && Array.isArray(box.cards)){
+          box.cards=box.cards
+            .filter(c=>!(c.cat==="personal" && (+c.q===(+((victim&&victim.q))||0))))
+            .map(c=>{ if(c.cat!=="personal") return c; const nq=mapping[+c.q]; return nq?{...c, q:nq, id:`personal:${nq}`}:c; });
+          localStorage.setItem("jtCatechismBox", JSON.stringify(box));
+        } }
+    }catch(e){}
+  };
   const toggleReview = (i) => commit(items.map((it,j)=> j===i?{...it, review: it.review===false}:it));
   const closeNow = () => { persist(items); onClose(); };
   const openedAt = React.useRef(Date.now());
@@ -12374,11 +12410,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ setSelRef(selPop.ref); setNoteDraft("“"+selPop.text+"”\n\n"); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
                 style={{padding:"5px 10px",borderRadius:14,border:"none",background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>📝 Note</button>
             )}
-            {selPop.gi!=null && (
+            {(selPop.gi!=null || selPop.ref) && (
               <button onMouseDown={e=>e.preventDefault()} onClick={()=>{
                   try{ const arr=(()=>{ try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return Array.isArray(a)?a:[]; }catch(_){ return []; } })();
                     const nq=arr.reduce((m,it)=>Math.max(m, parseInt(it.q,10)||0), 0) + 1;
-                    arr.push({q:nq, question:book.title, answer:selPop.text});
+                    const srcLabel = selPop.gi!=null ? book.title : ((selPop.ref&&(selPop.ref.q||selPop.ref.k))||"Scripture") + " (ESV)";
+                    arr.push({q:nq, question:srcLabel, answer:selPop.text});
                     localStorage.setItem("jtPersonalCatechism", JSON.stringify(arr));
                     localStorage.setItem("jtPersonalCatechismTs", String(Date.now()));
                     window.dispatchEvent(new Event("jtPersonalCatechismChanged"));
@@ -12755,24 +12792,6 @@ export default function App() {
   const updateGroup = (id, field, value) => saveGroups(groups.map(g=>g.id===id?{...g,[field]:value}:g));
   const regenGroupCode = (id) => saveGroups(groups.map(g=>g.id===id?{...g,code:genCode()}:g));
 
-  const getTombs = () => { try { return JSON.parse(localStorage.getItem("jtDeletedTs")||"[]"); } catch(e){ return []; } };
-  const addTombs = (arr) => {
-    try {
-      const cur = new Set(getTombs());
-      (arr||[]).forEach(t=>cur.add(t));
-      let list=[...cur]; if (list.length>3000) list=list.slice(list.length-3000);
-      localStorage.setItem("jtDeletedTs", JSON.stringify(list));
-      return list;
-    } catch(e){ return getTombs(); }
-  };
-  const stripTombs = (obj, tombSet) => {
-    const out={};
-    Object.keys(obj||{}).forEach(day=>{
-      const list=(obj[day]||[]).filter(e=>!tombSet.has(e.ts));
-      if (list.length) out[day]=list;
-    });
-    return out;
-  };
   const mergeEntries = (local, remote, tombs) => {
     const tombSet = new Set(tombs || getTombs());
     const merged = stripTombs(local, tombSet);
