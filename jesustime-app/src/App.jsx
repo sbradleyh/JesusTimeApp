@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAOoUlEQVR42u2ce3BUVZ7Hv+fce/uVByGBTpZXSMxQYaNkJEsSHIjIQ1idctVd0BVd0C11RXfX3bKsoQoYVkqtTM0/wkAxjFjWsuAUEqFAVsGJBVhAYhLkEYgR0UljyMMAeXb37XvP+e0f6dvTQVFh003T3F/VqXTfdN97+n5+j3N+v3MuQ4KKoigQQkTeZ2RkqKWlpbkzZsyYNXXq1PkFBQUVo0ePzk5JSZGqqnLDMGRfXx/v7Ow809zcXNPQ0PDh4cOHa+rq6lr9fr+82nlt+RHhnA95P2/evLy333678vz58z66Dmlubj69du3aF8vKykb/0HVsuYpVWLJ48eJf1NXV1UTfXCGEYZqmLoQwrGNSSjIMg6SU1nvxfZ8jIqqurn53wYIFt33f9RJFWEJ0gjEQEQCgvLw8u7Ky8vcVFRV/BwBCiFBYo9WOjg5eW1uL+vp6nDlzBm1tbeju7oZhGHA6ncjMzMS4ceNQVFSE0tJSTJs2DSNGjJBSSpMxxjnnKgC8995765YvX77iiy++6FUUBVLKyPVtFxXlOlatWvUPpmkSEZFhGAEppQiFQrRjxw568MEHaeTIkQTgJ7cxY8bQ0qVLqbq6OmJhoVBIJyK6fPmyeOqpp+6KVgobRhhGRkaGunv37o1ERKFQKOJqtmzZQsXFxUNusqIopKoqKYpCiqIQ5zzSrP+pqkqc8yHfmzVrFn3wwQdERGSapi6lFERE69at+1fOObvl44r148eOHetuaGg4TUTk9/sDRESNjY00d+7cIRAURSHG2DVZCGMsAs069thjj1F7ezsREQUCgQEiol27dr3lcrnYLWspFoysrCzniRMnmqJhbNmyhdLT0yMgrtT0623R58rNzaWPP/6YiIgGBgYGiIj27NnzlqqqjHN+a0FhjIFzDk3T2IEDB96NhrFmzZohN3A4QFzZVFWN/N22bdsQKJs2bfoVAKiqeutAsYaa69at+49oGKtXr46AuFbXdK2Ncx65xtatWyncjwEiomXLlt2TqEPimMF44IEHJkX78A0bNkS0NtYwoqFY7aOPPiIppdB1PRAMBqmoqCgj6YM8YwyMMaSlpfGWlhafEMKQUoqjR49GRk3xghENBQB5vV46f/48GYZhSCnFgQMH3mWMJbeVWD9u9erVz1jD24GBASosLIxpzPipMeW+++6LzH+IiBYuXHh70rouy/RHjx7tuHjxYsDSxFdeeWXITblRzbr+jh07yLLckydPHlVVlSVlcFdVFQDw0ksv/dLSwvb2dsrIyBgSYG9Us9xlUVERhUKhiJXcf//9hUlrJaqqssbGxmYpJSWSdVw5zI62kp07d76VdMHd0q7S0tJsK20RDAbptttuI8bYsE38hstK5s+fH8ka9/T0CK/X64jnDD7m6K0fcu+9995NRJKIZE1NDc6dOwfGGKSUCaE4Vsb30KFD8Pl8EEKE0tPT+cyZMyfH00pifhXTNAEAM2fO/EcrBb5v3z4kmisgIiiKgkAggIMHD0aOV1RUzI3rACge1uF2u3lhYeH08DFeW1sbuQmJNlcCgJqaGli1kylTppQDiFvZNy5AcnJyPNnZ2VlSSjMYDPIvv/wyIYFY/Tlz5gwYYxwAJkyYUOZyuXi84khcgGRnZ6c6nU6ViGRXVxe6uroSGsiFCxdgGAYAIDMzMys9PZ0lhcuyJD09PRK5e3p6EAgEEhpId3c3/H4/l1KabrdbTUtLcyWFhUTPQazXoVAo4evXhmHAMAwQkdQ0zeFyuUYklYUIISh61p7o6QhVVa1+ctM0TV3X+5MKSH9/f+Q6aWlpcDqdiOdk61pjXlpaGjwej+Scq8FgMNjf3z+QFEAs19TZ2RkwDEMyxvioUaMwcuTIhLaQnJwcOBwOAEBvb6/s7e2NW8yLC5C2tra+rq6ubs65mpqaKvPz8xNuYhjdn8LCQhCRBACfz1fj9/tFUgHp7++XZ8+ePRw+JktKSiIFq0QcZZWWlkJKaQJAY2Pjn4D4ZXxjrqJW6r2mpmb/YM5OmvPmzQMRJUwey4ofQghomoZZs2ZFjh85cuRIIsa76xZLs2bPnj3Ryvb29PRQTk7OkDIqEiTbO336dJJSkhDCCAQClJubm5KI7nU48lns66+//rNVD3nxxRcTsh6yadOmSD2kurq6Kqms40orefXVV//ZqhiePXuWXC5XQlQMrT6MHz+eent7IxXDxYsXT412u0kjlrnn5+en+v1+wzRNPbwGKqFq6uvXrycppTBNU7S0tHyVkpLCEnHwMaxWsnHjxl9bsaSjo4O8Xu8NrRxarqqkpIRCoRBZq+Off/752fEcXd0QK2GMYcyYMa5Lly71hEIhXUopqqqqbpiVWIuxXS4XHT9+PLLZ5/Tp08ccDkfyr/O1tO2555772/DKxQAR0csvv0wASNO0uMKwlGDz5s1ERBQMBgeIiO65556JSW0d3wdl165dfwhD0YmIlixZEoES6yAfDWPNmjVD1vZWVlb+yy0DIzrAZ2Zmqs3NzSeIiHRd14mInnzyySHrbmMZM66AESAi2r9///ucc9xyWxIs7Zs8eXJGe3v7xTAUg4ho5cqVQ0Y/w2UtnPOIVbjdbnrzzTeHwPjss8/+lJmZqSbVJPB6oJSUlGR2dHQMhNf7CiKi999/nwoKCoaAuR6LsUZv0VZRVlZG9fX1FK0EJ06cOJiTk3PrwrDEqovk5OS46+rqDgshDF3XRXhTJq1YsYKysrK+4/ut3VCMsSHNcnXWPsNoOHl5efTGG2+QYRhWADeklGL37t1/VBSFAYCmabcmiGgtTE1NVZcsWVJ+7NixT6SUFDIMYd00IqLW1lZ67bXX6I477rguNzV9+nTasGEDdXd3D+7ElZIMwyTDMEU4PbLroYceut2CkrQTwR9zVQDwxBNPTG1qajp11ccwDG6UDW8TMKmmpoYqKytp4cKFVFxcTDk5OZSamkoej4fS09Np7NixVFJSQo8//jitXbuWTp48eeUJr3qpI0eOHFiwYEHB9/UzKcXaWwgAU6ZMydy/f/+2v9zswT3pesikQyd89Mp/f0Lbqhvpcl/gBx+b0dPbS60XLpDP56O2tjbq7+//wc9fuNhHG3c30G/eOUINzW0k5eAaXit3RUS0devW344ZM8Z1o6CweLkoq/bxwgsv3Pv666/vTU1NVU3TDCqK4giGBN9X9xX215+Dr6N3cM0vSXgzUvCL28dj5pTxKBibCYVfe3d1Q6DJ14WDx1tQ23QBPQM6GAM4Y/jZuEzcV1aAWT/PBQOZQpDUNMXR1tbWuWzZsnm7du06yTkHEcVtpQyLFwyn08k3bty4YunSpf8liCQjkpxz9eNjf8b2A03wdfbA6VDh1JRIx0KmREA34HKomJA9An+dOwqFE7IwbnQ6MtNc8Dg1aCoHYwAREDIEBoIGunoDaOnoQbPvIppauvBNVx9MIeFxqlAVDsJglAmGTBhCoHDCKCyeczumTsqBECKkKIoDANasWfNPq1at2mJZeDygsHjAGDFiBK+qqto2Z86cR4K64Xc5NU/7pQH8fs8xfNrUCodDhUtTIGlo3drSZEkE3RAwTAEGBpdDRYpbQ6rbAZdDBWcMQhICuoH+QAgDQQO6YQJgcKgKHJoCxgAph95QzhgYA/y6CSLCvL/Jw5MLipHi0qQhRMihqq7Nmzcvf/bZZ38TDkAxh8JiGTOICGlpaXzfhx/+cfpddy0M6rrf5XR6apta8bud9bjcF0Sax/EdEFeNQWxw+CQlQUqCkAQZ/h4DwDiDEm7WSIl+wrl5+LO9fh252SPwn4vK8LOxmQgGdb/L5fRs3779fx555JEn/nLO2EFRYgUjXNhhe/bs2X733XcvDOp60OV0uncf+QJvVNVBEuBxqhDyp/+4wZtrWR+DonCoCoemcCgKh8I5uDXmjfrsj5433NwuDZf7gjh4wofx3nRM/KuRWjCo+4uLi0uys7O79+7dW6uqakzXAsQEiPXIo/Xr1/9q0aJF/xaG4dpx8HP8Ye9nSHFrg+5smDRtuPSViKBpCoSkQSij05E/NlML6npwenn5L7u7uw8fPXr0K0VRYmYlLBYwhBB49NFHy955550aXTf8Tqfm+eDTc1j3Xh3SPU4QCIm8vHcwJkkYpsTqpRX4eUE2DMPwM8Y85eXl3oaGhm+jR44JC8TqpNfr1U6dOnUpKyvLwTlXT339LV/51kG4NAVgwM3wrDDOGAwh4HKo+O1zc5Gd4TEZY/z48eOflpWV3SWEoFgAGdZMmhU7Vq1atdLr9aYCQH/A4L/bWQ8eDrQ3y4PbJBEcqoLeAR3rd9YDjKlCiNCdd95Z/vTTT8+RUsZk8cOwu6y8vDx3U1OTX1XVkKIojjf3HkfVJ58jI9WJqEXwN1Gqh6G7T8e///00zJ+WL4lItra2tk6ePDnf7/fL4Y4lw55rfuaZZx51OBySiOQ33/ZhX/05pLkdNyUMhIfYbqeKqkOfw6+bXEppjh8/Pvfhhx+eGovAPqxAPB4PX7Ro0a8BcEVRHP9b+yUGAsZ1pTwSRYgAp6agtasPh076wDlXiUguWbJkeUxi13CebMaMGfn5+fm5RGT6dYPXNrXC7VS/M0O+GaFoKsfB4y1gjKkAUFZW9kBeXl5aQgOZO3fuQ+HxvGxquYjOy35oioKb/QGskghOTcVXbd1ovdgPKaWZmpqqVlRUFCc0kPLy8lnh0RZv8nVBSImkWTTOGQaCIZz95lLkWFlZ2dyEBjJx4sTZ4fmIer6zFwpnSKbHExMBvo6eyB72SZMmFSU0kFGjRrms1939wcGCVJIQofA861JfMALE6/XmJTQQTXNENClkDrqrZLIQxgZrKBaQlJSUkoQGcisIGzJHGf7ciQ3k/5cq4jaQJBcbiA3EFhuIDcQWG4gNxBYbiA3EFhuIDcQWG4gtNhAbiC02EBuILTYQG4gtNhAbiC02EFtsIDYQW2wgNhBbbCA2EFtsIDYQW2wgtthAbCC22EBsILbYQJJX/g/HUuN6dLQVYwAAAABJRU5ErkJggg==";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v424";
+const APP_VERSION = "v428";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5887,7 +5887,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const [memSsErr, setMemSsErr] = React.useState("");
   const memSsGo = d => { const n=cardsCount(); if(!n)return; setMemSsErr(""); setMemSs(s => s ? {idx:(s.idx + d + n) % n, show:false} : s); };
   // Move between cards during a review without grading (full-screen ‹ › arrows)
-  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
+  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
   function cardsCount(){ return ((box && box.cards) || []).length; }
   const memSsFetch = async (card) => {
     if (!card || memSsBusy) return;
@@ -6916,7 +6916,16 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
             </div>
           </div>}
 
-          {!rev.done ? (()=>{
+          {!rev.done && rev.stage===0 ? (()=>{ const cur=rev.seq[rev.idx];
+            return (
+              <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",padding:"14px 18px calc(14px + env(safe-area-inset-bottom))"}}>
+                <div style={{flex:1,minHeight:0,overflowY:"auto"}}>
+                  <div style={{fontSize:revFont,lineHeight:1.55,color:C.text,fontFamily:"Georgia, serif",whiteSpace:"pre-wrap"}}>{cur.text||"(no text yet — tap ESV above to load it)"}</div>
+                </div>
+                <button onClick={()=>{ verseStartRef.current=Date.now(); verseDoneRef.current=null; setRevType({n:0,draft:"",reveal:false,hinted:false,errors:0,hints:0,revealLvl:0,wordMiss:0}); setRev(r=>r?{...r,stage:1}:r); }}
+                  style={{marginTop:12,padding:"13px 4px",borderRadius:12,border:`1px solid ${PU}`,background:PU,color:"#fff",fontSize:16,fontWeight:800,cursor:"pointer",flexShrink:0}}>▶ Start</button>
+              </div>
+            ); })() : !rev.done ? (()=>{
             const cur = rev.seq[rev.idx];
             const words = cur.text ? cur.text.split(/\s+/) : [];
             const n = revType.n;
@@ -10782,7 +10791,11 @@ function HomeBody({ entries={}, today, C, tags=[], computeStreak=()=>0, addEntry
   const hideAuthor=(()=>{try{return localStorage.getItem("jtHideAuthor")==="1";}catch(e){return false;}})();
   const rotateSec=(()=>{try{return parseInt(localStorage.getItem("jtPresentDelay")||"8",10)||8;}catch(e){return 8;}})();
   const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
-  const personalNames=(()=>{try{return JSON.parse(localStorage.getItem("jtPersonalNames")||"[]");}catch(e){return [];}})();
+  const personalNames=(()=>{try{
+    const base=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]")||[];
+    let cat=[]; try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); cat=(Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():""})).filter(x=>x.n); }catch(_){}
+    return base.concat(cat);
+  }catch(e){return [];}})();
   const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
     if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
     const out=[]; const idx=g.map(()=>0); let rem=g.reduce((s,x)=>s+x.length,0); let gi=0;
@@ -12345,7 +12358,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             )}
             {selPop.gi!=null && (
               <button onMouseDown={e=>e.preventDefault()} onClick={()=>{
-                  try{ const arr=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); arr.push({n:selPop.text, a:book.title}); localStorage.setItem("jtPersonalNames",JSON.stringify(arr)); localStorage.setItem("jtPersonalNamesTs",String(Date.now())); window.dispatchEvent(new Event("jtPersonalNamesChanged")); }catch(e){}
+                  try{ const arr=(()=>{ try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return Array.isArray(a)?a:[]; }catch(_){ return []; } })();
+                    const nq=arr.reduce((m,it)=>Math.max(m, parseInt(it.q,10)||0), 0) + 1;
+                    arr.push({q:nq, question:book.title, answer:selPop.text});
+                    localStorage.setItem("jtPersonalCatechism", JSON.stringify(arr));
+                    localStorage.setItem("jtPersonalCatechismTs", String(Date.now()));
+                    window.dispatchEvent(new Event("jtPersonalCatechismChanged")); }catch(e){}
                   setSelPop(sp=>({...sp,done:1})); try{window.getSelection().removeAllRanges();}catch(e){}
                   setTimeout(()=>setSelPop(null),1100); }}
                 style={{padding:"5px 10px",borderRadius:14,border:"none",background:"rgba(74,144,217,0.15)",color:"#7ab4f0",fontSize:13,fontWeight:800,cursor:"pointer"}}>🌅 Teach</button>
@@ -13421,7 +13439,7 @@ export default function App() {
               border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px",
               display:"flex",alignItems:"baseline",gap:4}}>
               {(()=>{const m=titleStats.mins||0;const h=Math.floor(m/60),r=m%60;return h?`${h}h ${r}m`:`${r}m`;})()}
-              <span style={{fontSize:13,fontWeight:700,color:C.textMid}}>· {titleStats.pctVal}%</span>
+              <span style={{fontSize:20,fontWeight:800,color:C.gold}}>· {titleStats.pctVal}%</span>
               <span style={{fontSize:11,fontWeight:600,color:C.textFaint}}>of awake</span>
             </span>
           </div>
@@ -13779,11 +13797,13 @@ export default function App() {
                                   zIndex:10,whiteSpace:"nowrap",cursor:"pointer"}}>
 
                                   <span style={{fontSize:30}}>{icon}</span>
-                                  <div style={{display:"flex",alignItems:"baseline",gap:2}}>
-                                    <span style={{fontSize:24,color,fontWeight:700,lineHeight:1}}>
-                                      {h>0?`${h}:${String(m).padStart(2,'0')}`:`:${String(m).padStart(2,'0')}`}
-                                    </span>
-                                  </div>
+                                  {mins>0 && (
+                                    <div style={{display:"flex",alignItems:"baseline",gap:2}}>
+                                      <span style={{fontSize:24,color,fontWeight:700,lineHeight:1}}>
+                                        {h>0?`${h}:${String(m).padStart(2,'0')}`:`:${String(m).padStart(2,'0')}`}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}
@@ -14007,8 +14027,10 @@ export default function App() {
                                 const collapsible = arrAll.length > Math.max(9, activeN);
                                 const arr = (!collapsible || chipsExpanded) ? arrAll : arrAll.slice(0, Math.max(9, activeN));
                                 const hiddenN = arrAll.length - arr.length;
+                                const totalCells = arr.length + (collapsible?1:0);
+                                const gridCols = totalCells<=2 ? Math.max(1,totalCells) : totalCells<=4 ? 2 : 3;
                                 return (
-                                  <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
+                                  <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:`repeat(${gridCols},1fr)`,gridAutoFlow:"row dense",gap:6}}>
                                     {arr.map((tag)=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
                                       
                                       <button onClick={()=>{ setCirclePopupTag(p=>p===tag?null:tag); }}
