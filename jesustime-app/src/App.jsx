@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v423";
+const APP_VERSION = "v424";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12477,6 +12477,7 @@ export default function App() {
     const top = st[st.length-1];
     if (!top || top.tab!==cur.tab || top.view!==cur.view) st.push(cur);
     if (st.length > 30) st.splice(0, st.length - 30);
+    setHistN(st.length);
   };
   const saveMainTab = (t, isBack=false) => {
     if (activeMainTab !== t && !isBack) _pushHist();
@@ -12496,6 +12497,7 @@ export default function App() {
     const st = backStackRef.current;
     let e = st.pop();
     while (e && e.tab===activeMainTab && e.view===todayView && st.length) e = st.pop();
+    setHistN(st.length);
     setShowTodayMenu(false); setShowFriendsMenu(false); setShowBibleMenu(false); setShowAbideMenu(false);
     if (!e) { saveMainTab("today", true); return; }
     saveMainTab(e.tab, true);
@@ -12627,6 +12629,9 @@ export default function App() {
   const saveTodayViewHidden = (v) => { setTodayViewHidden(v); try{localStorage.setItem("jtTodayViewsHidden",JSON.stringify(v));}catch(e){} };
   const [slotHist, setSlotHist] = useState(null);
   const [gsOpen, setGsOpen] = useState(false);
+  const [chipsExpanded, setChipsExpandedS] = useState(()=>{ try{ return localStorage.getItem("jtChipsExpanded")==="1"; }catch(e){ return false; } });
+  const setChipsExpanded = v => { setChipsExpandedS(v); try{ localStorage.setItem("jtChipsExpanded", v?"1":"0"); }catch(e){} };
+  const [histN, setHistN] = useState(0);
   React.useEffect(()=>{ const f=()=>setGsOpen(true); window.addEventListener("jtGlobalSearch",f); return ()=>window.removeEventListener("jtGlobalSearch",f); },[]);
   const [lockVerified, setLockVerifiedRaw] = useState(()=>{ try{ return localStorage.getItem("jtLockVerified")==="1"; }catch(e){ return false; } });
   const setLockVerified = (v)=>{ setLockVerifiedRaw(v); try{ localStorage.setItem("jtLockVerified", v?"1":"0"); }catch(e){} };
@@ -13380,7 +13385,7 @@ export default function App() {
         <div style={{textAlign:"center",pointerEvents:"none",minWidth:0,overflow:"visible",position:"relative",zIndex:1,width:"100%",display:"flex",alignItems:"center"}}>
 
           <div style={{flex:1,display:"flex",gap:5,justifyContent:"center",alignItems:"center",marginTop:2,whiteSpace:"nowrap",flexWrap:"nowrap"}}>
-            <button onClick={goBack} title="Back" style={{pointerEvents:"auto",position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",fontSize:32,fontWeight:800,color:"#d4a017",background:"transparent",border:"none",padding:"0px 12px",cursor:"pointer",lineHeight:1}}>‹</button>
+            {histN>0 && <button onClick={goBack} title="Back" style={{pointerEvents:"auto",position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",fontSize:32,fontWeight:800,color:"#d4a017",background:"transparent",border:"none",padding:"0px 12px",cursor:"pointer",lineHeight:1}}>‹</button>}
             <div style={{position:"relative",pointerEvents:"auto"}}>
               <button onClick={()=>setShowPeriodPicker(o=>!o)}
                 style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
@@ -13413,11 +13418,11 @@ export default function App() {
               )}
             </div>
             <span style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
-              border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px"}}>{(()=>{const m=titleStats.mins||0;const h=Math.floor(m/60),r=m%60;return h?`${h}h ${r}m`:`${r}m`;})()}</span>
-            <span style={{fontSize:20,fontWeight:800,color:C.gold,background:"#000",
               border:`1px solid rgba(212,160,23,0.4)`,borderRadius:14,padding:"2px 10px",
-              display:"flex",alignItems:"baseline",gap:2}}>
-              {titleStats.pctVal}%<span style={{fontSize:12,fontWeight:600,color:C.textFaint}}>of awake</span>
+              display:"flex",alignItems:"baseline",gap:4}}>
+              {(()=>{const m=titleStats.mins||0;const h=Math.floor(m/60),r=m%60;return h?`${h}h ${r}m`:`${r}m`;})()}
+              <span style={{fontSize:13,fontWeight:700,color:C.textMid}}>· {titleStats.pctVal}%</span>
+              <span style={{fontSize:11,fontWeight:600,color:C.textFaint}}>of awake</span>
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
@@ -13681,11 +13686,13 @@ export default function App() {
                                   zIndex:10,whiteSpace:"nowrap",cursor:"pointer"}}>
 
                                   <span style={{fontSize:30}}>{icon}</span>
-                                  <div style={{display:"flex",alignItems:"baseline",gap:2}}>
-                                    <span style={{fontSize:24,color,fontWeight:700,lineHeight:1}}>
-                                      {h>0?`${h}:${String(m).padStart(2,'0')}`:`:${String(m).padStart(2,'0')}`}
-                                    </span>
-                                  </div>
+                                  {mins>0 && (
+                                    <div style={{display:"flex",alignItems:"baseline",gap:2}}>
+                                      <span style={{fontSize:24,color,fontWeight:700,lineHeight:1}}>
+                                        {h>0?`${h}:${String(m).padStart(2,'0')}`:`:${String(m).padStart(2,'0')}`}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}
@@ -13995,7 +14002,11 @@ export default function App() {
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{add(m.slice(1));})));
                                 const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
                                 const sv=t=>computeStreak(t,entries,today);
-                                const arr=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>sv(b)-sv(a));
+                                const arrAll=[...map.values()].filter(t=>!isDeletedTag(t,del)).sort((a,b)=>sv(b)-sv(a));
+                                const activeN=arrAll.filter(t=>sv(t)>0).length;
+                                const collapsible = arrAll.length > Math.max(9, activeN);
+                                const arr = (!collapsible || chipsExpanded) ? arrAll : arrAll.slice(0, Math.max(9, activeN));
+                                const hiddenN = arrAll.length - arr.length;
                                 return (
                                   <div style={{width:"100%",maxWidth:420,marginTop:2,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gridAutoFlow:"row dense",gap:6}}>
                                     {arr.map((tag)=>{ const done=usedT.has(tag.toLowerCase()); const st=sv(tag); const atRisk=!done&&st>0; const hasApp=TAG_PAGE_RE.test(String(tag).replace(/ /g,"_")); return (<React.Fragment key={tag}>
@@ -14005,6 +14016,14 @@ export default function App() {
                                         <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textDecoration:hasApp?"underline":"none",textDecorationColor:hasApp?"#4a90d9":undefined,textDecorationThickness:hasApp?"3.5px":undefined,textUnderlineOffset:hasApp?"3px":undefined}}>{dispLabel(tag)}</span>{st>0&&<span style={{fontSize:11,fontWeight:800,opacity:0.85,flexShrink:0}}>🔥{st}</span>}
                                       </button>
                                     </React.Fragment>);})}
+                                {collapsible && (
+                                  <button onClick={()=>setChipsExpanded(!chipsExpanded)}
+                                    style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"8px 4px",borderRadius:11,
+                                      border:`1px dashed rgba(${C.ink},0.35)`,background:"transparent",color:C.textFaint,
+                                      fontSize:13,fontWeight:700,cursor:"pointer"}}>
+                                    {chipsExpanded ? "− less" : `+ ${hiddenN} more`}
+                                  </button>
+                                )}
                                   </div>
                                 );
                               })()}
