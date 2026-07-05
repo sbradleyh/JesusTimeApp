@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v414";
+const APP_VERSION = "v423";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -676,6 +676,7 @@ function todayKey() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 function pct(m)  { return Math.min(100, Math.round((m/WAKE)*1000)/10); }
+function openBibleRef(v){ try{ localStorage.setItem("jtReaderBibleRef", String(v).replace(/_/g," ")); window.dispatchEvent(new Event("jtGoReader")); }catch(e){} }
 function fmtM(m) {
   if (!m) return ":00";
   const h = Math.floor(m/60), r = m%60;
@@ -752,7 +753,7 @@ const BIBLE_TRANSLATIONS = [
 
 
 
-function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, deleteEntry, addEntry, today, entries, setEntries, persist}) {
+function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, deleteEntry, addEntry, today, entries, setEntries, persist, addUpdate=()=>{}, setVerse=()=>{}, openVerse=()=>{}}) {
   const [confirm, setConfirm] = React.useState(false); // double-tap delete arm
   const [editMins, setEditMins] = React.useState("");
   const [editText, setEditText] = React.useState(item.text);
@@ -769,7 +770,8 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
       if (en.ts !== item.ts) return en;
       const tag = type === "answered" ? "#Prayer_Request_Answered" : "#Prayer_Request";
       const marker = item.answeredIso ? ` #Answered_${item.answeredIso}` : "";
-      const newNotes = tag + " " + editText.trim() + marker;
+      const verseTag = item.verse ? ` #Verse_${item.verse}` : "";
+      const newNotes = tag + " " + editText.trim() + marker + verseTag;
       return { ...en, notes: newNotes };
     });
     setEntries(updated);
@@ -857,7 +859,7 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
         <div style={{flex:1,marginRight:12}}>
           <div style={{display:"flex",alignItems:"center",gap:0,marginBottom: isOpen ? 4 : 0}}>
             {!isOpen && (
-              <span style={{fontSize:16,color:"#ffffff",fontStyle:"italic",
+              <span style={{fontSize:16,color:"#ffffff",fontStyle:"italic",whiteSpace:"pre-line",
                 flex:1,minWidth:0,marginRight:8,lineHeight:1.35,
                 display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>
                 {item.text}
@@ -875,6 +877,9 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
                       border:staleDays>=7?"1px solid rgba(240,160,48,0.4)":"none"}}>
                     {staleDays}d
                   </span>}
+                {item.verse && <button onClick={e=>{e.stopPropagation(); openVerse(item.verse);}}
+                  style={{fontSize:11,fontWeight:800,color:"#7ab4f0",background:"rgba(74,144,217,0.12)",border:"1px solid rgba(74,144,217,0.4)",borderRadius:7,padding:"1px 6px",cursor:"pointer",whiteSpace:"nowrap"}}>📖 {String(item.verse).replace(/_/g," ")}</button>}
+                {type==="answered" && item.answeredIso && <span style={{fontSize:11,color:"#4ade80",fontWeight:700,whiteSpace:"nowrap"}}>✓ waited {Math.max(0,Math.round((new Date(item.answeredIso)-new Date(item.iso))/86400000))}d</span>}
                 {totalPrayed > 0 && <span style={{fontSize:11,color:C.gold,fontWeight:800,whiteSpace:"nowrap"}}>{fmtM(totalPrayed)} / {prayedCount}x</span>}
                 <span style={{fontSize:13,color:C.textFaint,
                   display:"inline-block",transform:isOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▾</span>
@@ -925,6 +930,12 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
                     ✓ Answered
                   </button>
                 )}
+                {type==="request" && (
+                  <button onClick={e=>{ e.stopPropagation(); setEditing(false); addUpdate(item); }} title="Add update"
+                    style={{flexShrink:0,padding:"7px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>＋ Update</button>
+                )}
+                <button onClick={e=>{ e.stopPropagation(); setEditing(false); setVerse(item); }} title="Anchor verse"
+                  style={{flexShrink:0,padding:"7px 10px",borderRadius:8,border:"1px solid rgba(74,144,217,0.5)",background:"transparent",color:"#7ab4f0",fontSize:13,fontWeight:800,cursor:"pointer"}}>📖</button>
                 <input type="tel" inputMode="numeric" pattern="[0-9]*"
                   onClick={e=>e.stopPropagation()}
                   value={(() => { const d=(editMins||"").replace(/\D/g,""); if(!d)return""; if(d.length<=2)return d; return d.slice(0,-2)+":"+d.slice(-2); })()}
@@ -996,6 +1007,12 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
     return new Set(d.filter(x=>x<=today));
   };
   const daySet = getPeriodDays();
+  const [sessOpen, setSessOpen] = React.useState(false);
+  const [sessStep, setSessStep] = React.useState(0);
+  const [sessStart, setSessStart] = React.useState(0);
+  const [sessTick, setSessTick] = React.useState(0);
+  const [statsOpen, setStatsOpen] = React.useState(false);
+  React.useEffect(()=>{ if(!sessOpen) return; const t=setInterval(()=>setSessTick(x=>x+1),1000); return ()=>clearInterval(t); },[sessOpen]);
 
   // Parse prayer entries
   const requests = [], answered = [];
@@ -1007,8 +1024,9 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
       const isRequest = /#Prayer_Request\b/i.test(notes) && !isAnswered;
       if (!isRequest && !isAnswered) return;
       const ansMatch = notes.match(/#Answered_(\d{4}-\d{2}-\d{2})/i);
-      const text = notes.replace(/#Prayer_Request_Answered/gi,"").replace(/#Prayer_Request/gi,"").replace(/#Answered_\d{4}-\d{2}-\d{2}/gi,"").trim();
-      const entry = {iso, ts:e.ts, text, key:`${iso}-${i}`, minutes:e.minutes, answeredIso: ansMatch ? ansMatch[1] : null};
+      const vMatch = notes.match(/#Verse_(\S+)/i);
+      const text = notes.replace(/#Prayer_Request_Answered/gi,"").replace(/#Prayer_Request/gi,"").replace(/#Answered_\d{4}-\d{2}-\d{2}/gi,"").replace(/#Verse_\S+/gi,"").trim();
+      const entry = {iso, ts:e.ts, text, key:`${iso}-${i}`, minutes:e.minutes, answeredIso: ansMatch ? ansMatch[1] : null, verse: vMatch ? vMatch[1] : null};
       if (isAnswered) answered.push(entry);
       else requests.push(entry);
     });
@@ -1041,6 +1059,21 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
     await persist(updatedEntries);
   };
 
+  const updateReqEntry = async (req, mut) => {
+    const updated={...entries};
+    updated[req.iso]=(updated[req.iso]||[]).map(e=> e.ts!==req.ts ? e : {...e, notes: mut(e.notes||"")});
+    setEntries(updated); await persist(updated);
+  };
+  const addUpdate = async (req) => {
+    const t=window.prompt("Update for this request:",""); if(t===null||!t.trim()) return;
+    const md=`${parseInt(today.slice(5,7))}/${parseInt(today.slice(8,10))}`;
+    await updateReqEntry(req, n => n + `\n\u2022 ${md} \u2014 ${t.trim()}`);
+  };
+  const setVerse = async (req) => {
+    const v=window.prompt("Anchor verse (e.g. Eph 1:17)", String(req.verse||"").replace(/_/g," ")); if(v===null) return;
+    await updateReqEntry(req, n => n.replace(/\s?#Verse_\S+/gi,"") + (v.trim()?` #Verse_${v.trim().replace(/\s+/g,"_")}`:""));
+  };
+  const openVerse = (v) => { try{ localStorage.setItem("jtReaderBibleRef", String(v).replace(/_/g," ")); window.dispatchEvent(new Event("jtGoReader")); }catch(e){} };
   const logPrayer = async () => {
     if (!addNotes.trim()) return;
     const tag = addType==="answered" ? "#Prayer_Request_Answered" : "#Prayer_Request";
@@ -1105,6 +1138,103 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
         </button>
       </div>
     <div style={{overflowX:"hidden",width:"100%"}}>
+      <div style={{display:"flex",gap:8,marginBottom:10}}>
+        <button onClick={()=>{ setSessOpen(true); setSessStep(0); setSessStart(Date.now()); }}
+          style={{flex:1,padding:"9px 4px",borderRadius:11,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>▶ Prayer Session</button>
+        <button onClick={()=>setStatsOpen(o=>!o)}
+          style={{flexShrink:0,padding:"9px 14px",borderRadius:11,border:`1px solid ${statsOpen?C.gold:C.border}`,background:statsOpen?C.buttonActive:"transparent",color:statsOpen?C.gold:C.textFaint,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>📊</button>
+      </div>
+      {statsOpen && (()=>{
+        const mo=today.slice(0,7);
+        const all=[...requests,...answered];
+        const addedMo=all.filter(r=>r.iso.startsWith(mo)).length;
+        const ansMo=answered.filter(r=>(r.answeredIso||"").startsWith(mo)).length;
+        const waits=answered.filter(r=>r.answeredIso).map(r=>Math.max(0,Math.round((new Date(r.answeredIso)-new Date(r.iso))/86400000)));
+        const avgWait=waits.length?Math.round(waits.reduce((a,b)=>a+b,0)/waits.length):0;
+        const oldest=requests.length?requests.reduce((a,b)=>a.iso<b.iso?a:b):null;
+        const oldestDays=oldest?Math.round((new Date(today)-new Date(oldest.iso))/86400000):0;
+        const dim=parseInt(today.slice(8,10),10);
+        const prayedDays=Object.keys(entries).filter(d=>d.startsWith(mo)&&(entries[d]||[]).some(e=>/#Prayed/i.test(e.notes||""))).length;
+        return (
+          <div style={{margin:"0 0 10px",padding:"9px 11px",borderRadius:11,border:`1px solid ${C.border}`,background:`rgba(${C.ink},0.04)`,
+            display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px 12px",fontSize:12.5,color:C.textMid,fontWeight:600}}>
+            <span>Open requests: <b style={{color:C.text}}>{requests.length}</b></span>
+            <span>Answered ever: <b style={{color:"#4ade80"}}>{answered.length}</b></span>
+            <span>Added this mo: <b style={{color:C.text}}>{addedMo}</b></span>
+            <span>Answered this mo: <b style={{color:"#4ade80"}}>{ansMo}</b></span>
+            <span>Avg wait: <b style={{color:C.text}}>{avgWait}d</b></span>
+            <span>Longest open: <b style={{color:"#f0a030"}}>{oldestDays}d</b></span>
+            <span style={{gridColumn:"1 / -1"}}>Prayed {prayedDays}/{dim} days this month · {Math.round(prayedDays/Math.max(1,dim)*100)}%</span>
+          </div>
+        );
+      })()}
+      {(()=>{
+        const md=today.slice(5,10); const yr=today.slice(0,4);
+        const near=(a,b)=>{ const d1=new Date("2000-"+a), d2=new Date("2000-"+b); return Math.abs(d1-d2)<=3*86400000; };
+        const eb=answered.filter(r=>r.answeredIso && r.answeredIso.slice(0,4)<yr && near(r.answeredIso.slice(5,10), md));
+        if(!eb.length) return null;
+        return (
+          <div style={{margin:"0 0 10px",padding:"9px 11px",borderRadius:11,border:"1px solid rgba(74,222,128,0.4)",background:"rgba(74,222,128,0.07)"}}>
+            <div style={{fontSize:11.5,fontWeight:800,color:"#4ade80",letterSpacing:"0.05em",marginBottom:4}}>🪨 EBENEZER — THIS WEEK IN PAST YEARS</div>
+            {eb.slice(0,3).map(r=>(
+              <div key={r.key} style={{fontSize:12.5,color:C.textMid,padding:"2px 0"}}>
+                <b style={{color:"#4ade80"}}>{r.answeredIso.slice(0,4)}</b> · {String(r.text).split("\n")[0].slice(0,70)}
+              </div>
+            ))}
+          </div>
+        );
+      })()}
+      {sessOpen && (()=>{
+        const secs=Math.floor((Date.now()-sessStart)/1000); void sessTick;
+        const mmss=`${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")}`;
+        const STEPS=[
+          ["Adoration","Praise God for who He is — His holiness, power, mercy, and faithfulness. (Ps 145)"],
+          ["Confession","Name your sins honestly before Him. \u201CIf we confess our sins, He is faithful and just to forgive.\u201D (1 Jn 1:9)"],
+          ["Thanksgiving","Thank Him for specific mercies — today\u2019s and old ones you\u2019ve stopped noticing."],
+          ["Supplication","Bring your requests before the throne of grace:"]
+        ];
+        const [t,body]=STEPS[sessStep];
+        const finish=async()=>{ const mins=Math.max(1,Math.round((Date.now()-sessStart)/60000));
+          await addEntry(mins,{dur:`${mins}m`,notes:"#Prayed #Session",time:nowTimeStr()},today);
+          setSessOpen(false); };
+        return (
+          <div style={{position:"fixed",inset:0,zIndex:950,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div style={{width:"min(380px,92vw)",maxHeight:"80vh",display:"flex",flexDirection:"column",borderRadius:18,border:`1px solid ${C.gold}`,background:C.bg,padding:"16px 16px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                <span style={{fontSize:12,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em"}}>PRAYER SESSION</span>
+                <span style={{marginLeft:"auto",fontSize:14,fontWeight:800,color:C.gold}}>{mmss}</span>
+                <button onClick={()=>setSessOpen(false)} style={{background:"transparent",border:"none",color:C.textFaint,fontSize:18,cursor:"pointer",padding:"0 2px"}}>✕</button>
+              </div>
+              <div style={{display:"flex",gap:4,marginBottom:12}}>
+                {STEPS.map((st,i)=>(<div key={i} style={{flex:1,height:4,borderRadius:2,background:i<=sessStep?"#d4a017":`rgba(${C.ink},0.15)`}}/>))}
+              </div>
+              <div style={{fontSize:22,fontWeight:800,color:C.gold,marginBottom:6}}>{t}</div>
+              <div style={{fontSize:14.5,color:C.textMid,lineHeight:1.5,marginBottom:10}}>{body}</div>
+              {sessStep===3 && (
+                <div style={{flex:1,minHeight:0,overflowY:"auto",border:`1px solid ${C.border}`,borderRadius:10,padding:"8px 10px",marginBottom:10}}>
+                  {(notYetPrayedAll.length?notYetPrayedAll:requests).map(r=>(
+                    <div key={r.key} style={{fontSize:14,color:C.text,padding:"5px 0",borderBottom:`1px solid rgba(${C.ink},0.08)`}}>
+                      {String(r.text).split("\n")[0]}{r.verse?<span style={{color:"#7ab4f0",fontSize:11.5,marginLeft:6}}>📖 {String(r.verse).replace(/_/g," ")}</span>:null}
+                    </div>
+                  ))}
+                  {requests.length===0 && <div style={{fontSize:13,color:C.textFaint}}>No open requests.</div>}
+                </div>
+              )}
+              <div style={{display:"flex",gap:8}}>
+                {sessStep>0 && <button onClick={()=>setSessStep(x=>x-1)}
+                  style={{flex:1,padding:"11px 4px",borderRadius:11,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,fontSize:14,fontWeight:800,cursor:"pointer"}}>‹ Back</button>}
+                {sessStep<3 ? (
+                  <button onClick={()=>setSessStep(x=>x+1)}
+                    style={{flex:2,padding:"11px 4px",borderRadius:11,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.15)",color:C.gold,fontSize:14,fontWeight:800,cursor:"pointer"}}>Next ›</button>
+                ) : (
+                  <button onClick={finish}
+                    style={{flex:2,padding:"11px 4px",borderRadius:11,border:"1px solid #4ade80",background:"rgba(74,222,128,0.15)",color:"#4ade80",fontSize:14,fontWeight:800,cursor:"pointer"}}>✓ Finish & Log</button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {(viewFilter!=="all"||period!=="all"||praySearch.trim()) &&
         <div style={{fontSize:12,fontWeight:700,color:C.textFaint,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",marginBottom:8}}>{praySearch.trim()?`"${praySearch.trim()}"`:filterLabel}{period!=="all"?` · ${periodLabel}`:""}</div>}
       {showFilters && (<>
@@ -1214,7 +1344,7 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
             style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:"#c06080",fontWeight:700,marginBottom:6,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:4}}>
             {viewFilter==="unprayed"?"▾":"▸"} Unprayed For ({notYetPrayed.length})
           </div>
-          {notYetPrayed.map(item=><PrayerCard key={item.key} item={item} type="request" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist}/>)}
+          {notYetPrayed.map(item=><PrayerCard key={item.key} item={item} type="request" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist} addUpdate={addUpdate} setVerse={setVerse} openVerse={openVerse}/>)}
         </div>
       )}
 
@@ -1225,7 +1355,7 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
             style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:"#60a060",fontWeight:700,marginBottom:6,cursor:"pointer",display:"inline-flex",alignItems:"center",gap:4}}>
             {viewFilter==="answered"?"▾":"▸"} Answered ({answeredFiltered.length})
           </div>
-          {answeredFiltered.map(item=><PrayerCard key={item.key} item={item} type="answered" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist}/>)}
+          {answeredFiltered.map(item=><PrayerCard key={item.key} item={item} type="answered" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist} addUpdate={addUpdate} setVerse={setVerse} openVerse={openVerse}/>)}
         </div>
       )}
 
@@ -1233,7 +1363,7 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
       {prayedForToday.length>0 && (viewFilter==="all"||viewFilter==="prayed") && (
         <div style={{marginTop:8}}>
           <div style={{fontSize:12,letterSpacing:"0.1em",textTransform:"uppercase",color:"#6090c0",fontWeight:700,marginBottom:6}}>✝ Prayed For Today ({prayedForToday.length})</div>
-          {prayedForToday.map(item=><PrayerCard key={item.key} item={item} type="request" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist}/>)}
+          {prayedForToday.map(item=><PrayerCard key={item.key} item={item} type="request" isOpen={expanded[item.key]} expanded={expanded} setExpanded={setExpanded} markAnswered={markAnswered} deleteEntry={deleteEntry} addEntry={addEntry} today={today} entries={entries} setEntries={setEntries} persist={persist} addUpdate={addUpdate} setVerse={setVerse} openVerse={openVerse}/>)}
         </div>
       )}
 
@@ -3184,7 +3314,75 @@ function LegendPopup({onClose}) {
 }
 
 
+function GlobalSearch({entries, today, go, onClose}) {
+  const [q,setQ]=React.useState("");
+  const [res,setRes]=React.useState(null);
+  const run=()=>{
+    const qq=q.trim().toLowerCase(); if(!qq){ setRes(null); return; }
+    const out={tags:[],prayers:[],cat:[],books:[]};
+    // tags
+    const tm=new Map();
+    Object.keys(entries).forEach(day=>(entries[day]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(t=>{
+      const n=normTag(t.slice(1)); if(!n) return; const k=n.toLowerCase();
+      if(!tm.has(k)) tm.set(k,{tag:n,days:new Set()}); tm.get(k).days.add(day);
+    })));
+    tm.forEach(v=>{ if(v.tag.toLowerCase().includes(qq)) out.tags.push({tag:v.tag,n:v.days.size}); });
+    out.tags.sort((a,b)=>b.n-a.n); out.tags=out.tags.slice(0,5);
+    // prayers
+    Object.keys(entries).sort().reverse().forEach(day=>(entries[day]||[]).forEach(e=>{
+      const nt=e.notes||"";
+      if(/#Prayer_Request/i.test(nt)){
+        const txt=nt.replace(/#\S+/g,"").trim();
+        if(txt.toLowerCase().includes(qq)) out.prayers.push({txt:txt.split("\n")[0].slice(0,70), ans:/#Prayer_Request_Answered/i.test(nt)});
+      }
+    }));
+    out.prayers=out.prayers.slice(0,5);
+    // catechisms
+    [["Baptist",BAPTIST_CATECHISM],["Heidelberg",HEIDELBERG_CATECHISM],["Spurgeon",SPURGEON_CATECHISM]].forEach(([nm,arr])=>{
+      (arr||[]).forEach(it=>{
+        if(out.cat.length>=5) return;
+        if(String(it.question||"").toLowerCase().includes(qq)||String(it.answer||"").toLowerCase().includes(qq))
+          out.cat.push({nm,q:it.q,question:String(it.question||"").slice(0,70)});
+      });
+    });
+    // books (loaded text)
+    [["disciple","The Disciple",DISCIPLE_PARAS],["witnesses","The Witnesses",WITNESSES_PARAS],["pilgrim","Pilgrim's Progress",PP_PARAS],["burial","Baptism\u2014A Burial",BURIAL_PARAS],["dagg","Dagg: On Baptism",DAGG_PARAS]].forEach(([id,title,paras])=>{
+      (paras||[]).forEach((pp,gi)=>{
+        if(out.books.length>=6) return;
+        const t=String(pp); const ix=t.toLowerCase().indexOf(qq);
+        if(ix>=0) out.books.push({id,title,gi,snip:t.slice(Math.max(0,ix-24), ix+56).replace(/^\u00a7\u00a7 /,"")});
+      });
+    });
+    setRes(out);
+  };
+  const Sec=({t,children})=>(<div style={{marginTop:10}}><div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",marginBottom:4}}>{t}</div>{children}</div>);
+  const Row=({onClick,children})=>(<div onClick={onClick} style={{padding:"7px 8px",borderRadius:8,cursor:"pointer",fontSize:13.5,color:C.text,borderBottom:`1px solid rgba(${C.ink},0.07)`}}>{children}</div>);
+  return (
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:960,background:"rgba(0,0,0,0.7)",display:"flex",alignItems:"flex-start",justifyContent:"center",paddingTop:"10vh"}}>
+      <div onClick={e=>e.stopPropagation()} style={{width:"min(400px,94vw)",maxHeight:"74vh",display:"flex",flexDirection:"column",borderRadius:16,border:`1px solid ${C.borderHi}`,background:C.bg,padding:"12px 14px"}}>
+        <div style={{display:"flex",gap:6}}>
+          <input autoFocus value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{ if(e.key==="Enter") run(); }}
+            placeholder="Search tags, prayers, books, teaching…"
+            style={{flex:1,minWidth:0,padding:"9px 11px",borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.text,fontSize:14.5}}/>
+          <button onClick={run} style={{padding:"8px 13px",borderRadius:10,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.12)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>Go</button>
+          <button onClick={onClose} style={{padding:"8px 10px",borderRadius:10,border:"none",background:"transparent",color:C.textFaint,fontSize:16,cursor:"pointer"}}>✕</button>
+        </div>
+        <div style={{overflowY:"auto",minHeight:0}}>
+          {res && res.tags.length>0 && <Sec t="TAGS">{res.tags.map(r=>(<Row key={r.tag} onClick={()=>go.tag(r.tag.replace(/ /g,"_"))}>🏷 {dispLabel(r.tag)} <span style={{color:C.textFaint,fontSize:12}}>· {r.n}d</span></Row>))}</Sec>}
+          {res && res.prayers.length>0 && <Sec t="PRAYERS">{res.prayers.map((r,i)=>(<Row key={i} onClick={()=>go.prayer()}>{r.ans?"✓":"🙏"} {r.txt}</Row>))}</Sec>}
+          {res && res.cat.length>0 && <Sec t="TEACHING">{res.cat.map((r,i)=>(<Row key={i} onClick={()=>go.teaching()}>📜 Q{r.q} ({r.nm}) — {r.question}…</Row>))}</Sec>}
+          {res && res.books.length>0 && <Sec t="BOOKS">{res.books.map((r,i)=>(<Row key={i} onClick={()=>go.reader(r.id,r.gi)}>📕 <b style={{color:C.gold}}>{r.title}</b> — …{r.snip}…</Row>))}</Sec>}
+          {res && !res.tags.length&&!res.prayers.length&&!res.cat.length&&!res.books.length &&
+            <div style={{padding:"18px 4px",textAlign:"center",color:C.textFaint,fontSize:13}}>No matches. (Books search only what's been opened.)</div>}
+        </div>
+      </div>
+    </div>
+  );
+}
 function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setViewDay, viewOffset, setViewOffset, today, handleExport, handleImport, visible={}, setVisible=()=>{}, widgetOrder=[], setWidgetOrder=()=>{}, userInitials="", saveInitials=()=>{}, groups=[], addGroup=()=>{}, removeGroup=()=>{}, updateGroup=()=>{}, regenGroupCode=()=>{}, appToken="", saveAppToken=()=>{}, workerUrl="", saveWorkerUrl=()=>{}, esvToken="", saveEsvToken=()=>{}, syncCode="", saveSyncCode=()=>{}, generateSyncCode=()=>{}, syncStatus="idle", lastSync=null, pullSync=()=>{}, themeName="dark", saveTheme=()=>{}, bottomTabOrder=[], saveBottomTabOrder=()=>{}, bottomTabVisible={}, saveBottomTabVisible=()=>{}, bibleViewHidden={}, saveBibleViewHidden=()=>{}, todayViewHidden={}, saveTodayViewHidden=()=>{}, tabStarMap={}, lockVerified=false, setLockVerified=()=>{}, onSelectTab=()=>{}, onEditLayout=null, open=undefined, setOpen=null, hideTrigger=false, onQuickAdd=null}) {
+  const [uiZoom, setUiZoomS] = React.useState(()=>{ try{ return parseFloat(localStorage.getItem("jtUiZoom")||"1")||1; }catch(e){ return 1; } });
+  React.useEffect(()=>{ try{ document.documentElement.style.zoom=uiZoom; }catch(e){} },[uiZoom]);
+  const bumpZoom = d => setUiZoomS(z=>{ const v=Math.min(1.3,Math.max(0.85,Math.round((z+d)*100)/100)); try{ localStorage.setItem("jtUiZoom",String(v)); }catch(e){} return v; });
   const [menuOpenInternal, setMenuOpenInternal] = React.useState(false);
   const menuOpen = open!==undefined ? open : menuOpenInternal;
   const setMenuOpen = setOpen || setMenuOpenInternal;
@@ -3729,12 +3927,24 @@ function HamburgerMenu({setOpenCollapsible, chartTab, setChartTab, viewDay, setV
                       <button onClick={()=>{setMenuOpen(false);handleExport();}} style={_uBtn}>
                         <span style={{fontSize:18}}>⬇️</span><span>Backup</span>
                       </button>
+                      {(()=>{ let t=0; try{ t=parseInt(localStorage.getItem("jtLastBackupAt")||"0",10);}catch(e){}
+                        return <div style={{fontSize:10.5,color:C.textFaint,textAlign:"center",marginTop:-3}}>☁️ auto: {t?new Date(t).toLocaleDateString():"—"}</div>; })()}
+                      <button onClick={()=>{ setMenuOpen(false); try{ window.dispatchEvent(new Event("jtGlobalSearch")); }catch(e){} }} style={_uBtn}>
+                        <span style={{fontSize:18}}>🔎</span><span>Search</span>
+                      </button>
                       <button onClick={()=>{ setMenuOpen(false); onEditLayout && onEditLayout(); }} style={{..._uBtn,color:C.gold,borderColor:C.gold}}>
                         <span style={{fontSize:18}}>✏️</span><span>Edit Tabs</span>
                       </button>
                       {lockVerified && <button onClick={()=>{ setLockVerified(false); setMenuOpen(false); }} style={{..._uBtn,color:"#f0a060",borderColor:"#f0a060"}}>
                         <span style={{fontSize:18}}>🔒</span><span>Relock</span>
                       </button>}
+                      <div style={{display:"flex",alignItems:"center",gap:6,padding:"2px 2px"}}>
+                        <span style={{fontSize:15}}>🔠</span>
+                        <span style={{fontSize:12.5,fontWeight:700,color:C.textMid,flex:1}}>Text size</span>
+                        <button onClick={()=>bumpZoom(-0.05)} style={{width:30,height:28,borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:15,fontWeight:800,cursor:"pointer"}}>−</button>
+                        <span style={{fontSize:12,fontWeight:800,color:C.gold,width:40,textAlign:"center"}}>{Math.round(uiZoom*100)}%</span>
+                        <button onClick={()=>bumpZoom(0.05)} style={{width:30,height:28,borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.text,fontSize:15,fontWeight:800,cursor:"pointer"}}>+</button>
+                      </div>
                       </div>
                       <div style={{flex:1,display:"flex",flexDirection:"column",gap:6}}>
                       <button onClick={()=>{setMenuOpen(false);setLegendOpen(true);}} style={{..._uBtn,color:C.gold}}>
@@ -9189,6 +9399,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
     ? {flex:"0 1 auto",minWidth:0,padding:"9px 4px",borderRadius:10,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:13,fontWeight:800,cursor:"pointer",textAlign:"center"}
     : {flex:"1 1 calc(13% - 8px)",minWidth:0,padding:"13px 1px",borderRadius:11,border:`1px solid ${C.border}`,background:C.inputBg,color:C.text,fontSize:14,fontWeight:800,cursor:"pointer",textAlign:"center"};
   const [ctrlVis, setCtrlVis] = React.useState(true);
+  React.useEffect(()=>{ if (present) setCtrlVis(false); }, [present]);   // open clean; tap wakes controls
   const hideRef = React.useRef(null);
   const wakeControls = () => { setCtrlVis(true); if(hideRef.current) clearTimeout(hideRef.current); hideRef.current = setTimeout(()=>setCtrlVis(false), 5000); };
   React.useEffect(() => { if(present) wakeControls(); return () => { if(hideRef.current) clearTimeout(hideRef.current); }; }, [present]);
@@ -11311,7 +11522,6 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [srchI, setSrchI] = React.useState(0);
   const [flashPi, setFlashPi] = React.useState(null);
   const [, setHlVer] = React.useState(0);
-  const [speaking, setSpeaking] = React.useState(false);
   const holdRef = React.useRef(null);
   const posThrottle = React.useRef(0);
   const [bibleChoose, setBibleChoose] = React.useState(null);
@@ -11382,14 +11592,11 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const savePos = (id,pos) => { try { const m=_rp(); m[id]={...(m[id]||{}),...pos,ts:Date.now()}; localStorage.setItem("jtReadPos",JSON.stringify(m)); } catch(e){} };
   const _hl = () => { try { return JSON.parse(localStorage.getItem("jtReadHl")||"{}"); } catch(e){ return {}; } };
   const getHls = id => _hl()[id]||{};
-  const setHl = (id,gi,val) => { try { const m=_hl(); const bm=m[id]||{}; if(val==null) delete bm[gi]; else bm[gi]=val; m[id]=bm; localStorage.setItem("jtReadHl",JSON.stringify(m)); setHlVer(v=>v+1); } catch(e){} };
-  const onHold = (gi) => {
-    const hl = getHls(book.id)[gi];
-    if (!hl) { setHl(book.id, gi, {c:1}); return; }
-    const n = window.prompt("Highlight note (empty removes highlight)", hl.note||"");
-    if (n===null) return;
-    if (n==="") setHl(book.id, gi, null); else setHl(book.id, gi, {c:1, note:n});
-  };
+  const toHlArr = v => v==null ? [] : Array.isArray(v) ? v : [{q:null, note:v.note}];
+  const _writeHl = (id, gi, arr) => { try { const m=_hl(); const bm=m[id]||{}; if(!arr||!arr.length) delete bm[gi]; else bm[gi]=arr; m[id]=bm; localStorage.setItem("jtReadHl",JSON.stringify(m)); setHlVer(v=>v+1); } catch(e){} };
+  const addHl = (id, gi, item) => { _writeHl(id, gi, [...toHlArr(getHls(id)[gi]), item]); };
+  const removeHl = (id, gi, idx) => { const arr=toHlArr(getHls(id)[gi]); arr.splice(idx,1); _writeHl(id, gi, arr); };
+  const nthIndex = (str, q, n) => { let i=-1, c=-1; while(c<n){ i=str.indexOf(q, i+1); if(i<0) return -1; c++; } return i; };
   const bookScroller = () => topMode==="book" ? topScrollRef.current : botMode==="book" ? botScrollRef.current : null;
   const jumpPara = (gi, center) => {
     const el = document.getElementById(`rdp-${book.id}-${gi}`);
@@ -11400,17 +11607,6 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     const hits=[]; (book.paras||[]).forEach((pp,i)=>{ if(String(pp).toLowerCase().includes(qq)) hits.push(i); });
     setSrchHits(hits); setSrchI(0); if(hits.length) jumpPara(hits[0], true);
   };
-  const speakToggle = () => {
-    try {
-      if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return; }
-      const pos=getPos(book.id); const startGi=(pos&&pos.gi)||0;
-      const text=(book.paras||[]).slice(Math.max(0,startGi)).map(pp=>String(pp).replace(/^\u00a7\u00a7 /,"")).join("\n\n").slice(0,28000);
-      if(!text) return;
-      const u=new SpeechSynthesisUtterance(text); u.rate=1; u.onend=()=>setSpeaking(false);
-      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); setSpeaking(true);
-    } catch(e){}
-  };
-  React.useEffect(()=>()=>{ try{ window.speechSynthesis.cancel(); }catch(e){} },[]);
   React.useEffect(()=>{
     const pos=getPos(bookId); if(!pos||!pos.top) return;
     const t=setTimeout(()=>{ const el=bookScroller(); if(el) try{ el.scrollTop=pos.top; }catch(e){} },140);
@@ -11423,7 +11619,22 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const showInPane = m => { if(topMode!==m && botMode!==m){ if(activePane==="top") setTop(m); else setBot(m); } };
   const pickBook = id => { recordBookOpen(id); setBookId(id); try{localStorage.setItem("jtReaderBook",id);}catch(e){} if(activePane==="top") setTop("book"); else setBot("book"); setShowBooks(false); };
   const sceneRefForIndex = (si) => { for(let j=si;j>=0;j--){ const sc=book.scenes[j]; if(sc&&sc.c&&sc.c[0]) return sc.c[0]; } return active||null; };
-  const onBookSelect = () => { try{ const sel=window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount){ setSelPop(null); return; } const text=sel.toString().trim(); if(!text){ setSelPop(null); return; } let p=sel.anchorNode; p=p&&(p.nodeType===1?p:p.parentElement); let ref=null; while(p){ if(p.id&&/^rdsc-/.test(p.id)){ const mm=p.id.match(/-(\d+)$/); if(mm) ref=sceneRefForIndex(parseInt(mm[1],10)); break; } if(p.getAttribute&&p.getAttribute("data-rdbible")!=null){ ref=active; break; } p=p.parentElement; } if(!ref){ setSelPop(null); return; } const rect=sel.getRangeAt(0).getBoundingClientRect(); setSelPop({ref,text,x:rect.left+rect.width/2,y:rect.top}); }catch(e){ setSelPop(null); } };
+  const onBookSelect = () => { try{ const sel=window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount){ setSelPop(null); return; } const text=sel.toString().trim(); if(!text){ setSelPop(null); return; } let p=sel.anchorNode; p=p&&(p.nodeType===1?p:p.parentElement); let ref=null; while(p){ if(p.id&&/^rdsc-/.test(p.id)){ const mm=p.id.match(/-(\d+)$/); if(mm) ref=sceneRefForIndex(parseInt(mm[1],10)); break; } if(p.getAttribute&&p.getAttribute("data-rdbible")!=null){ ref=active; break; } p=p.parentElement; }
+    let gi=null, occ=0;
+    try{
+      let pe=sel.anchorNode; pe=pe&&(pe.nodeType===1?pe:pe.parentElement);
+      const pEl=pe&&pe.closest?pe.closest("[data-gi]"):null;
+      if(pEl && pEl.id && pEl.id.startsWith(`rdp-${book.id}-`)){
+        gi=parseInt(pEl.dataset.gi);
+        const r=sel.getRangeAt(0).cloneRange(); r.setStart(pEl,0);
+        const startCh=Math.max(0, r.toString().length - sel.toString().length);
+        const para=String(book.paras[gi]||"");
+        let k=-1; occ=0; while((k=para.indexOf(text,k+1))>=0 && k<startCh) occ++;
+        if(para.indexOf(text)<0) gi=null;
+      }
+    }catch(e){ gi=null; }
+    if(!ref && gi==null){ setSelPop(null); return; }
+    const rect=sel.getRangeAt(0).getBoundingClientRect(); setSelPop({ref,text,x:rect.left+rect.width/2,y:rect.top,gi,occ}); }catch(e){ setSelPop(null); } };
   const splitRef = React.useRef(null); const dragging = React.useRef(false);
   const onDragDown=(e)=>{ dragging.current=true; try{e.currentTarget.setPointerCapture(e.pointerId);}catch(_){} };
   const onDragMove=(e)=>{ if(!dragging.current||!splitRef.current) return; const r=splitRef.current.getBoundingClientRect(); let f=(e.clientY-r.top)/(r.height||1); f=Math.max(0.18,Math.min(0.82,f)); fracRef.current=f; setFrac(f); };
@@ -11464,6 +11675,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
     if(idx>=0){ setTimeout(()=>goScene(idx), 140); }
   }, [bookId]); // eslint-disable-line
   const loadRef = (r) => { setActive(r); showInPane("bible"); if(!esvChapCache[r.k]) loadEsvPassage(r.q, r.k, true); setSearchOpen(false); setSearchQ(""); };
+  React.useEffect(()=>{
+    let r=null; try{ r=localStorage.getItem("jtReaderBibleRef"); if(r) localStorage.removeItem("jtReaderBibleRef"); }catch(e){}
+    if(r){ const pr=parseRefInput(r); if(pr) setTimeout(()=>loadRef(pr),180); }
+    let j=null; try{ const raw=localStorage.getItem("jtReaderJump"); if(raw){ localStorage.removeItem("jtReaderJump"); j=JSON.parse(raw); } }catch(e){}
+    if(j&&j.id){ pickBook(j.id); const tryJump=(n)=>{ const el=document.getElementById(`rdp-${j.id}-${j.gi}`); if(el){ el.scrollIntoView({block:"center"}); setFlashPi(j.gi); setTimeout(()=>setFlashPi(null),1500); } else if(n>0) setTimeout(()=>tryJump(n-1),450); }; setTimeout(()=>tryJump(5),450); }
+  },[]); // eslint-disable-line
   const BIBLE_CANON = Object.keys(BOOK_ABBR);
   const BOOK_ALIAS = {jn:"John",mt:"Matthew",mk:"Mark",lk:"Luke",jas:"James",php:"Philippians",phm:"Philemon",sos:"Song of Solomon"};
   const fullBook = (raw) => {
@@ -11745,8 +11962,6 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${tocOpen?C.gold:C.border}`,background:tocOpen?C.buttonActive:"transparent",color:tocOpen?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>☰</button>
             <button onClick={()=>{ setSrchOpen(o=>{ const n=!o; if(n) setTimeout(()=>{ const el=document.getElementById("rdSrchIn"); el&&el.focus(); },80); return n; }); setTocOpen(false); }} title="Search"
               style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${srchOpen?C.gold:C.border}`,background:srchOpen?C.buttonActive:"transparent",color:srchOpen?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>🔍</button>
-            <button onClick={speakToggle} title="Read aloud"
-              style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${speaking?C.gold:C.border}`,background:speaking?C.buttonActive:"transparent",color:speaking?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>{speaking?"⏹":"🔊"}</button>
           </div>
           {book.id==="mycatechism" && <button onClick={()=>setEditKey("mycatechism")}
             style={{flexShrink:0,padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:11,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✏️ Edit</button>}
@@ -11792,12 +12007,12 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
               ))}
               {hlKeys.length>0 && (<>
                 <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"10px 0 6px"}}>MY HIGHLIGHTS</div>
-                {hlKeys.map(gi=>(
-                  <button key={"h"+gi} onClick={()=>{ jumpPara(gi,true); setTocOpen(false); }}
+                {hlKeys.flatMap(gi=>toHlArr(hls[gi]).map((h,hi)=>(
+                  <button key={"h"+gi+"-"+hi} onClick={()=>{ jumpPara(gi,true); setTocOpen(false); }}
                     style={{display:"block",width:"100%",textAlign:"left",padding:"6px 8px",borderRadius:8,border:"none",background:"transparent",color:C.textMid,fontSize:12.5,cursor:"pointer"}}>
-                    <span style={{color:"#d4a017"}}>▍</span> {String(book.paras[gi]||"").replace(/^\u00a7\u00a7 /,"").slice(0,64)}…{hls[gi].note?" 📝":""}
+                    <span style={{color:"#d4a017"}}>▍</span> {(h.q?String(h.q):String(book.paras[gi]||"").replace(/^\u00a7\u00a7 /,"")).slice(0,64)}…{h.note?" 📝":""}
                   </button>
-                ))}
+                )))}
               </>)}
             </div>
           );
@@ -11818,22 +12033,34 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           <div key={si} id={"rdsc-"+bookId+"-"+si} style={{marginBottom:16}}>
             {book.paras.slice(sc.s, sc.e+1).map((para,pi)=>{
               const gi=sc.s+pi;
-              const hl=getHls(book.id)[gi];
-              const hlSt=hl?{background:"rgba(212,160,23,0.13)",borderLeft:"3px solid #d4a017",paddingLeft:8,borderRadius:6}:{};
+              const hlArr=toHlArr(getHls(book.id)[gi]);
+              const whole=hlArr.find(h=>!h.q);
+              const wholeSt=whole?{background:"rgba(212,160,23,0.13)",borderLeft:"3px solid #d4a017",paddingLeft:8,borderRadius:6}:{};
               const flSt=flashPi===gi?{outline:"2px solid #d4a017",outlineOffset:2,borderRadius:6}:{};
-              const press={
-                onTouchStart:()=>{ holdRef.current=setTimeout(()=>{ holdRef.current=null; onHold(gi); },550); },
-                onTouchEnd:()=>{ if(holdRef.current){clearTimeout(holdRef.current);holdRef.current=null;} },
-                onTouchMove:()=>{ if(holdRef.current){clearTimeout(holdRef.current);holdRef.current=null;} },
-                onContextMenu:(e)=>{ e.preventDefault(); onHold(gi); },
+              const body=(txt)=>{
+                const ranges=[];
+                hlArr.forEach((h,hi)=>{ if(!h.q) return; const pos=nthIndex(txt,h.q,h.n||0); if(pos>=0) ranges.push({s:pos,e:pos+h.q.length,h,hi}); });
+                ranges.sort((a,b)=>a.s-b.s);
+                if(!ranges.length) return renderRefs(txt);
+                const out=[]; let cur=0;
+                ranges.forEach((r,k)=>{
+                  if(r.s<cur) return;
+                  if(r.s>cur) out.push(<React.Fragment key={"t"+k}>{renderRefs(txt.slice(cur,r.s))}</React.Fragment>);
+                  out.push(<mark key={"m"+k}
+                    onClick={e=>{ e.stopPropagation(); const msg=(r.h.note?("Note: "+r.h.note+"\n\n"):"")+"Remove this highlight?"; if(window.confirm(msg)) removeHl(book.id,gi,r.hi); }}
+                    style={{background:"rgba(212,160,23,0.32)",color:"inherit",borderRadius:4,padding:"0 1px",cursor:"pointer"}}>{renderRefs(txt.slice(r.s,r.e))}{r.h.note?"📝":""}</mark>);
+                  cur=r.e;
+                });
+                out.push(<React.Fragment key="tl">{renderRefs(txt.slice(cur))}</React.Fragment>);
+                return out;
               };
-              const noteIcon = hl&&hl.note ? <span onClick={e=>{e.stopPropagation(); window.alert(hl.note);}} style={{marginLeft:6,cursor:"pointer"}}>📝</span> : null;
+              const noteIcon = whole&&whole.note ? <span onClick={e=>{e.stopPropagation(); window.alert(whole.note);}} style={{marginLeft:6,cursor:"pointer"}}>📝</span> : null;
               if(typeof para==="string" && para.startsWith("\u00a7\u00a7 ")){ const h=para.slice(3); const hr=parseRefInput(h);
-                return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} {...press} style={{fontFamily:serif,fontSize:fp+3,fontWeight:800,color:C.gold,margin:"22px 0 10px",lineHeight:1.3,textIndent:0,...hlSt,...flSt}}>
+                return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} style={{fontFamily:serif,fontSize:fp+3,fontWeight:800,color:C.gold,margin:"22px 0 10px",lineHeight:1.3,textIndent:0,...wholeSt,...flSt}}>
                   {hr ? <button onClick={(e)=>{e.stopPropagation(); openRefBelow(hr);}} style={{background:"none",border:"none",padding:0,color:C.gold,fontWeight:800,fontSize:"1em",fontFamily:"inherit",cursor:"pointer",textAlign:"left"}}>{h}</button> : h}{noteIcon}
                 </p>;
               }
-              return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} {...press} style={{fontFamily:serif,fontSize:fp,lineHeight:lh,color:C.text,margin:"0 0 12px",textIndent:"1.2em",...hlSt,...flSt}}>{renderRefs(para)}{noteIcon}</p>;
+              return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} style={{fontFamily:serif,fontSize:fp,lineHeight:lh,color:C.text,margin:"0 0 12px",textIndent:"1.2em",...wholeSt,...flSt}}>{body(String(para))}{noteIcon}</p>;
             })}
             {sc.c.length>0 && (
               <div style={{lineHeight:2.1}}>
@@ -12103,8 +12330,28 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
           </div></>)}
       </div>
       {selPop && (
-        <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ setSelRef(selPop.ref); setNoteDraft("“"+selPop.text+"”\n\n"); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
-          style={{position:"fixed",left:Math.max(8,Math.min((typeof window!=="undefined"?window.innerWidth:360)-148,selPop.x-70)),top:Math.max(8,selPop.y-46),zIndex:1200,padding:"8px 14px",borderRadius:20,border:`1px solid ${C.gold}`,background:C.bg,color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.55)",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>📝 Add note</button>
+        <div style={{position:"fixed",left:Math.max(8,Math.min((typeof window!=="undefined"?window.innerWidth:360)-236,selPop.x-118)),top:Math.max(8,selPop.y-48),zIndex:1200,display:"flex",gap:6,
+          padding:"7px 9px",borderRadius:20,border:`1px solid ${C.gold}`,background:C.bg,boxShadow:"0 4px 16px rgba(0,0,0,0.55)",whiteSpace:"nowrap"}}>
+          {selPop.done ? (
+            <span style={{fontSize:13,fontWeight:800,color:"#4ade80",padding:"1px 8px"}}>✓ Added to slideshow</span>
+          ) : (<>
+            {selPop.gi!=null && (
+              <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ addHl(book.id, selPop.gi, {q:selPop.text, n:selPop.occ}); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
+                style={{padding:"5px 10px",borderRadius:14,border:"none",background:"rgba(212,160,23,0.16)",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>🖍 Highlight</button>
+            )}
+            {selPop.ref && (
+              <button onMouseDown={e=>e.preventDefault()} onClick={()=>{ setSelRef(selPop.ref); setNoteDraft("“"+selPop.text+"”\n\n"); setSelPop(null); try{window.getSelection().removeAllRanges();}catch(e){} }}
+                style={{padding:"5px 10px",borderRadius:14,border:"none",background:"transparent",color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer"}}>📝 Note</button>
+            )}
+            {selPop.gi!=null && (
+              <button onMouseDown={e=>e.preventDefault()} onClick={()=>{
+                  try{ const arr=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); arr.push({n:selPop.text, a:book.title}); localStorage.setItem("jtPersonalNames",JSON.stringify(arr)); localStorage.setItem("jtPersonalNamesTs",String(Date.now())); window.dispatchEvent(new Event("jtPersonalNamesChanged")); }catch(e){}
+                  setSelPop(sp=>({...sp,done:1})); try{window.getSelection().removeAllRanges();}catch(e){}
+                  setTimeout(()=>setSelPop(null),1100); }}
+                style={{padding:"5px 10px",borderRadius:14,border:"none",background:"rgba(74,144,217,0.15)",color:"#7ab4f0",fontSize:13,fontWeight:800,cursor:"pointer"}}>🌅 Teach</button>
+            )}
+          </>)}
+        </div>
       )}
       {gkSel && (
         <div onClick={()=>setGkSel(null)} style={{position:"fixed",inset:0,zIndex:100050}}>
@@ -12379,6 +12626,8 @@ export default function App() {
   const [todayViewHidden, setTodayViewHidden] = useState(() => { try { return JSON.parse(localStorage.getItem("jtTodayViewsHidden")||"{}")||{}; } catch { return {}; } });
   const saveTodayViewHidden = (v) => { setTodayViewHidden(v); try{localStorage.setItem("jtTodayViewsHidden",JSON.stringify(v));}catch(e){} };
   const [slotHist, setSlotHist] = useState(null);
+  const [gsOpen, setGsOpen] = useState(false);
+  React.useEffect(()=>{ const f=()=>setGsOpen(true); window.addEventListener("jtGlobalSearch",f); return ()=>window.removeEventListener("jtGlobalSearch",f); },[]);
   const [lockVerified, setLockVerifiedRaw] = useState(()=>{ try{ return localStorage.getItem("jtLockVerified")==="1"; }catch(e){ return false; } });
   const setLockVerified = (v)=>{ setLockVerifiedRaw(v); try{ localStorage.setItem("jtLockVerified", v?"1":"0"); }catch(e){} };
 
@@ -12737,6 +12986,26 @@ export default function App() {
   const toastTimer = React.useRef(null);
   const showToast = (msg, opts={}) => { setToast({msg, history:!!opts.history}); if(toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(()=>setToast(null), opts.ms||2400); };
   const today = todayKey();
+  React.useEffect(()=>{ try{
+    const n=(entries[today]||[]).length;
+    if (navigator.setAppBadge) { if(n>0) navigator.setAppBadge(n); else if(navigator.clearAppBadge) navigator.clearAppBadge(); }
+  }catch(e){} },[entries,today]);
+  React.useEffect(()=>{
+    if(!loaded) return;
+    const code=syncCodeRef.current, url=workerUrlRef.current;
+    if(!code||!url) return;
+    try{ if(localStorage.getItem("jtLastBackupDay")===today) return; }catch(e){}
+    let dev=""; try{ dev=localStorage.getItem("jtDeviceId")||""; if(!dev){ dev=Math.random().toString(36).slice(2,8); localStorage.setItem("jtDeviceId",dev);} }catch(e){ dev="dev"; }
+    const dow=new Date(today+"T00:00:00").getDay();   // 7 rotating day-of-week slots
+    (async()=>{ try{
+      let pn=[]; try{ pn=JSON.parse(localStorage.getItem("jtPersonalNames")||"[]"); }catch(_){}
+      await fetch(`${url.replace(/\/$/,'')}/sync/${encodeURIComponent(code+"__bk_"+dev+"_"+dow)}`, {
+        method:"POST", headers:{"Content-Type":"application/json","x-app-token":APP_TOKEN},
+        body:JSON.stringify({entries, names:pn, deletedTs:getTombs(), backupTs:Date.now(), day:today})
+      });
+      try{ localStorage.setItem("jtLastBackupDay",today); localStorage.setItem("jtLastBackupAt",String(Date.now())); }catch(e){}
+    }catch(e){} })();
+  },[loaded, today]); // eslint-disable-line
   // Completion moment: all three slots lit today → one-time celebration
   const [celebrate, setCelebrate] = useState(false);
   const [todayView, setTodayView] = useState("square");
@@ -12936,11 +13205,27 @@ export default function App() {
         const raw = JSON.parse(ev.target.result);
         const isV2 = raw && raw.v >= 2 && raw.entries;
         const impEntries = isV2 ? (raw.entries||{}) : raw;
-        // 1) entries: additive merge, deduped by ts
+        // preview: what would this import do?
+        const tombs=new Set(getTombs());
+        let addN=0, confN=0, skipN=0; const daysAff=new Set();
+        Object.keys(impEntries).forEach(day=>{
+          const map=new Map((entries[day]||[]).map(x=>[x.ts,x]));
+          (impEntries[day]||[]).forEach(x=>{
+            if(tombs.has(x.ts)){ skipN++; return; }
+            const cur=map.get(x.ts);
+            if(!cur){ addN++; daysAff.add(day); }
+            else if((cur.minutes||0)!==(x.minutes||0) || String(cur.notes||"")!==String(x.notes||"")) confN++;
+          });
+        });
+        const msg = `Import adds ${addN} entr${addN===1?"y":"ies"} across ${daysAff.size} day${daysAff.size===1?"":"s"}`
+          + (confN?`, ${confN} conflict${confN===1?"":"s"} (keeping local)`:"")
+          + (skipN?`, ${skipN} previously-deleted skipped`:"") + ". Continue?";
+        if(!window.confirm(msg)){ e.target.value=""; return; }
+        // 1) entries: additive merge, deduped by ts (tombstones respected)
         const merged={...entries};
         Object.keys(impEntries).forEach(day=>{
           const ex=entries[day]||[],exTs=new Set(ex.map(x=>x.ts));
-          merged[day]=[...ex,...(impEntries[day]||[]).filter(x=>!exTs.has(x.ts))];
+          merged[day]=[...ex,...(impEntries[day]||[]).filter(x=>!exTs.has(x.ts)&&!tombs.has(x.ts))];
         });
         setEntries(merged); await persist(merged);
         if (!isV2) { showToast("Log imported ✓"); return; }
@@ -13136,6 +13421,13 @@ export default function App() {
             </span>
           </div>
           <div style={{flexShrink:0,pointerEvents:"auto",marginLeft:4}}>
+      {gsOpen && <GlobalSearch entries={entries} today={today} onClose={()=>setGsOpen(false)}
+        go={{
+          tag:(t)=>{ try{ localStorage.setItem("jtLogPrefill","#"+t); }catch(e){} setGsOpen(false); saveMainTab("log"); },
+          prayer:()=>{ setGsOpen(false); saveMainTab("prayer"); },
+          teaching:()=>{ setGsOpen(false); saveMainTab("catechism"); },
+          reader:(id,gi)=>{ try{ localStorage.setItem("jtReaderJump",JSON.stringify({id,gi})); }catch(e){} setGsOpen(false); saveMainTab("reader"); }
+        }}/>}
       <HamburgerMenu setOpenCollapsible={setOpenCollapsible} chartTab={chartTab} setChartTab={setChartTab} viewDay={viewDay} setViewDay={setViewDay} viewOffset={viewOffset} setViewOffset={setViewOffset} today={today} handleExport={handleExport} handleImport={handleImport} visible={visible} setVisible={setVisible} widgetOrder={widgetOrder} setWidgetOrder={setWidgetOrder} userInitials={userInitials} saveInitials={saveInitials} groups={groups} addGroup={addGroup} removeGroup={removeGroup} updateGroup={updateGroup} regenGroupCode={regenGroupCode} appToken={appToken} saveAppToken={saveAppToken} workerUrl={workerUrl} saveWorkerUrl={saveWorkerUrl} esvToken={esvToken} saveEsvToken={saveEsvToken} syncCode={syncCode} saveSyncCode={saveSyncCode} generateSyncCode={generateSyncCode} syncStatus={syncStatus} lastSync={lastSync} pullSync={pullSync} themeName={themeName} saveTheme={saveTheme} bottomTabOrder={bottomTabOrder} saveBottomTabOrder={saveBottomTabOrder} bottomTabVisible={bottomTabVisible} saveBottomTabVisible={saveBottomTabVisible} bibleViewHidden={bibleViewHidden} saveBibleViewHidden={saveBibleViewHidden} todayViewHidden={todayViewHidden} saveTodayViewHidden={saveTodayViewHidden} tabStarMap={tabStarMap} lockVerified={lockVerified} setLockVerified={setLockVerified} onSelectTab={(id)=>{ if(id==="streaks:home2"){pickTodayView("home2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:circle2"){pickTodayView("circle2");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:square"){pickTodayView("square");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:dayline"){pickTodayView("dayline");setChartTab("day");saveMainTab("today");return;} if(id==="streaks:week"){pickTodayView("week");setChartTab("week");saveMainTab("today");return;} if(id==="streaks:month"){pickTodayView("month");setChartTab("month");saveMainTab("today");return;} if(id==="streaks:year"){pickTodayView("year");setChartTab("year");saveMainTab("today");return;} if(id==="streaks:year2"){pickTodayView("year2");setChartTab("year");saveMainTab("today");return;} if(id==="bible:read"){saveBibleView("read");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:mem"){saveBibleView("mem");setBibleChosen(true);saveMainTab("bible");return;} if(id==="bible:drill"){setBibleChosen(true);saveMainTab("bible");setDrillSignal(x=>x+1);return;} if(id==="bible"){saveBibleView("read");setBibleChosen(true);} if(id==="abide"){saveMainTab("prayer");return;} if(id==="today"){pickTodayView("today");setChartTab("day");saveMainTab("today");return;} saveMainTab(id); }} onEditLayout={()=>setShowTabEditor(true)} open={appMenuOpen} setOpen={setAppMenuOpen} hideTrigger={true} onQuickAdd={()=>{setAppMenuOpen(false);setQuickAddOpen(true);setSuppressSuggestions(true);}}/>
           </div>
         </div>
@@ -13462,8 +13754,8 @@ export default function App() {
                             
                             {badgeData.map(({icon,mins,border,bg,color,angleDeg,slot})=>{
                               const rad = angleDeg * Math.PI / 180;
-                              const DIAG = {morning:-45, midday:45, evening:135};
-                              const NUDGE = {morning:[25,-28], midday:[25,20], evening:[-25,20]};
+                              const DIAG = {morning:-135, midday:-45, evening:135};
+                              const NUDGE = {morning:[-25,-28], midday:[25,-28], evening:[-25,20]};
                               const rad2 = DIAG[slot] * Math.PI / 180;
                               const bR = r + 4;
                               const bx = cx + bR * Math.cos(rad2) + NUDGE[slot][0];
@@ -13488,6 +13780,17 @@ export default function App() {
                                 </div>
                               );
                             })}
+                            {(()=>{ const rad2=45*Math.PI/180; const bR=r+4;
+                              const bx=cx+bR*Math.cos(rad2)+25, by=cy+bR*Math.sin(rad2)+20;
+                              return (
+                                <div onClick={e=>{ e.stopPropagation(); try{ window.dispatchEvent(new Event("jtStartSlideshow")); }catch(err){} }}
+                                  style={{position:"absolute",left:bx,top:by,transform:"translate(-50%,-50%)",
+                                    padding:"6px 8px",borderRadius:20,border:`2px solid rgba(212,160,23,0.55)`,
+                                    background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",
+                                    zIndex:10,cursor:"pointer"}}>
+                                  <span style={{fontSize:30,lineHeight:1}}>🌅</span>
+                                </div>
+                              ); })()}
                             <JesusNameBubble C={C}/>
                           </CircleSwipeWrapper>
                         );
