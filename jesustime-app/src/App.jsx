@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v407";
+const APP_VERSION = "v409";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12243,7 +12243,6 @@ export default function App() {
   const saveBibleViewHidden = (v) => { setBibleViewHidden(v); try{localStorage.setItem("jtBibleViewsHidden",JSON.stringify(v));}catch(e){} };
   const [todayViewHidden, setTodayViewHidden] = useState(() => { try { return JSON.parse(localStorage.getItem("jtTodayViewsHidden")||"{}")||{}; } catch { return {}; } });
   const saveTodayViewHidden = (v) => { setTodayViewHidden(v); try{localStorage.setItem("jtTodayViewsHidden",JSON.stringify(v));}catch(e){} };
-  const [slotHist, setSlotHist] = useState(null);
   const [lockVerified, setLockVerifiedRaw] = useState(()=>{ try{ return localStorage.getItem("jtLockVerified")==="1"; }catch(e){ return false; } });
   const setLockVerified = (v)=>{ setLockVerifiedRaw(v); try{ localStorage.setItem("jtLockVerified", v?"1":"0"); }catch(e){} };
 
@@ -13443,7 +13442,7 @@ export default function App() {
                               const isNow = chartTab==="day" && viewDay===today && getTimeSlot(Date.now())===slot;
                               return (
                                 <div key={icon}
-                                  onClick={e=>{e.stopPropagation();setCircleSlot(slot);setSlotHist(slot);}}
+                                  onClick={e=>{e.stopPropagation();setCircleSlot(slot);}}
                                   style={{position:"absolute",left:bx,top:by,transform:"translate(-50%,-50%)",
                                   padding:"1px 5px 3px",borderRadius:20,border:`2px solid ${circleSlot===slot?"#d4a017":border}`,
                                   boxShadow:circleSlot===slot?"0 0 0 2px #d4a017, 0 0 10px rgba(212,160,23,0.55)":"none",
@@ -14411,41 +14410,6 @@ export default function App() {
       })()}
 
 
-      {slotHist && (()=>{
-        const day = viewDay || today;
-        const icons = {morning:"☕", midday:"☀️", evening:"🌙"};
-        const names = {morning:"Morning", midday:"Midday", evening:"Evening"};
-        const list = (entries[day]||[]).filter(e=>getTimeSlot(e.ts)===slotHist).sort((a,b)=>a.ts-b.ts);
-        const tot = list.reduce((t,e)=>t+(e.minutes||0),0);
-        const tstr = ts => { const d=new Date(ts); let h=d.getHours(); const m=d.getMinutes(); const ap=h>=12?"p":"a"; h=h%12||12; return `${h}:${String(m).padStart(2,"0")}${ap}`; };
-        return (
-          <div onClick={()=>setSlotHist(null)}
-            style={{position:"fixed",inset:0,zIndex:900,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <div onClick={e=>e.stopPropagation()}
-              style={{width:"min(340px,88vw)",maxHeight:"70vh",overflowY:"auto",borderRadius:16,border:`1px solid ${C.borderHi}`,background:C.bg,padding:"14px 14px 12px"}}>
-              <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:10}}>
-                <span style={{fontSize:22,lineHeight:1}}>{icons[slotHist]}</span>
-                <span style={{fontSize:15,fontWeight:800,color:C.gold}}>{names[slotHist]}</span>
-                <span style={{fontSize:13,fontWeight:700,color:C.textMid}}>{parseInt(day.slice(5,7))}/{parseInt(day.slice(8,10))}</span>
-                <span style={{marginLeft:"auto",fontSize:13.5,fontWeight:800,color:tot>0?"#4ade80":C.textFaint}}>{fmtM(tot)}</span>
-              </div>
-              {list.length===0 && <div style={{color:C.textFaint,fontSize:13,padding:"10px 2px 14px",textAlign:"center"}}>No time logged {slotHist==="morning"?"this morning":slotHist==="midday"?"this midday":"this evening"}.</div>}
-              {list.map(e=>(
-                <div key={e.ts} onClick={()=>{ setSlotHist(null); openEdit(day, e); }}
-                  style={{display:"flex",alignItems:"center",gap:8,padding:"8px 6px",borderRadius:9,cursor:"pointer",
-                    borderBottom:`1px solid rgba(${C.ink},0.08)`}}>
-                  <span style={{fontSize:12.5,fontWeight:700,color:C.textFaint,width:56,flexShrink:0}}>{tstr(e.ts)}</span>
-                  <span style={{fontSize:13,fontWeight:800,color:"#4ade80",width:52,flexShrink:0}}>{fmtM(e.minutes||0)}</span>
-                  <span style={{fontSize:12.5,color:C.textMid,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{(e.notes||"").trim()||"—"}</span>
-                </div>
-              ))}
-              <button onClick={()=>setSlotHist(null)}
-                style={{width:"100%",marginTop:10,padding:"9px 4px",borderRadius:10,border:`1px solid ${C.border}`,
-                  background:"transparent",color:C.textFaint,fontSize:13,fontWeight:700,cursor:"pointer"}}>Close</button>
-            </div>
-          </div>
-        );
-      })()}
       {/* Activity-chip popup card (Prayer/Names/Look/Bible/Teaching) */}
       {chipPopup && (() => {
         const t=(chipPopup.tag||"").replace(/ /g,"_");
@@ -14526,18 +14490,15 @@ export default function App() {
         </div>
       )}
       {toast && (
-        <div style={{position:"fixed",bottom:100,left:"50%",transform:"translateX(-50%)",
-          background:"rgba(212,160,23,0.97)",color:C.onAccent,padding:toast.history?"13px 20px":"12px 24px",
-          borderRadius:20,fontSize:18,fontWeight:700,zIndex:500,maxWidth:"calc(100% - 32px)",textAlign:"center",
-          animation:"jtToastIn .25s ease both",
-          boxShadow:"0 4px 20px rgba(0,0,0,0.5)",whiteSpace:toast.history?"normal":"nowrap"}}>
-          <div>{toast.msg}</div>
+        <div style={{position:"fixed",bottom:92,left:"50%",transform:"translateX(-50%)",
+          background:"rgba(212,160,23,0.97)",color:C.onAccent,padding:toast.history?"9px 14px":"12px 24px",
+          borderRadius:22,fontSize:toast.history?15:18,fontWeight:700,zIndex:500,maxWidth:"calc(100% - 24px)",textAlign:"center",
+          animation:"jtToastIn .25s ease both",display:toast.history?"flex":"block",alignItems:"center",gap:10,
+          boxShadow:"0 4px 20px rgba(0,0,0,0.5)",whiteSpace:"nowrap"}}>
+          <div style={{overflow:"hidden",textOverflow:"ellipsis"}}>{toast.msg}</div>
           {toast.history && (
-            <div style={{marginTop:8,display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
-              <button onClick={()=>{ setToast(null); saveMainTab("log"); }}
-                style={{padding:"6px 16px",borderRadius:14,border:`1.5px solid ${C.onAccent}`,background:"transparent",color:C.onAccent,fontSize:14,fontWeight:800,cursor:"pointer"}}>View in History</button>
-              <div style={{fontSize:12,fontWeight:600,opacity:0.85,lineHeight:1.35}}>Undo anytime by deleting the entry in History.</div>
-            </div>
+            <button onClick={()=>{ setToast(null); saveMainTab("log"); }}
+              style={{flexShrink:0,padding:"5px 12px",borderRadius:13,border:`1.5px solid ${C.onAccent}`,background:"transparent",color:C.onAccent,fontSize:13,fontWeight:800,cursor:"pointer"}}>History ›</button>
           )}
         </div>
       )}
