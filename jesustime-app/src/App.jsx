@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v413";
+const APP_VERSION = "v414";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -11304,6 +11304,16 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const [flipPane, setFlipPane] = React.useState(()=>{ try{ return { top: localStorage.getItem("jtReaderFlipTop")==="1", bottom: localStorage.getItem("jtReaderFlipBot")==="1" }; }catch(e){ return {top:false,bottom:false}; } });
   const [bookLogPop, setBookLogPop] = React.useState(false);
   const [hdrBookPop, setHdrBookPop] = React.useState(false);
+  const [tocOpen, setTocOpen] = React.useState(false);
+  const [srchOpen, setSrchOpen] = React.useState(false);
+  const [srchQ, setSrchQ] = React.useState("");
+  const [srchHits, setSrchHits] = React.useState([]);
+  const [srchI, setSrchI] = React.useState(0);
+  const [flashPi, setFlashPi] = React.useState(null);
+  const [, setHlVer] = React.useState(0);
+  const [speaking, setSpeaking] = React.useState(false);
+  const holdRef = React.useRef(null);
+  const posThrottle = React.useRef(0);
   const [bibleChoose, setBibleChoose] = React.useState(null);
   const openGreekInPane = (pane) => { recordBookOpen("greekbible"); setBookId("greekbible"); try{localStorage.setItem("jtReaderBook","greekbible");}catch(e){} setPaneMode(pane,"book"); setBibleChoose(null); try{ const last=JSON.parse(localStorage.getItem("jtGkLast")||"null"); if(last&&last.f){ const bk=GREEK_CANON.find(b=>b.f===last.f&&b.src===last.src); if(bk){ gkOpenBookIn(pane,bk); if(last.ch!=null) gkSetNav(pane,{ch:last.ch}); } } }catch(e){} };
   const [refSelOpen, setRefSelOpen] = React.useState(false);
@@ -11367,6 +11377,45 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
   const topScrollRef = React.useRef(null), botScrollRef = React.useRef(null), bookPosRef = React.useRef(0);
   const serif = '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif';
   const book = BOOKS.find(x=>x.id===bookId)||BOOKS[0];
+  const _rp = () => { try { return JSON.parse(localStorage.getItem("jtReadPos")||"{}"); } catch(e){ return {}; } };
+  const getPos = id => _rp()[id]||null;
+  const savePos = (id,pos) => { try { const m=_rp(); m[id]={...(m[id]||{}),...pos,ts:Date.now()}; localStorage.setItem("jtReadPos",JSON.stringify(m)); } catch(e){} };
+  const _hl = () => { try { return JSON.parse(localStorage.getItem("jtReadHl")||"{}"); } catch(e){ return {}; } };
+  const getHls = id => _hl()[id]||{};
+  const setHl = (id,gi,val) => { try { const m=_hl(); const bm=m[id]||{}; if(val==null) delete bm[gi]; else bm[gi]=val; m[id]=bm; localStorage.setItem("jtReadHl",JSON.stringify(m)); setHlVer(v=>v+1); } catch(e){} };
+  const onHold = (gi) => {
+    const hl = getHls(book.id)[gi];
+    if (!hl) { setHl(book.id, gi, {c:1}); return; }
+    const n = window.prompt("Highlight note (empty removes highlight)", hl.note||"");
+    if (n===null) return;
+    if (n==="") setHl(book.id, gi, null); else setHl(book.id, gi, {c:1, note:n});
+  };
+  const bookScroller = () => topMode==="book" ? topScrollRef.current : botMode==="book" ? botScrollRef.current : null;
+  const jumpPara = (gi, center) => {
+    const el = document.getElementById(`rdp-${book.id}-${gi}`);
+    if (el) { el.scrollIntoView({block:center?"center":"start"}); setFlashPi(gi); setTimeout(()=>setFlashPi(null),1400); }
+  };
+  const runSearch = (q) => {
+    const qq=(q||"").trim().toLowerCase(); if(!qq){ setSrchHits([]); return; }
+    const hits=[]; (book.paras||[]).forEach((pp,i)=>{ if(String(pp).toLowerCase().includes(qq)) hits.push(i); });
+    setSrchHits(hits); setSrchI(0); if(hits.length) jumpPara(hits[0], true);
+  };
+  const speakToggle = () => {
+    try {
+      if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return; }
+      const pos=getPos(book.id); const startGi=(pos&&pos.gi)||0;
+      const text=(book.paras||[]).slice(Math.max(0,startGi)).map(pp=>String(pp).replace(/^\u00a7\u00a7 /,"")).join("\n\n").slice(0,28000);
+      if(!text) return;
+      const u=new SpeechSynthesisUtterance(text); u.rate=1; u.onend=()=>setSpeaking(false);
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); setSpeaking(true);
+    } catch(e){}
+  };
+  React.useEffect(()=>()=>{ try{ window.speechSynthesis.cancel(); }catch(e){} },[]);
+  React.useEffect(()=>{
+    const pos=getPos(bookId); if(!pos||!pos.top) return;
+    const t=setTimeout(()=>{ const el=bookScroller(); if(el) try{ el.scrollTop=pos.top; }catch(e){} },140);
+    return ()=>clearTimeout(t);
+  }, [bookId, (book.paras||[]).length]); // eslint-disable-line
   const persistPanes = (t,b,f)=>{ try{ localStorage.setItem("jtReaderPanes", JSON.stringify({top:t,bot:b,frac:f})); }catch(e){} };
   const setTop = m => { setTopMode(m); persistPanes(m, botMode, fracRef.current); };
   const setBot = m => { setBotMode(m); persistPanes(topMode, m, fracRef.current); };
@@ -11655,12 +11704,49 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             {hdrBookPop && (<>
               <div onClick={()=>setHdrBookPop(false)} style={{position:"fixed",inset:0,zIndex:13}}/>
               <div style={{position:"absolute",left:0,top:"calc(100% + 6px)",zIndex:14,minWidth:230,maxWidth:"80vw",maxHeight:"50vh",overflowY:"auto",background:C.card,border:`1px solid ${C.borderHi}`,borderRadius:10,padding:6,display:"flex",flexDirection:"column",gap:4,boxShadow:"0 8px 22px rgba(0,0,0,0.45)"}}>
+                {(()=>{ const m=_rp(); let best=null;
+                  BOOKS.forEach(b=>{ if(b.id==="greekbible"||b.id===bookId) return; const pp=m[b.id]; if(pp&&pp.ts&&(!best||pp.ts>best.ts)) best={...pp,id:b.id,title:b.title}; });
+                  return best ? (
+                    <button onClick={()=>{ pickBook(best.id); setHdrBookPop(false); }}
+                      style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>
+                      ▶ Continue: {best.title} · {best.pct||0}%
+                    </button>
+                  ) : null; })()}
                 {BOOKS.filter(b=>b.id!=="greekbible").map(b=>{ const on=b.id===bookId;
+                  const pos=getPos(b.id); const pct=pos?(pos.pct||0):0;
+                  const ago=pos&&pos.ts?(()=>{ const d=Math.floor((Date.now()-pos.ts)/86400000); return d<=0?"today":d===1?"1d ago":d+"d ago"; })():null;
                   return <button key={b.id} onClick={()=>{ pickBook(b.id); setHdrBookPop(false); }}
-                    style={{textAlign:"left",padding:"9px 11px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{bookIcon(b.id)} {b.title}</button>;
+                    style={{textAlign:"left",padding:"8px 11px",borderRadius:8,border:`1px solid ${on?C.gold:C.border}`,background:on?C.buttonActive:"transparent",color:on?C.gold:C.text,fontSize:14,fontWeight:700,cursor:"pointer"}}>
+                    <div style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{bookIcon(b.id)} {b.title}</div>
+                    {pos && (
+                      <div style={{display:"flex",alignItems:"center",gap:6,marginTop:4}}>
+                        <div style={{flex:1,height:4,borderRadius:2,background:`rgba(${C.ink},0.14)`,overflow:"hidden"}}>
+                          <div style={{width:`${pct}%`,height:"100%",background:"#d4a017"}}/>
+                        </div>
+                        <span style={{fontSize:10.5,fontWeight:700,color:C.textFaint,flexShrink:0}}>{pct}% · {ago}</span>
+                      </div>
+                    )}
+                  </button>;
                 })}
               </div>
             </>)}
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
+            {(()=>{ const goal=parseInt(localStorage.getItem("jtReadGoal")||"10",10)||10;
+              const gMin=(entries[today]||[]).reduce((t,e)=>t+((/#Reader/i.test(e.notes||""))?(e.minutes||0):0),0);
+              const gp=Math.min(1,gMin/goal); const R=8, CIRC=2*Math.PI*R;
+              return <svg width="22" height="22" viewBox="0 0 22 22" style={{cursor:"pointer",flexShrink:0}}
+                onClick={()=>{ const n=window.prompt("Daily reading goal (minutes)", String(goal)); const v=parseInt(n,10); if(v>0){ try{localStorage.setItem("jtReadGoal",String(v));}catch(e){} setHlVer(x=>x+1);} }}>
+                <circle cx="11" cy="11" r={R} fill="none" stroke={`rgba(${C.ink},0.18)`} strokeWidth="3"/>
+                <circle cx="11" cy="11" r={R} fill="none" stroke={gp>=1?"#4ade80":"#d4a017"} strokeWidth="3"
+                  strokeDasharray={`${CIRC*gp} ${CIRC}`} strokeLinecap="round" transform="rotate(-90 11 11)"/>
+              </svg>; })()}
+            <button onClick={()=>{ setTocOpen(o=>!o); setSrchOpen(false); }} title="Contents"
+              style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${tocOpen?C.gold:C.border}`,background:tocOpen?C.buttonActive:"transparent",color:tocOpen?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>☰</button>
+            <button onClick={()=>{ setSrchOpen(o=>{ const n=!o; if(n) setTimeout(()=>{ const el=document.getElementById("rdSrchIn"); el&&el.focus(); },80); return n; }); setTocOpen(false); }} title="Search"
+              style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${srchOpen?C.gold:C.border}`,background:srchOpen?C.buttonActive:"transparent",color:srchOpen?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>🔍</button>
+            <button onClick={speakToggle} title="Read aloud"
+              style={{padding:"3px 8px",borderRadius:8,border:`1px solid ${speaking?C.gold:C.border}`,background:speaking?C.buttonActive:"transparent",color:speaking?C.gold:C.textFaint,fontSize:12,fontWeight:800,cursor:"pointer"}}>{speaking?"⏹":"🔊"}</button>
           </div>
           {book.id==="mycatechism" && <button onClick={()=>setEditKey("mycatechism")}
             style={{flexShrink:0,padding:"3px 10px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.gold,fontSize:11,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap"}}>✏️ Edit</button>}
@@ -11677,6 +11763,45 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
             )}
           </div>
         </div>
+        {srchOpen && (
+          <div style={{display:"flex",alignItems:"center",gap:6,margin:"0 0 8px"}}>
+            <input id="rdSrchIn" value={srchQ} onChange={e=>setSrchQ(e.target.value)}
+              onKeyDown={e=>{ if(e.key==="Enter") runSearch(srchQ); }}
+              placeholder="Search in book…"
+              style={{flex:1,minWidth:0,padding:"7px 10px",borderRadius:9,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.text,fontSize:13.5}}/>
+            <button onClick={()=>runSearch(srchQ)} style={{padding:"6px 10px",borderRadius:8,border:`1px solid ${C.gold}`,background:"transparent",color:C.gold,fontSize:12.5,fontWeight:800,cursor:"pointer"}}>Go</button>
+            {srchHits.length>0 && (<>
+              <span style={{fontSize:12,color:C.textFaint,whiteSpace:"nowrap"}}>{srchI+1}/{srchHits.length}</span>
+              <button onClick={()=>{ const n=(srchI-1+srchHits.length)%srchHits.length; setSrchI(n); jumpPara(srchHits[n],true); }} style={{padding:"5px 8px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,cursor:"pointer"}}>‹</button>
+              <button onClick={()=>{ const n=(srchI+1)%srchHits.length; setSrchI(n); jumpPara(srchHits[n],true); }} style={{padding:"5px 8px",borderRadius:8,border:`1px solid ${C.border}`,background:"transparent",color:C.textMid,cursor:"pointer"}}>›</button>
+            </>)}
+            <button onClick={()=>{ setSrchOpen(false); setSrchQ(""); setSrchHits([]); }} style={{padding:"5px 8px",borderRadius:8,border:"none",background:"transparent",color:C.textFaint,fontSize:15,cursor:"pointer"}}>✕</button>
+          </div>
+        )}
+        {tocOpen && (()=>{
+          const heads=[]; (book.paras||[]).forEach((pp,i)=>{ if(String(pp).startsWith("\u00a7\u00a7 ")) heads.push({gi:i,label:String(pp).slice(3)}); });
+          if(!heads.length) (book.scenes||[]).forEach((sc,si)=>{ if(sc.t) heads.push({gi:sc.s,label:sc.t}); });
+          const hls=getHls(book.id); const hlKeys=Object.keys(hls).map(Number).sort((a,b)=>a-b);
+          return (
+            <div style={{margin:"0 0 10px",borderRadius:12,border:`1px solid ${C.borderHi}`,background:C.card,padding:"8px 10px",maxHeight:"46vh",overflowY:"auto"}}>
+              <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"2px 0 6px"}}>CONTENTS</div>
+              {heads.length===0 && <div style={{fontSize:12.5,color:C.textFaint,padding:"2px 0 8px"}}>No sections in this book.</div>}
+              {heads.map(h=>(
+                <button key={h.gi} onClick={()=>{ jumpPara(h.gi); setTocOpen(false); }}
+                  style={{display:"block",width:"100%",textAlign:"left",padding:"7px 8px",borderRadius:8,border:"none",background:"transparent",color:C.gold,fontSize:13.5,fontWeight:700,cursor:"pointer"}}>{h.label}</button>
+              ))}
+              {hlKeys.length>0 && (<>
+                <div style={{fontSize:11,fontWeight:800,color:C.textFaint,letterSpacing:"0.06em",margin:"10px 0 6px"}}>MY HIGHLIGHTS</div>
+                {hlKeys.map(gi=>(
+                  <button key={"h"+gi} onClick={()=>{ jumpPara(gi,true); setTocOpen(false); }}
+                    style={{display:"block",width:"100%",textAlign:"left",padding:"6px 8px",borderRadius:8,border:"none",background:"transparent",color:C.textMid,fontSize:12.5,cursor:"pointer"}}>
+                    <span style={{color:"#d4a017"}}>▍</span> {String(book.paras[gi]||"").replace(/^\u00a7\u00a7 /,"").slice(0,64)}…{hls[gi].note?" 📝":""}
+                  </button>
+                ))}
+              </>)}
+            </div>
+          );
+        })()}
         <div data-rdbody="1">
         {book.greek ? renderGreekBody(pane, fp, lh) : (<>
         {bookLoading && (!book.paras || !book.paras.length) && (
@@ -11692,12 +11817,23 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
         {book.scenes.map((sc,si)=>(
           <div key={si} id={"rdsc-"+bookId+"-"+si} style={{marginBottom:16}}>
             {book.paras.slice(sc.s, sc.e+1).map((para,pi)=>{
+              const gi=sc.s+pi;
+              const hl=getHls(book.id)[gi];
+              const hlSt=hl?{background:"rgba(212,160,23,0.13)",borderLeft:"3px solid #d4a017",paddingLeft:8,borderRadius:6}:{};
+              const flSt=flashPi===gi?{outline:"2px solid #d4a017",outlineOffset:2,borderRadius:6}:{};
+              const press={
+                onTouchStart:()=>{ holdRef.current=setTimeout(()=>{ holdRef.current=null; onHold(gi); },550); },
+                onTouchEnd:()=>{ if(holdRef.current){clearTimeout(holdRef.current);holdRef.current=null;} },
+                onTouchMove:()=>{ if(holdRef.current){clearTimeout(holdRef.current);holdRef.current=null;} },
+                onContextMenu:(e)=>{ e.preventDefault(); onHold(gi); },
+              };
+              const noteIcon = hl&&hl.note ? <span onClick={e=>{e.stopPropagation(); window.alert(hl.note);}} style={{marginLeft:6,cursor:"pointer"}}>📝</span> : null;
               if(typeof para==="string" && para.startsWith("\u00a7\u00a7 ")){ const h=para.slice(3); const hr=parseRefInput(h);
-                return <p key={pi} style={{fontFamily:serif,fontSize:fp+3,fontWeight:800,color:C.gold,margin:"22px 0 10px",lineHeight:1.3,textIndent:0}}>
-                  {hr ? <button onClick={(e)=>{e.stopPropagation(); openRefBelow(hr);}} style={{background:"none",border:"none",padding:0,color:C.gold,fontWeight:800,fontSize:"1em",fontFamily:"inherit",textDecoration:"underline",cursor:"pointer"}}>{h}</button> : h}
+                return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} {...press} style={{fontFamily:serif,fontSize:fp+3,fontWeight:800,color:C.gold,margin:"22px 0 10px",lineHeight:1.3,textIndent:0,...hlSt,...flSt}}>
+                  {hr ? <button onClick={(e)=>{e.stopPropagation(); openRefBelow(hr);}} style={{background:"none",border:"none",padding:0,color:C.gold,fontWeight:800,fontSize:"1em",fontFamily:"inherit",cursor:"pointer",textAlign:"left"}}>{h}</button> : h}{noteIcon}
                 </p>;
               }
-              return <p key={pi} style={{fontFamily:serif,fontSize:fp,lineHeight:lh,color:C.text,margin:"0 0 12px",textIndent:"1.2em"}}>{renderRefs(para)}</p>;
+              return <p key={pi} id={`rdp-${book.id}-${gi}`} data-gi={gi} {...press} style={{fontFamily:serif,fontSize:fp,lineHeight:lh,color:C.text,margin:"0 0 12px",textIndent:"1.2em",...hlSt,...flSt}}>{renderRefs(para)}{noteIcon}</p>;
             })}
             {sc.c.length>0 && (
               <div style={{lineHeight:2.1}}>
@@ -11833,7 +11969,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
       <div ref={splitRef} style={{flex:"1 1 auto",display:"flex",flexDirection:"column",minHeight:0,paddingTop: (fs||immersive)?"env(safe-area-inset-top)":undefined,paddingBottom: immersive?"env(safe-area-inset-bottom)":undefined}}>
         {topMode!=="off" && (
         <div style={{flexBasis: botMode==="off"?0:`${frac*100}%`,flexGrow: botMode==="off"?1:0,flexShrink: botMode==="off"?1:0,display:"flex",flexDirection:"column",minHeight:0,position:"relative",borderTop:`2px solid ${activePane==="top"?C.gold:"transparent"}`}}>
-          <div ref={topScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("top")} onScroll={e=>{ if(topMode==="book") bookPosRef.current=e.target.scrollTop; gkMirrorScroll("top"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(topMode,"top")}</div>
+          <div ref={topScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("top")} onScroll={e=>{ if(topMode==="book"){ bookPosRef.current=e.target.scrollTop; const now=Date.now(); if(now-posThrottle.current>800){ posThrottle.current=now; const t=e.target; const pct=t.scrollHeight>t.clientHeight?Math.min(100,Math.round(t.scrollTop/(t.scrollHeight-t.clientHeight)*100)):0; let gi=0; t.querySelectorAll("[data-gi]").forEach(k=>{ if(k.offsetTop<=t.scrollTop+40) gi=parseInt(k.dataset.gi)||0; }); savePos(bookId,{top:t.scrollTop,pct,gi}); } } gkMirrorScroll("top"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(topMode,"top")}</div>
           {flipPane.top && (<>
             <button onClick={()=>turnPage("top",-1)} title="Previous page" style={{position:"absolute",left:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>‹</button>
             <button onClick={()=>turnPage("top",1)} title="Next page" style={{position:"absolute",right:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>›</button>
@@ -11852,7 +11988,7 @@ function ReaderModule({workerUrl="", appToken="", esvChapCache={}, esvChapBusy="
         </div>)}
         {botMode!=="off" && (
         <div style={{flex:"1 1 0",display:"flex",flexDirection:"column",minHeight:0,position:"relative",borderTop:`2px solid ${activePane==="bottom"?C.gold:"transparent"}`}}>
-          <div ref={botScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("bottom")} onScroll={e=>{ if(botMode==="book") bookPosRef.current=e.target.scrollTop; gkMirrorScroll("bottom"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(botMode,"bottom")}</div>
+          <div ref={botScrollRef} onMouseUp={onBookSelect} onTouchStart={onPaneTouchStart} onTouchEnd={onPaneTouchEnd("bottom")} onScroll={e=>{ if(botMode==="book"){ bookPosRef.current=e.target.scrollTop; const now=Date.now(); if(now-posThrottle.current>800){ posThrottle.current=now; const t=e.target; const pct=t.scrollHeight>t.clientHeight?Math.min(100,Math.round(t.scrollTop/(t.scrollHeight-t.clientHeight)*100)):0; let gi=0; t.querySelectorAll("[data-gi]").forEach(k=>{ if(k.offsetTop<=t.scrollTop+40) gi=parseInt(k.dataset.gi)||0; }); savePos(bookId,{top:t.scrollTop,pct,gi}); } } gkMirrorScroll("bottom"); setSelPop(null); }} style={{flex:"1 1 auto",overflowY:"auto",overflowX:"hidden",WebkitOverflowScrolling:"touch",minHeight:0}}>{renderPane(botMode,"bottom")}</div>
           {flipPane.bottom && (<>
             <button onClick={()=>turnPage("bottom",-1)} title="Previous page" style={{position:"absolute",left:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>‹</button>
             <button onClick={()=>turnPage("bottom",1)} title="Next page" style={{position:"absolute",right:8,bottom:8,width:38,height:34,borderRadius:9,border:`1px solid ${C.borderHi}`,background:`rgba(${C.ink==='0,0,0'?'255,255,255':'0,0,0'},0.55)`,color:C.gold,fontSize:20,fontWeight:800,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(3px)"}}>›</button>
