@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAOoUlEQVR42u2ce3BUVZ7Hv+fce/uVByGBTpZXSMxQYaNkJEsSHIjIQ1idctVd0BVd0C11RXfX3bKsoQoYVkqtTM0/wkAxjFjWsuAUEqFAVsGJBVhAYhLkEYgR0UljyMMAeXb37XvP+e0f6dvTQVFh003T3F/VqXTfdN97+n5+j3N+v3MuQ4KKoigQQkTeZ2RkqKWlpbkzZsyYNXXq1PkFBQUVo0ePzk5JSZGqqnLDMGRfXx/v7Ow809zcXNPQ0PDh4cOHa+rq6lr9fr+82nlt+RHhnA95P2/evLy333678vz58z66Dmlubj69du3aF8vKykb/0HVsuYpVWLJ48eJf1NXV1UTfXCGEYZqmLoQwrGNSSjIMg6SU1nvxfZ8jIqqurn53wYIFt33f9RJFWEJ0gjEQEQCgvLw8u7Ky8vcVFRV/BwBCiFBYo9WOjg5eW1uL+vp6nDlzBm1tbeju7oZhGHA6ncjMzMS4ceNQVFSE0tJSTJs2DSNGjJBSSpMxxjnnKgC8995765YvX77iiy++6FUUBVLKyPVtFxXlOlatWvUPpmkSEZFhGAEppQiFQrRjxw568MEHaeTIkQTgJ7cxY8bQ0qVLqbq6OmJhoVBIJyK6fPmyeOqpp+6KVgobRhhGRkaGunv37o1ERKFQKOJqtmzZQsXFxUNusqIopKoqKYpCiqIQ5zzSrP+pqkqc8yHfmzVrFn3wwQdERGSapi6lFERE69at+1fOObvl44r148eOHetuaGg4TUTk9/sDRESNjY00d+7cIRAURSHG2DVZCGMsAs069thjj1F7ezsREQUCgQEiol27dr3lcrnYLWspFoysrCzniRMnmqJhbNmyhdLT0yMgrtT0623R58rNzaWPP/6YiIgGBgYGiIj27NnzlqqqjHN+a0FhjIFzDk3T2IEDB96NhrFmzZohN3A4QFzZVFWN/N22bdsQKJs2bfoVAKiqeutAsYaa69at+49oGKtXr46AuFbXdK2Ncx65xtatWyncjwEiomXLlt2TqEPimMF44IEHJkX78A0bNkS0NtYwoqFY7aOPPiIppdB1PRAMBqmoqCgj6YM8YwyMMaSlpfGWlhafEMKQUoqjR49GRk3xghENBQB5vV46f/48GYZhSCnFgQMH3mWMJbeVWD9u9erVz1jD24GBASosLIxpzPipMeW+++6LzH+IiBYuXHh70rouy/RHjx7tuHjxYsDSxFdeeWXITblRzbr+jh07yLLckydPHlVVlSVlcFdVFQDw0ksv/dLSwvb2dsrIyBgSYG9Us9xlUVERhUKhiJXcf//9hUlrJaqqssbGxmYpJSWSdVw5zI62kp07d76VdMHd0q7S0tJsK20RDAbptttuI8bYsE38hstK5s+fH8ka9/T0CK/X64jnDD7m6K0fcu+9995NRJKIZE1NDc6dOwfGGKSUCaE4Vsb30KFD8Pl8EEKE0tPT+cyZMyfH00pifhXTNAEAM2fO/EcrBb5v3z4kmisgIiiKgkAggIMHD0aOV1RUzI3rACge1uF2u3lhYeH08DFeW1sbuQmJNlcCgJqaGli1kylTppQDiFvZNy5AcnJyPNnZ2VlSSjMYDPIvv/wyIYFY/Tlz5gwYYxwAJkyYUOZyuXi84khcgGRnZ6c6nU6ViGRXVxe6uroSGsiFCxdgGAYAIDMzMys9PZ0lhcuyJD09PRK5e3p6EAgEEhpId3c3/H4/l1KabrdbTUtLcyWFhUTPQazXoVAo4evXhmHAMAwQkdQ0zeFyuUYklYUIISh61p7o6QhVVa1+ctM0TV3X+5MKSH9/f+Q6aWlpcDqdiOdk61pjXlpaGjwej+Scq8FgMNjf3z+QFEAs19TZ2RkwDEMyxvioUaMwcuTIhLaQnJwcOBwOAEBvb6/s7e2NW8yLC5C2tra+rq6ubs65mpqaKvPz8xNuYhjdn8LCQhCRBACfz1fj9/tFUgHp7++XZ8+ePRw+JktKSiIFq0QcZZWWlkJKaQJAY2Pjn4D4ZXxjrqJW6r2mpmb/YM5OmvPmzQMRJUwey4ofQghomoZZs2ZFjh85cuRIIsa76xZLs2bPnj3Ryvb29PRQTk7OkDIqEiTbO336dJJSkhDCCAQClJubm5KI7nU48lns66+//rNVD3nxxRcTsh6yadOmSD2kurq6Kqms40orefXVV//ZqhiePXuWXC5XQlQMrT6MHz+eent7IxXDxYsXT412u0kjlrnn5+en+v1+wzRNPbwGKqFq6uvXrycppTBNU7S0tHyVkpLCEnHwMaxWsnHjxl9bsaSjo4O8Xu8NrRxarqqkpIRCoRBZq+Off/752fEcXd0QK2GMYcyYMa5Lly71hEIhXUopqqqqbpiVWIuxXS4XHT9+PLLZ5/Tp08ccDkfyr/O1tO2555772/DKxQAR0csvv0wASNO0uMKwlGDz5s1ERBQMBgeIiO65556JSW0d3wdl165dfwhD0YmIlixZEoES6yAfDWPNmjVD1vZWVlb+yy0DIzrAZ2Zmqs3NzSeIiHRd14mInnzyySHrbmMZM66AESAi2r9///ucc9xyWxIs7Zs8eXJGe3v7xTAUg4ho5cqVQ0Y/w2UtnPOIVbjdbnrzzTeHwPjss8/+lJmZqSbVJPB6oJSUlGR2dHQMhNf7CiKi999/nwoKCoaAuR6LsUZv0VZRVlZG9fX1FK0EJ06cOJiTk3PrwrDEqovk5OS46+rqDgshDF3XRXhTJq1YsYKysrK+4/ut3VCMsSHNcnXWPsNoOHl5efTGG2+QYRhWADeklGL37t1/VBSFAYCmabcmiGgtTE1NVZcsWVJ+7NixT6SUFDIMYd00IqLW1lZ67bXX6I477rguNzV9+nTasGEDdXd3D+7ElZIMwyTDMEU4PbLroYceut2CkrQTwR9zVQDwxBNPTG1qajp11ccwDG6UDW8TMKmmpoYqKytp4cKFVFxcTDk5OZSamkoej4fS09Np7NixVFJSQo8//jitXbuWTp48eeUJr3qpI0eOHFiwYEHB9/UzKcXaWwgAU6ZMydy/f/+2v9zswT3pesikQyd89Mp/f0Lbqhvpcl/gBx+b0dPbS60XLpDP56O2tjbq7+//wc9fuNhHG3c30G/eOUINzW0k5eAaXit3RUS0devW344ZM8Z1o6CweLkoq/bxwgsv3Pv666/vTU1NVU3TDCqK4giGBN9X9xX215+Dr6N3cM0vSXgzUvCL28dj5pTxKBibCYVfe3d1Q6DJ14WDx1tQ23QBPQM6GAM4Y/jZuEzcV1aAWT/PBQOZQpDUNMXR1tbWuWzZsnm7du06yTkHEcVtpQyLFwyn08k3bty4YunSpf8liCQjkpxz9eNjf8b2A03wdfbA6VDh1JRIx0KmREA34HKomJA9An+dOwqFE7IwbnQ6MtNc8Dg1aCoHYwAREDIEBoIGunoDaOnoQbPvIppauvBNVx9MIeFxqlAVDsJglAmGTBhCoHDCKCyeczumTsqBECKkKIoDANasWfNPq1at2mJZeDygsHjAGDFiBK+qqto2Z86cR4K64Xc5NU/7pQH8fs8xfNrUCodDhUtTIGlo3drSZEkE3RAwTAEGBpdDRYpbQ6rbAZdDBWcMQhICuoH+QAgDQQO6YQJgcKgKHJoCxgAph95QzhgYA/y6CSLCvL/Jw5MLipHi0qQhRMihqq7Nmzcvf/bZZ38TDkAxh8JiGTOICGlpaXzfhx/+cfpddy0M6rrf5XR6apta8bud9bjcF0Sax/EdEFeNQWxw+CQlQUqCkAQZ/h4DwDiDEm7WSIl+wrl5+LO9fh252SPwn4vK8LOxmQgGdb/L5fRs3779fx555JEn/nLO2EFRYgUjXNhhe/bs2X733XcvDOp60OV0uncf+QJvVNVBEuBxqhDyp/+4wZtrWR+DonCoCoemcCgKh8I5uDXmjfrsj5433NwuDZf7gjh4wofx3nRM/KuRWjCo+4uLi0uys7O79+7dW6uqakzXAsQEiPXIo/Xr1/9q0aJF/xaG4dpx8HP8Ye9nSHFrg+5smDRtuPSViKBpCoSkQSij05E/NlML6npwenn5L7u7uw8fPXr0K0VRYmYlLBYwhBB49NFHy955550aXTf8Tqfm+eDTc1j3Xh3SPU4QCIm8vHcwJkkYpsTqpRX4eUE2DMPwM8Y85eXl3oaGhm+jR44JC8TqpNfr1U6dOnUpKyvLwTlXT339LV/51kG4NAVgwM3wrDDOGAwh4HKo+O1zc5Gd4TEZY/z48eOflpWV3SWEoFgAGdZMmhU7Vq1atdLr9aYCQH/A4L/bWQ8eDrQ3y4PbJBEcqoLeAR3rd9YDjKlCiNCdd95Z/vTTT8+RUsZk8cOwu6y8vDx3U1OTX1XVkKIojjf3HkfVJ58jI9WJqEXwN1Gqh6G7T8e///00zJ+WL4lItra2tk6ePDnf7/fL4Y4lw55rfuaZZx51OBySiOQ33/ZhX/05pLkdNyUMhIfYbqeKqkOfw6+bXEppjh8/Pvfhhx+eGovAPqxAPB4PX7Ro0a8BcEVRHP9b+yUGAsZ1pTwSRYgAp6agtasPh076wDlXiUguWbJkeUxi13CebMaMGfn5+fm5RGT6dYPXNrXC7VS/M0O+GaFoKsfB4y1gjKkAUFZW9kBeXl5aQgOZO3fuQ+HxvGxquYjOy35oioKb/QGskghOTcVXbd1ovdgPKaWZmpqqVlRUFCc0kPLy8lnh0RZv8nVBSImkWTTOGQaCIZz95lLkWFlZ2dyEBjJx4sTZ4fmIer6zFwpnSKbHExMBvo6eyB72SZMmFSU0kFGjRrms1939wcGCVJIQofA861JfMALE6/XmJTQQTXNENClkDrqrZLIQxgZrKBaQlJSUkoQGcisIGzJHGf7ciQ3k/5cq4jaQJBcbiA3EFhuIDcQWG4gNxBYbiA3EFhuIDcQWG4gtNhAbiC02EBuILTYQG4gtNhAbiC02EFtsIDYQW2wgNhBbbCA2EFtsIDYQW2wgtthAbCC22EBsILbYQJJX/g/HUuN6dLQVYwAAAABJRU5ErkJggg==";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v432";
+const APP_VERSION = "v435";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -597,9 +597,13 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
           <line x1={cx} y1={cy} x2={p.x} y2={p.y}
             stroke="#d4a017" strokeWidth="2.4" strokeDasharray="5 5"
             style={{filter:"drop-shadow(0 0 2px rgba(0,0,0,0.7))"}}/>
-          <text x={lp2.x} y={lp2.y} textAnchor="middle" dominantBaseline="central"
-            fontSize="11" fontWeight="800" fill="#d4a017"
-            style={{filter:"drop-shadow(0 0 2px rgba(0,0,0,0.8))"}}>avg</text>
+          {(()=>{ let rot = deg - 90;               // align text along the dashed line
+            if (rot > 90 || rot < -90) rot += 180;    // keep it readable (never upside-down)
+            const lp3 = polar(deg, r - 26);
+            return <text x={lp3.x} y={lp3.y} textAnchor="middle" dominantBaseline="central"
+              transform={`rotate(${rot} ${lp3.x} ${lp3.y})`} dy="-7"
+              fontSize="11" fontWeight="800" fill="#d4a017"
+              style={{filter:"drop-shadow(0 0 2px rgba(0,0,0,0.8))"}}>avg</text>; })()}
         </g>;
       })()}
       {/* Outer border ring — gold glow at 50%+ replaces the old star ring */}
@@ -619,7 +623,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
           const elapsedJ = Math.min(900, Math.max(0, (nw.getHours()*60 + nw.getMinutes()) - 420));
           const gapJ = Math.max(0, elapsedJ - totJ);
           const baseJ = size/2;   // caught up → half the circle
-          const isz = totJ <= 0 ? 48 : Math.max(48, baseJ - (baseJ - 20) * Math.min(1, gapJ/480));   // shrinks over an 8h gap
+          const isz = totJ <= 0 ? 48 : Math.max(48, baseJ - (baseJ - 20) * Math.sqrt(Math.min(1, gapJ/480)));   // front-loaded shrink, 8h to floor
           const ip = polar(a, r - isz/2 + 1);
           return <g pointerEvents="none">
             <image href={nowIcon} x={ip.x - isz/2} y={ip.y - isz/2} width={isz} height={isz}
@@ -646,7 +650,7 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const gapR = Math.max(0, elapsedR - tot);   // minutes behind "now"
         // mirror Jesus' current size/position so we can detect overlap
         const baseJ = size/2;
-        const jIsz = Math.max(48, baseJ - (baseJ - 20) * Math.min(1, gapR/480));
+        const jIsz = Math.max(48, baseJ - (baseJ - 20) * Math.sqrt(Math.min(1, gapR/480)));
         const isz = Math.max(14, jIsz * 0.5);   // boy is always half of Jesus
         const aJ = Math.min(360, elapsedR/900*360);
         const jp = polar(aJ, r - jIsz/2 + 1);
@@ -11296,6 +11300,8 @@ function CatechismEditor({ C, onClose=()=>{} }) {
   const backdropClose = () => { if (Date.now()-openedAt.current < 450) return; closeNow(); };
   const inputStyle = {background:C.bg,border:`1px solid ${C.border}`,borderRadius:8,color:C.text,fontSize:14,padding:"8px 10px",width:"100%",boxSizing:"border-box"};
   const reviewCount = items.filter(it=> it.review!==false && (String(it.answer||"").trim()||String(it.question||"").trim())).length;
+  const [mtFilter, setMtFilter] = React.useState("");
+  const mtMatch = it => { const q=mtFilter.trim().toLowerCase(); if(!q) return true; return String(it.question||"").toLowerCase().includes(q) || String(it.answer||"").toLowerCase().includes(q) || ("q"+it.q).includes(q); };
   return (
     <div onClick={backdropClose} style={{position:"fixed",inset:0,zIndex:200000,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
       <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:560,maxHeight:"88vh",display:"flex",flexDirection:"column",background:C.bg,borderTopLeftRadius:16,borderTopRightRadius:16,border:`1px solid ${C.borderHi}`,boxShadow:"0 -8px 32px rgba(0,0,0,0.5)",paddingBottom:"env(safe-area-inset-bottom)"}}>
@@ -11304,10 +11310,15 @@ function CatechismEditor({ C, onClose=()=>{} }) {
           <button onClick={add} style={{flexShrink:0,background:C.buttonActive,border:`1px solid ${C.gold}`,borderRadius:8,color:C.gold,fontSize:13,fontWeight:800,cursor:"pointer",padding:"6px 12px"}}>+ Add</button>
           <button onClick={closeNow} style={{flexShrink:0,background:"none",border:"none",color:C.text,fontSize:20,cursor:"pointer"}}>✕</button>
         </div>
-        <div style={{padding:"6px 16px 0",fontSize:11,color:C.textFaint}}>{items.length} total · {reviewCount} in review · tap a card’s button to add/remove it from review</div>
+        <div style={{padding:"8px 16px 0"}}>
+          <input value={mtFilter} onChange={e=>setMtFilter(e.target.value)} placeholder="Search my teaching…"
+            style={{width:"100%",boxSizing:"border-box",padding:"8px 11px",borderRadius:9,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.text,fontSize:14}}/>
+        </div>
+        <div style={{padding:"6px 16px 0",fontSize:11,color:C.textFaint}}>{mtFilter.trim()?`${items.filter(mtMatch).length} of `:""}{items.length} total · {reviewCount} in review · tap a card’s button to add/remove it from review</div>
         <div style={{overflowY:"auto",WebkitOverflowScrolling:"touch",padding:"10px 16px 16px",display:"flex",flexDirection:"column",gap:14}}>
           {items.length===0 && <div style={{color:C.textFaint,fontSize:14,textAlign:"center",lineHeight:1.5,padding:"22px 8px"}}>Nothing here yet. Tap “+ Add” to create your first entry. Fill in a question and answer, or leave the question blank and enter just an answer/statement to memorize.</div>}
           {items.map((_,k)=>{ const i=items.length-1-k; const it=items[i];
+            if(!mtMatch(it)) return null;
             const inReview = it.review!==false;
             return (
               <div key={it.q} style={{border:`1px solid ${C.border}`,borderRadius:12,padding:"10px 11px",display:"flex",flexDirection:"column",gap:7}}>
