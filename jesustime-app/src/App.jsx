@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v459";
+const APP_VERSION = "v460";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -12758,6 +12758,8 @@ export default function App() {
   const [gsOpen, setGsOpen] = useState(false);
   const [tagsMin, setTagsMinS] = useState(()=>{ try{ return localStorage.getItem("jtTagsMin")==="1"; }catch(e){ return false; } });
   const setTagsMin = v => { setTagsMinS(v); try{ localStorage.setItem("jtTagsMin", v?"1":"0"); }catch(e){} };
+  const [addTagOpen, setAddTagOpen] = useState(false);
+  const [addTagQ, setAddTagQ] = useState("");
   const [chipsExpanded, setChipsExpandedS] = useState(()=>{ try{ return localStorage.getItem("jtChipsExpanded")==="1"; }catch(e){ return false; } });
   const setChipsExpanded = v => { setChipsExpandedS(v); try{ localStorage.setItem("jtChipsExpanded", v?"1":"0"); }catch(e){} };
   const [histN, setHistN] = useState(0);
@@ -14136,6 +14138,7 @@ export default function App() {
                                 const map=new Map();
                                 const add=t=>{const n=norm(t); if(!n) return; const k=n.toLowerCase(); if(!map.has(k)) map.set(k,n);};
                                 ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review","Teaching","Reader"].forEach(add);
+                                try{ JSON.parse(localStorage.getItem("jtCustomChips")||"[]").forEach(add); }catch(e){}
                                 starredTags.forEach(t=>add(t.replace(/ /g,"_")));
                                 Object.values(entries).forEach(day=>(day||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{add(m.slice(1));})));
                                 const usedT=new Set(); (entries[today]||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(m=>{const t=m.slice(1); const n=norm(t); if(n) usedT.add(n.toLowerCase());}));
@@ -14173,6 +14176,10 @@ export default function App() {
                                       </button>
                                       ); })()}
                                     </React.Fragment>);})}
+                                <button onClick={()=>{ setAddTagQ(""); setAddTagOpen(true); }}
+                                  style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"8px 4px",borderRadius:11,
+                                    border:`1px dashed rgba(${C.ink},0.35)`,background:"transparent",color:C.gold,
+                                    fontSize:16,fontWeight:800,cursor:"pointer"}}>＋</button>
                                 {collapsible && (
                                   <button onClick={()=>setChipsExpanded(!chipsExpanded)}
                                     style={{display:"flex",alignItems:"center",justifyContent:"center",padding:"8px 4px",borderRadius:11,
@@ -14919,6 +14926,51 @@ export default function App() {
       })()}
 
 
+      {addTagOpen && (()=>{
+        let del=[]; try{ del=JSON.parse(localStorage.getItem("deletedTags")||"[]"); }catch(e){}
+        const m=new Map();
+        const addT=(raw)=>{ const n=normTag(raw); if(!n) return; const k=n.toLowerCase(); if(!m.has(k)) m.set(k,n); };
+        Object.values(entries).forEach(a=>(a||[]).forEach(e=>((e.notes||"").match(/#([A-Za-z][A-Za-z0-9_]*)/g)||[]).forEach(t=>addT(t.slice(1)))));
+        ["Bible_Read","Bible_Memory","Bible_Books","Prayed","Names_Review","Teaching","Reader"].forEach(addT);
+        try{ JSON.parse(localStorage.getItem("jtCustomChips")||"[]").forEach(addT); }catch(e){}
+        const q=addTagQ.trim();
+        const list=[...m.values()].filter(t=>!q||t.toLowerCase().includes(q.toLowerCase())).sort((a,b)=>a.localeCompare(b)).slice(0,30);
+        const exact=q && [...m.values()].some(t=>t.toLowerCase()===q.toLowerCase().replace(/_/g," ")||t.toLowerCase()===q.toLowerCase());
+        const restore=(t)=>{ try{ const cur=JSON.parse(localStorage.getItem("deletedTags")||"[]");
+          const next=cur.filter(x=>x!==t&&x!==t.replace(/_/g," ")&&x!==t.replace(/ /g,"_"));
+          localStorage.setItem("deletedTags",JSON.stringify(next)); }catch(e){} };
+        return (
+          <div onClick={()=>setAddTagOpen(false)}
+            style={{position:"fixed",inset:0,zIndex:940,background:"rgba(0,0,0,0.65)",display:"flex",alignItems:"flex-start",justifyContent:"center",paddingTop:"14vh"}}>
+            <div onClick={e=>e.stopPropagation()}
+              style={{width:"min(340px,90vw)",maxHeight:"62vh",display:"flex",flexDirection:"column",borderRadius:16,border:`1px solid ${C.borderHi}`,background:C.bg,padding:"12px 13px"}}>
+              <input autoFocus value={addTagQ} onChange={e=>setAddTagQ(e.target.value)} placeholder="Search or add a tag…"
+                style={{padding:"9px 11px",borderRadius:10,border:`1px solid ${C.borderHi}`,background:"transparent",color:C.text,fontSize:14.5,marginBottom:8}}/>
+              <div style={{overflowY:"auto",minHeight:0}}>
+                {q && !exact && (
+                  <div onClick={()=>{ try{ const cur=JSON.parse(localStorage.getItem("jtCustomChips")||"[]");
+                        const name=ciTagWords(q.replace(/_/g," ")); if(!cur.includes(name)) cur.push(name);
+                        localStorage.setItem("jtCustomChips",JSON.stringify(cur)); restore(name); }catch(e){}
+                      setAddTagOpen(false); }}
+                    style={{padding:"9px 8px",borderRadius:9,cursor:"pointer",color:C.gold,fontSize:14,fontWeight:800,border:`1px dashed ${C.gold}`,marginBottom:6}}>
+                    ＋ Add “{ciTagWords(q.replace(/_/g," "))}”
+                  </div>
+                )}
+                {list.map(t=>{ const isDel=isDeletedTag(t,del);
+                  return (
+                    <div key={t} onClick={()=>{ if(isDel) restore(t); setAddTagOpen(false); setCirclePopupTag(t); }}
+                      style={{display:"flex",alignItems:"center",gap:8,padding:"8px 8px",borderRadius:9,cursor:"pointer",
+                        borderBottom:`1px solid rgba(${C.ink},0.07)`,color:isDel?C.textFaint:C.text,fontSize:14}}>
+                      <span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{dispLabel(t)}</span>
+                      {isDel && <span style={{fontSize:11,color:C.textFaint,flexShrink:0}}>(hidden — tap to restore)</span>}
+                    </div>
+                  ); })}
+                {list.length===0 && !q && <div style={{padding:"10px 4px",color:C.textFaint,fontSize:13,textAlign:"center"}}>Type to search or add.</div>}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       {slotHist && (()=>{
         const day = viewDay || today;
         const icons = {morning:"☕", midday:"☀️", evening:"🌙"};
