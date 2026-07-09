@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v472";
+const APP_VERSION = "v480";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -593,8 +593,11 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         const arr = Array.isArray(avgLineMins) ? avgLineMins : [avgLineMins];
         const pts = arr.map((v,i)=>{ if(v==null) return null;
           const deg = Math.min(360, v/(15*60)*360);
-          const rr = ((i+1)/arr.length) * (r-8);
-          return {...polar(deg, rr), deg}; });
+          const frac = arr.length>1 ? i/(arr.length-1) : 1;
+          const rr = (0.5 + 0.5*frac) * (r-8);            // start halfway out, end at rim
+          const prev = i>0 ? arr[i-1] : null;
+          const col = (prev==null || v===prev) ? "#d4a017" : (v > prev ? "#4ade80" : "#e05a4a");
+          return {...polar(deg, rr), deg, col}; });
         const valid = pts.filter(Boolean);
         if (!valid.length) return null;
         const at = k => pts[Math.max(0, Math.min(pts.length-1, k))] || valid[0];
@@ -605,12 +608,12 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
             let dx=b.x-a.x, dy=b.y-a.y; const L=Math.hypot(dx,dy)||1; dx/=L; dy/=L;
             const h=6.5;
             return <line key={i} x1={p.x-dx*h} y1={p.y-dy*h} x2={p.x+dx*h} y2={p.y+dy*h}
-              stroke="#d4a017" strokeWidth="2.4" strokeLinecap="round"
+              stroke={p.col} strokeWidth="2.4" strokeLinecap="round"
               style={{filter:"drop-shadow(0 0 2px rgba(0,0,0,0.7))"}}/>;
           })}
           {(()=>{ let rot = last.deg - 90;
             if (rot > 90 || rot < -90) rot += 180;
-            const lp3 = polar(last.deg, Math.min(r-5, ((valid.length)/arr.length)*(r-8)+14));
+            const lp3 = polar(last.deg, r-5);
             return <text x={lp3.x} y={lp3.y} textAnchor="end" dominantBaseline="central"
               transform={`rotate(${rot} ${lp3.x} ${lp3.y})`} dy="-7"
               fontSize="11" fontWeight="800" fill="#d4a017"
@@ -1154,6 +1157,13 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
         </button>
       </div>
     <div style={{overflowX:"hidden",width:"100%"}}>
+      {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Prayed/i.test(e.notes||""))?(e.minutes||0):0),0);
+        return m>0 ? (
+          <div style={{display:"flex",justifyContent:"flex-end",marginBottom:4}}>
+            <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
+              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(m)} today</span>
+          </div>
+        ) : null; })()}
       <div style={{display:"flex",gap:8,marginBottom:10}}>
         <button onClick={()=>{ setSessOpen(true); setSessStep(0); setSessStart(Date.now()); }}
           style={{flex:1,padding:"9px 4px",borderRadius:11,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>▶ Prayer Session</button>
@@ -5945,9 +5955,10 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   // Auto-count all time in Bible Memory (page + review) into one counter
   const memPageSec = React.useRef(0);
   const flushMemPage = React.useRef(null);
+  const [, setMemTimerTick] = React.useState(0);
   React.useEffect(()=>{
     const tick = setInterval(()=>{
-      if (document.visibilityState==="visible") memPageSec.current += 1;
+      if (document.visibilityState==="visible") { memPageSec.current += 1; setMemTimerTick(x=>x+1); }
     }, 1000);
     const flush = () => {
       let sec = memPageSec.current; memPageSec.current = 0;
@@ -5966,8 +5977,8 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const revGrade = ok => {
     if (!rev) return;
     const cur = rev.seq[rev.idx];
-    (()=>{ const c0 = cur; if (!c0) return; const ws = c0.text ? c0.text.split(/\s+/) : []; const completed = !!c0.text && revType.n >= ws.length; const perfect = completed && ok && (revType.errors||0)===0 && (revType.hints||0)===0; bumpStats({reviews:1, memorized:ok?1:0, perfect:perfect?1:0, errors:revType.errors||0, hints:revType.hints||0}); })();
-    const _ws = cur.text ? cur.text.split(/\s+/) : [];
+    (()=>{ const c0 = cur; if (!c0) return; const ws = c0.text ? revWords(c0) : []; const completed = !!c0.text && revType.n >= ws.length; const perfect = completed && ok && (revType.errors||0)===0 && (revType.hints||0)===0; bumpStats({reviews:1, memorized:ok?1:0, perfect:perfect?1:0, errors:revType.errors||0, hints:revType.hints||0}); })();
+    const _ws = cur.text ? revWords(cur) : [];
     const _completed = !!cur.text && revType.n >= _ws.length;
     let _sd = null;
     if (_completed) { const _miss=revType.errors||0, _hints=revType.hints||0, _t=verseTimeMs(); _sd={score:verseScore(_t,_miss,_hints), timeMs:_t, miss:_miss, hints:_hints}; }
@@ -6080,9 +6091,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   React.useEffect(() => { if (revWordRef.current) { try { revWordRef.current.scrollIntoView({block:"nearest", behavior:"smooth"}); } catch(e){} } }, [revType.n]);
   const revLetters = w => (w||"").toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]/g,"");
   const revAdvRef = React.useRef("");
+  const revWords = (cur) => { const rw=String((cur&&cur.label)||"").trim(); const a=rw?rw.split(/\s+/):[]; return a.concat(String((cur&&cur.text)||"").split(/\s+/)); };
+  const refTokCount = (cur) => { const rw=String((cur&&cur.label)||"").trim(); return rw? rw.split(/\s+/).length : 0; };
   const planFor = (cur, round) => {
     if (!cur || !cur.text) return null;
-    const w = cur.text.split(/\s+/);
+    const w = revWords(cur);
     const chunks=[]; let st=0;
     w.forEach((wd,i)=>{ if ((/[.,;:!?\u2014\u201d\u2019"]$/.test(wd) && i-st>=2) || i-st>=9) { chunks.push([st,i]); st=i+1; } });
     if (st < w.length) chunks.push([st, w.length-1]);
@@ -6103,14 +6116,14 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const revOnType = (val) => {
     const cur = rev && rev.seq[rev.idx]; if (!cur || !cur.text) return;
     if (revType.missedAt != null) return;                     // locked on the missed screen until Retry
-    const words = cur.text.split(/\s+/);
+    const words = revWords(cur);
     const plan = planFor(cur, (rev && rev.round)||0);
     setRevType(t => {
       let n = t.n, draft = val, lvl = t.revealLvl||0, miss = t.wordMiss||0, errors = t.errors||0, hints = t.hints||0, hinted = t.hinted;
       const grew = val.length > (t.draft||"").length;
-      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;   // given words are free
+      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;   // given/letterless words are free
       while (n < words.length) {
-        if (plan && !plan.hiddenSet.has(n)) { n++; continue; }
+        if ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n])) { n++; continue; }
         const target = revLetters(words[n]); const typed = revLetters(draft);
         if (!typed) break;
         if (!target.startsWith(typed)) break;                // wrong letters → hold (shown red)
@@ -6118,7 +6131,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         if (typed.length >= need) { n++; draft=""; lvl=0; miss=0; }
         else break;
       }
-      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;   // trailing given words
+      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;   // trailing free words
       const finalRound = !plan || plan.round >= plan.total-1;
       if (n >= words.length && !finalRound) {
         const key = String(cur.id||"x")+"|"+plan.round;
@@ -6139,11 +6152,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   };
   const revFill = () => {                                    // clicking a hint word fills it
     const cur = rev && rev.seq[rev.idx]; if (!cur || !cur.text) return;
-    const words = cur.text.split(/\s+/);
+    const words = revWords(cur);
     const plan = planFor(cur, (rev && rev.round)||0);
     if (revType.n < words.length) setRevType(t => {
       let n = t.n + 1;
-      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;
+      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;
       const finalRound = !plan || plan.round >= plan.total-1;
       if (n >= words.length && !finalRound) {
         const key = String(cur.id||"x")+"|"+plan.round;
@@ -6735,7 +6748,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                 style={{flex:1,padding:"11px",borderRadius:12,
                   border:`1.5px solid ${PU}`,background:"rgba(127,119,221,0.12)",
                   color:PU,fontSize:15,fontWeight:800,cursor:"pointer"}}>
-                💜 Review {dueCards.length} card{dueCards.length>1?"s":""} due today
+                💜 Review {Math.min(3, cards.filter(c=>String(c.text||"").trim()).length)} card{Math.min(3, cards.filter(c=>String(c.text||"").trim()).length)!==1?"s":""} today
               </button>
             ) : cards.length > 0 ? (<>
               <div style={{flex:1,padding:"10px 12px",borderRadius:12,border:`1px solid ${C.border}`,
@@ -6802,25 +6815,43 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
           </div>
         )}
 
-        {memStats.reviews > 0 && (
-          <div style={{display:"flex",gap:6,marginBottom:10}}>
-            {[["Perfect",memStats.perfect,"#3aaa55"],["Errors",memStats.errors,C.red],["Hints",memStats.hints,"#d4a017"],["Reviews",memStats.reviews,PU]].map(([lbl,val,col])=>(
-              <div key={lbl} style={{flex:1,textAlign:"center",padding:"9px 4px",borderRadius:10,border:`1px solid ${C.border}`,background:C.card}}>
-                <div style={{fontSize:23,fontWeight:800,color:col}}>{val}</div>
-                <div style={{fontSize:11,fontWeight:700,color:C.textFaint,textTransform:"uppercase",letterSpacing:"0.04em"}}>{lbl}</div>
+        {cards.length > 0 && (()=>{
+          let carry=0; try{ carry=parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; }catch(e){}
+          const loggedM=(entries[today]||[]).reduce((t,e)=>t+((/#Bible_Memory/i.test(e.notes||""))?(e.minutes||0):0),0);
+          const secT=loggedM*60 + carry + memPageSec.current;
+          const timerStr=`${Math.floor(secT/60)}:${String(secT%60).padStart(2,"0")}`;
+          const nNew  = cards.filter(c=>(c.level||0)===0).length;
+          const nLrn  = cards.filter(c=>(c.level||0)>=1 && (c.level||0)<=2).length;
+          const nMast = cards.filter(c=>(c.level||0)>=3).length;
+          const pct = Math.round(nMast/cards.length*100);
+          return (
+            <div style={{marginBottom:10}}>
+              <div style={{display:"flex",gap:6}}>
+                {[["⏱ Today",timerStr,C.gold],["New",nNew,"#d4a017"],["Recent",nLrn,PU],["Completed",nMast,"#3aaa55"]].map(([lbl,val,col])=>(
+                  <div key={lbl} style={{flex:1,textAlign:"center",padding:"9px 4px",borderRadius:10,border:`1px solid ${C.border}`,background:C.card}}>
+                    <div style={{fontSize:23,fontWeight:800,color:col}}>{val}</div>
+                    <div style={{fontSize:11,fontWeight:700,color:C.textFaint,textTransform:"uppercase",letterSpacing:"0.04em"}}>{lbl}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+              <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6}}>
+                <div style={{flex:1,height:5,borderRadius:3,background:`rgba(${C.ink},0.14)`,overflow:"hidden"}}>
+                  <div style={{width:`${pct}%`,height:"100%",background:"#3aaa55"}}/>
+                </div>
+                <span style={{fontSize:11.5,fontWeight:800,color:"#3aaa55",flexShrink:0}}>{pct}% completed</span>
+              </div>
+            </div>
+          );
+        })()}
 
-        {showBoxList && cards.length > 0 && [0,1,2,3].map(lvl => {
-          const group = cards.filter(c=>c.level===lvl);
+        {showBoxList && cards.length > 0 && [["New","#d4a017",c=>(c.level||0)===0],["Recent",PU,c=>(c.level||0)>=1&&(c.level||0)<=2],["Completed","#3aaa55",c=>(c.level||0)>=3]].map(([lvlName,lvlColor,lvlFn]) => {
+          const group = cards.filter(lvlFn);
           if (!group.length) return null;
           return (
-            <div key={lvl} style={{marginBottom:6}}>
+            <div key={lvlName} style={{marginBottom:6}}>
               <div style={{fontSize:13,fontWeight:800,letterSpacing:"0.08em",textTransform:"uppercase",
-                color:LEVEL_COLORS[lvl],margin:"8px 0 5px"}}>
-                {LEVEL_NAMES[lvl]} ({group.length})
+                color:lvlColor,margin:"8px 0 5px"}}>
+                {lvlName} ({group.length})
               </div>
               {group.map(c=>(
                 <div key={c.id} style={{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",
@@ -6871,8 +6902,10 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
             )}
           </div>
 
-          {!drill.list && (()=>{ const dDone=(entries[today]||[]).some(e=>/#Bible_Books\b/.test(e.notes||"")); const dStreak=computeStreak("Bible_Books",entries,today); return (
+          {!drill.list && (()=>{ const dDone=(entries[today]||[]).some(e=>/#Bible_Books\b/.test(e.notes||"")); const dStreak=computeStreak("Bible_Books",entries,today);
+            const dMins=(entries[today]||[]).reduce((t,e)=>t+((/#Bible_Books\b/.test(e.notes||""))?(e.minutes||0):0),0); return (
             <div style={{display:"flex",justifyContent:"center",flexShrink:0,padding:"0 16px 6px"}}>
+              {dMins>0 && <span style={{alignSelf:"center",marginRight:8,fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(dMins)} today</span>}
               <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"8px 16px",borderRadius:16,border:`1px solid ${dDone?C.chipHi:`rgba(${C.ink},0.15)`}`,background:C.chipShell}}>
                 <span style={{fontSize:22}}>📚</span>
                 <span style={{fontSize:13,fontWeight:700,color:dDone?C.chipHi:`rgba(${C.ink},0.4)`,letterSpacing:"0.05em"}}>Books Drill</span>
@@ -7096,7 +7129,8 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
               </div>
             ); })() : !rev.done ? (()=>{
             const cur = rev.seq[rev.idx];
-            const words = cur.text ? cur.text.split(/\s+/) : [];
+            const words = cur.text ? revWords(cur) : [];
+            const refCnt = cur.text ? refTokCount(cur) : 0;
             const n = revType.n;
             const plan = cur.text ? planFor(cur, (rev.round||0)) : null;
             const finalRound = !plan || plan.round >= plan.total-1;
@@ -7176,10 +7210,9 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                       )}
                       {plan && (
                         <div style={{fontSize:revFont,lineHeight:1.75,fontWeight:600,textAlign:"left"}}>
-                          {refLabel && <span style={{color:C.gold,fontWeight:800,marginRight:8}}>{refLabel}</span>}
                           {words.slice(0, plan.showEnd+1).map((w,i)=>{
                             const hid=plan.hiddenSet.has(i);
-                            if(!hid) return <span key={i} style={{color:C.text}}>{w}{" "}</span>;
+                            if(!hid || !revLetters(w)) return <span key={i} style={{color:i<refCnt?C.gold:C.text,fontWeight:i<refCnt?800:600}}>{w}{" "}</span>;
                             if(i<n)  return <span key={i} style={{color:PU}}>{w}{" "}</span>;
                             const isNext = i===nextHid;
                             const lvl = isNext ? (revType.revealLvl||0) : 0;
@@ -10276,6 +10309,13 @@ function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persis
 
   return (
     <div style={{paddingTop:16}}>
+      {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Names_Review/i.test(e.notes||""))?(e.minutes||0):0),0);
+        return m>0 ? (
+          <div style={{display:"flex",justifyContent:"flex-end",padding:"0 52px 4px 12px"}}>
+            <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
+              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(m)} today</span>
+          </div>
+        ) : null; })()}
       <div style={{position:"absolute",top:9,right:12,zIndex:11}}>
         <button onClick={()=>setShowSearch(s=>!s)} title="Search & add names"
           style={{height:32,padding:"0 10px",borderRadius:9,border:`1.5px solid ${showSearch?C.gold:C.borderHi}`,
