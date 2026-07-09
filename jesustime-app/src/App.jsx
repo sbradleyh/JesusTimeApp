@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v467";
+const APP_VERSION = "v472";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -588,21 +588,29 @@ function TripleArc({morningMins, middayMins, eveningMins, totalPct, totalMins, s
         return <line key={`d${i}`} x1={cx} y1={cy} x2={p.x} y2={p.y}
           stroke="rgba(20,12,4,0.8)" strokeWidth="2" pointerEvents="none"/>;
       })}
-      {/* Average dashes: cumulative average as of each of the last 7 days */}
+      {/* Average path: dotted line center→rim, bending with the drifting average (oldest inner → today outer) */}
       {clockMode && avgLineMins!=null && (()=>{
         const arr = Array.isArray(avgLineMins) ? avgLineMins : [avgLineMins];
-        const degs = arr.map(v => v==null ? null : Math.min(360, v/(15*60)*360));
-        const lastIdx = (()=>{ for(let i=degs.length-1;i>=0;i--){ if(degs[i]!=null) return i; } return -1; })();
+        const pts = arr.map((v,i)=>{ if(v==null) return null;
+          const deg = Math.min(360, v/(15*60)*360);
+          const rr = ((i+1)/arr.length) * (r-8);
+          return {...polar(deg, rr), deg}; });
+        const valid = pts.filter(Boolean);
+        if (!valid.length) return null;
+        const at = k => pts[Math.max(0, Math.min(pts.length-1, k))] || valid[0];
+        const last = valid[valid.length-1];
         return <g pointerEvents="none">
-          {degs.map((deg,i)=>{ if(deg==null) return null;
-            const p1=polar(deg, r-4), p2=polar(deg, r-16);
-            return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
-              stroke="#d4a017" strokeWidth="2.6" strokeLinecap="round"
+          {pts.map((p,i)=>{ if(!p) return null;
+            const a=at(i-1), b=at(i+1);
+            let dx=b.x-a.x, dy=b.y-a.y; const L=Math.hypot(dx,dy)||1; dx/=L; dy/=L;
+            const h=6.5;
+            return <line key={i} x1={p.x-dx*h} y1={p.y-dy*h} x2={p.x+dx*h} y2={p.y+dy*h}
+              stroke="#d4a017" strokeWidth="2.4" strokeLinecap="round"
               style={{filter:"drop-shadow(0 0 2px rgba(0,0,0,0.7))"}}/>;
           })}
-          {lastIdx>=0 && (()=>{ const deg=degs[lastIdx]; let rot = deg - 90;
+          {(()=>{ let rot = last.deg - 90;
             if (rot > 90 || rot < -90) rot += 180;
-            const lp3 = polar(deg, r - 5);
+            const lp3 = polar(last.deg, Math.min(r-5, ((valid.length)/arr.length)*(r-8)+14));
             return <text x={lp3.x} y={lp3.y} textAnchor="end" dominantBaseline="central"
               transform={`rotate(${rot} ${lp3.x} ${lp3.y})`} dy="-7"
               fontSize="11" fontWeight="800" fill="#d4a017"
@@ -5908,14 +5916,51 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     return ()=>clearInterval(t);
   }, [rev]);
   const startReview = (all=false) => {
-    const pool = all ? cards : dueCards;
-    if (!pool.length) return;
-    const order = [0,1,2,3].flatMap(l => pool.filter(c=>c.level===l));
-    setRev({seq:order, idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:0});
+    let order;
+    if (all) {
+      if (!cards.length) return;
+      order = [0,1,2,3].flatMap(l => cards.filter(c=>c.level===l));
+    } else {
+      // Daily trio: one new · one recent · one completed
+      const withText = cards.filter(c=>String(c.text||"").trim());
+      const byOldest = a => [...a].sort((x,y)=>String(x.last||"").localeCompare(String(y.last||"")));
+      const nw   = byOldest(withText.filter(c=>(c.level||0)===0))[0];
+      const rec  = byOldest(withText.filter(c=>(c.level||0)>=1 && (c.level||0)<=2))[0];
+      const done = byOldest(withText.filter(c=>(c.level||0)>=3))[0];
+      order = [nw, rec, done].filter(Boolean);
+      const seen = new Set(order.map(c=>c.id));
+      // top up to 3 from the most-neglected remaining cards
+      byOldest(withText).forEach(c=>{ if(order.length<3 && !seen.has(c.id)){ order.push(c); seen.add(c.id); } });
+      if (!order.length) return;
+    }
+    setRev({seq:order, idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:0});
+    setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
+    verseStartRef.current = Date.now(); verseDoneRef.current = null;
   };
-  const reviewCard = (c) => { if (c) setRev({seq:[c], idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:0}); };
+  const reviewCard = (c) => { if (c) { setRev({seq:[c], idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:0});
+    setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
+    verseStartRef.current = Date.now(); verseDoneRef.current = null; } };
   const revElapsed = () => rev ? Date.now()-rev.start : 0;
   const fmtEl = ms => { const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
+  // Auto-count all time in Bible Memory (page + review) into one counter
+  const memPageSec = React.useRef(0);
+  const flushMemPage = React.useRef(null);
+  React.useEffect(()=>{
+    const tick = setInterval(()=>{
+      if (document.visibilityState==="visible") memPageSec.current += 1;
+    }, 1000);
+    const flush = () => {
+      let sec = memPageSec.current; memPageSec.current = 0;
+      try { sec += parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; } catch(e){}
+      const mins = Math.floor(sec/60);
+      try { localStorage.setItem("jtMemPageSec", String(sec - mins*60)); } catch(e){}
+      if (mins >= 1) addEntry(mins, {dur:`${mins}m`, notes:"#Bible_Memory", time:nowTimeStr()}, today);
+    };
+    flushMemPage.current = flush;
+    const onVis = () => { if (document.visibilityState==="hidden") flush(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(tick); document.removeEventListener("visibilitychange", onVis); flush(); };
+  }, []); // eslint-disable-line
   const [memStats, setMemStats] = React.useState(() => { try { return JSON.parse(localStorage.getItem("jtMemoryStats")||"null") || {reviews:0,perfect:0,errors:0,hints:0,memorized:0}; } catch(e){ return {reviews:0,perfect:0,errors:0,hints:0,memorized:0}; } });
   const bumpStats = p => setMemStats(s => { const n = {reviews:(s.reviews||0)+(p.reviews||0), perfect:(s.perfect||0)+(p.perfect||0), errors:(s.errors||0)+(p.errors||0), hints:(s.hints||0)+(p.hints||0), memorized:(s.memorized||0)+(p.memorized||0)}; try { localStorage.setItem("jtMemoryStats", JSON.stringify(n)); } catch(e){} return n; });
   const revGrade = ok => {
@@ -5933,22 +5978,14 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     const got = rev.got + (ok?1:0), back = rev.back + (ok?0:1);
     const isLast = rev.idx+1 >= rev.seq.length;
     if (isLast) {
-      if ((got+back) > 0) {
-        const mins = Math.max(1, Math.round(revElapsed()/60000));
-        const notes = `#Bible_Memory memory review · ${got+back} cards${gradedTags.length?" "+gradedTags.join(" "):""}`;
-        addEntry(mins, {dur:`${mins}m`, notes, time:nowTimeStr()}, today);
-      }
       setRev(null);
     } else {
-      setRev(r => r ? {...r, idx:r.idx+1, stage:0, round:0, got, back, gradedTags} : r);
+      setRev(r => r ? {...r, idx:r.idx+1, stage:1, round:0, got, back, gradedTags} : r);
+      setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
+      verseStartRef.current = Date.now(); verseDoneRef.current = null;
     }
   };
   const finishReview = async (log) => {
-    if (log && rev && (rev.got + rev.back) > 0) {
-      const mins = Math.max(1, Math.round(revElapsed()/60000));
-      const notes = `#Bible_Memory memory review · ${rev.got + rev.back} cards${rev.gradedTags.length?" "+rev.gradedTags.join(" "):""}`;
-      await addEntry(mins, {dur:`${mins}m`, notes, time:nowTimeStr()}, today);
-    }
     setRev(null);
   };
 
@@ -5969,7 +6006,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const [memSsErr, setMemSsErr] = React.useState("");
   const memSsGo = d => { const n=cardsCount(); if(!n)return; setMemSsErr(""); setMemSs(s => s ? {idx:(s.idx + d + n) % n, show:false} : s); };
   // Move between cards during a review without grading (full-screen ‹ › arrows)
-  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:0, round:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
+  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:1, round:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
   function cardsCount(){ return ((box && box.cards) || []).length; }
   const memSsFetch = async (card) => {
     if (!card || memSsBusy) return;
@@ -7017,9 +7054,9 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       {rev && rev.done && (()=>{ try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){} return null; })()}
       {rev && (<div style={{position:"fixed",inset:0,zIndex:99999,background:C.bg}}/>)}
       {rev && (
-        <div style={{position:"fixed",top:(isTesla||kbOverlay)?0:((rev.done||rev.stage===0)?0:(revVv.top||0)),left:0,right:0,height:(isTesla||kbOverlay)?((rev.done||rev.stage===0)?"100%":"45vh"):((rev.done||rev.stage===0)?"100%":(revVv.h?`${revVv.h}px`:"100%")),zIndex:100000,maxWidth:revLand?"100%":540,margin:"0 auto",
+        <div style={{position:"fixed",top:(isTesla||kbOverlay)?0:(rev.done?0:(revVv.top||0)),left:0,right:0,height:(isTesla||kbOverlay)?(rev.done?"100%":"45vh"):(rev.done?"100%":(revVv.h?`${revVv.h}px`:"100%")),zIndex:100000,maxWidth:revLand?"100%":540,margin:"0 auto",
           boxSizing:"border-box",overflow:"hidden",
-          paddingTop:(rev.done||rev.stage===0)?"env(safe-area-inset-top)":0,
+          paddingTop:rev.done?"env(safe-area-inset-top)":0,
           background:C.modalBg,display:"flex",flexDirection:"column",
           paddingBottom:revVv.h?0:"env(safe-area-inset-bottom)",
           animation:"jtSlideUp .22s ease both",boxShadow:"0 0 60px rgba(0,0,0,0.45)"}}>
@@ -7048,7 +7085,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
             </div>
           </div>}
 
-          {!rev.done && rev.stage===0 ? (()=>{ const cur=rev.seq[rev.idx];
+          {false ? (()=>{ const cur=rev.seq[rev.idx];
             return (
               <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",padding:"14px 18px calc(14px + env(safe-area-inset-bottom))"}}>
                 <div style={{flex:1,minHeight:0,overflowY:"auto"}}>
@@ -13992,7 +14029,7 @@ export default function App() {
                               showRunner={chartTab==="day" && viewDay===today}
                               avgLineMins={(()=>{ const totByDay={}; Object.keys(entries).forEach(d=>{ totByDay[d]=(entries[d]||[]).reduce((s,e)=>s+(e.minutes||0),0); });
                                 const keys=Object.keys(totByDay).filter(d=>totByDay[d]>0).sort();
-                                const series=[]; for(let i=6;i>=0;i--){ const dd=new Date(today+"T00:00:00"); dd.setDate(dd.getDate()-i);
+                                const series=[]; for(let i=4;i>=0;i--){ const dd=new Date(today+"T00:00:00"); dd.setDate(dd.getDate()-i);
                                   const iso=`${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,"0")}-${String(dd.getDate()).padStart(2,"0")}`;
                                   let sm=0,c=0; keys.forEach(k=>{ if(k<=iso){ sm+=totByDay[k]; c++; } });
                                   series.push(c? sm/c : null); }
