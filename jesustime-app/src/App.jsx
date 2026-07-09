@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAOoUlEQVR42u2ce3BUVZ7Hv+fce/uVByGBTpZXSMxQYaNkJEsSHIjIQ1idctVd0BVd0C11RXfX3bKsoQoYVkqtTM0/wkAxjFjWsuAUEqFAVsGJBVhAYhLkEYgR0UljyMMAeXb37XvP+e0f6dvTQVFh003T3F/VqXTfdN97+n5+j3N+v3MuQ4KKoigQQkTeZ2RkqKWlpbkzZsyYNXXq1PkFBQUVo0ePzk5JSZGqqnLDMGRfXx/v7Ow809zcXNPQ0PDh4cOHa+rq6lr9fr+82nlt+RHhnA95P2/evLy333678vz58z66Dmlubj69du3aF8vKykb/0HVsuYpVWLJ48eJf1NXV1UTfXCGEYZqmLoQwrGNSSjIMg6SU1nvxfZ8jIqqurn53wYIFt33f9RJFWEJ0gjEQEQCgvLw8u7Ky8vcVFRV/BwBCiFBYo9WOjg5eW1uL+vp6nDlzBm1tbeju7oZhGHA6ncjMzMS4ceNQVFSE0tJSTJs2DSNGjJBSSpMxxjnnKgC8995765YvX77iiy++6FUUBVLKyPVtFxXlOlatWvUPpmkSEZFhGAEppQiFQrRjxw568MEHaeTIkQTgJ7cxY8bQ0qVLqbq6OmJhoVBIJyK6fPmyeOqpp+6KVgobRhhGRkaGunv37o1ERKFQKOJqtmzZQsXFxUNusqIopKoqKYpCiqIQ5zzSrP+pqkqc8yHfmzVrFn3wwQdERGSapi6lFERE69at+1fOObvl44r148eOHetuaGg4TUTk9/sDRESNjY00d+7cIRAURSHG2DVZCGMsAs069thjj1F7ezsREQUCgQEiol27dr3lcrnYLWspFoysrCzniRMnmqJhbNmyhdLT0yMgrtT0623R58rNzaWPP/6YiIgGBgYGiIj27NnzlqqqjHN+a0FhjIFzDk3T2IEDB96NhrFmzZohN3A4QFzZVFWN/N22bdsQKJs2bfoVAKiqeutAsYaa69at+49oGKtXr46AuFbXdK2Ncx65xtatWyncjwEiomXLlt2TqEPimMF44IEHJkX78A0bNkS0NtYwoqFY7aOPPiIppdB1PRAMBqmoqCgj6YM8YwyMMaSlpfGWlhafEMKQUoqjR49GRk3xghENBQB5vV46f/48GYZhSCnFgQMH3mWMJbeVWD9u9erVz1jD24GBASosLIxpzPipMeW+++6LzH+IiBYuXHh70rouy/RHjx7tuHjxYsDSxFdeeWXITblRzbr+jh07yLLckydPHlVVlSVlcFdVFQDw0ksv/dLSwvb2dsrIyBgSYG9Us9xlUVERhUKhiJXcf//9hUlrJaqqssbGxmYpJSWSdVw5zI62kp07d76VdMHd0q7S0tJsK20RDAbptttuI8bYsE38hstK5s+fH8ka9/T0CK/X64jnDD7m6K0fcu+9995NRJKIZE1NDc6dOwfGGKSUCaE4Vsb30KFD8Pl8EEKE0tPT+cyZMyfH00pifhXTNAEAM2fO/EcrBb5v3z4kmisgIiiKgkAggIMHD0aOV1RUzI3rACge1uF2u3lhYeH08DFeW1sbuQmJNlcCgJqaGli1kylTppQDiFvZNy5AcnJyPNnZ2VlSSjMYDPIvv/wyIYFY/Tlz5gwYYxwAJkyYUOZyuXi84khcgGRnZ6c6nU6ViGRXVxe6uroSGsiFCxdgGAYAIDMzMys9PZ0lhcuyJD09PRK5e3p6EAgEEhpId3c3/H4/l1KabrdbTUtLcyWFhUTPQazXoVAo4evXhmHAMAwQkdQ0zeFyuUYklYUIISh61p7o6QhVVa1+ctM0TV3X+5MKSH9/f+Q6aWlpcDqdiOdk61pjXlpaGjwej+Scq8FgMNjf3z+QFEAs19TZ2RkwDEMyxvioUaMwcuTIhLaQnJwcOBwOAEBvb6/s7e2NW8yLC5C2tra+rq6ubs65mpqaKvPz8xNuYhjdn8LCQhCRBACfz1fj9/tFUgHp7++XZ8+ePRw+JktKSiIFq0QcZZWWlkJKaQJAY2Pjn4D4ZXxjrqJW6r2mpmb/YM5OmvPmzQMRJUwey4ofQghomoZZs2ZFjh85cuRIIsa76xZLs2bPnj3Ryvb29PRQTk7OkDIqEiTbO336dJJSkhDCCAQClJubm5KI7nU48lns66+//rNVD3nxxRcTsh6yadOmSD2kurq6Kqms40orefXVV//ZqhiePXuWXC5XQlQMrT6MHz+eent7IxXDxYsXT412u0kjlrnn5+en+v1+wzRNPbwGKqFq6uvXrycppTBNU7S0tHyVkpLCEnHwMaxWsnHjxl9bsaSjo4O8Xu8NrRxarqqkpIRCoRBZq+Off/752fEcXd0QK2GMYcyYMa5Lly71hEIhXUopqqqqbpiVWIuxXS4XHT9+PLLZ5/Tp08ccDkfyr/O1tO2555772/DKxQAR0csvv0wASNO0uMKwlGDz5s1ERBQMBgeIiO65556JSW0d3wdl165dfwhD0YmIlixZEoES6yAfDWPNmjVD1vZWVlb+yy0DIzrAZ2Zmqs3NzSeIiHRd14mInnzyySHrbmMZM66AESAi2r9///ucc9xyWxIs7Zs8eXJGe3v7xTAUg4ho5cqVQ0Y/w2UtnPOIVbjdbnrzzTeHwPjss8/+lJmZqSbVJPB6oJSUlGR2dHQMhNf7CiKi999/nwoKCoaAuR6LsUZv0VZRVlZG9fX1FK0EJ06cOJiTk3PrwrDEqovk5OS46+rqDgshDF3XRXhTJq1YsYKysrK+4/ut3VCMsSHNcnXWPsNoOHl5efTGG2+QYRhWADeklGL37t1/VBSFAYCmabcmiGgtTE1NVZcsWVJ+7NixT6SUFDIMYd00IqLW1lZ67bXX6I477rguNzV9+nTasGEDdXd3D+7ElZIMwyTDMEU4PbLroYceut2CkrQTwR9zVQDwxBNPTG1qajp11ccwDG6UDW8TMKmmpoYqKytp4cKFVFxcTDk5OZSamkoej4fS09Np7NixVFJSQo8//jitXbuWTp48eeUJr3qpI0eOHFiwYEHB9/UzKcXaWwgAU6ZMydy/f/+2v9zswT3pesikQyd89Mp/f0Lbqhvpcl/gBx+b0dPbS60XLpDP56O2tjbq7+//wc9fuNhHG3c30G/eOUINzW0k5eAaXit3RUS0devW344ZM8Z1o6CweLkoq/bxwgsv3Pv666/vTU1NVU3TDCqK4giGBN9X9xX215+Dr6N3cM0vSXgzUvCL28dj5pTxKBibCYVfe3d1Q6DJ14WDx1tQ23QBPQM6GAM4Y/jZuEzcV1aAWT/PBQOZQpDUNMXR1tbWuWzZsnm7du06yTkHEcVtpQyLFwyn08k3bty4YunSpf8liCQjkpxz9eNjf8b2A03wdfbA6VDh1JRIx0KmREA34HKomJA9An+dOwqFE7IwbnQ6MtNc8Dg1aCoHYwAREDIEBoIGunoDaOnoQbPvIppauvBNVx9MIeFxqlAVDsJglAmGTBhCoHDCKCyeczumTsqBECKkKIoDANasWfNPq1at2mJZeDygsHjAGDFiBK+qqto2Z86cR4K64Xc5NU/7pQH8fs8xfNrUCodDhUtTIGlo3drSZEkE3RAwTAEGBpdDRYpbQ6rbAZdDBWcMQhICuoH+QAgDQQO6YQJgcKgKHJoCxgAph95QzhgYA/y6CSLCvL/Jw5MLipHi0qQhRMihqq7Nmzcvf/bZZ38TDkAxh8JiGTOICGlpaXzfhx/+cfpddy0M6rrf5XR6apta8bud9bjcF0Sax/EdEFeNQWxw+CQlQUqCkAQZ/h4DwDiDEm7WSIl+wrl5+LO9fh252SPwn4vK8LOxmQgGdb/L5fRs3779fx555JEn/nLO2EFRYgUjXNhhe/bs2X733XcvDOp60OV0uncf+QJvVNVBEuBxqhDyp/+4wZtrWR+DonCoCoemcCgKh8I5uDXmjfrsj5433NwuDZf7gjh4wofx3nRM/KuRWjCo+4uLi0uys7O79+7dW6uqakzXAsQEiPXIo/Xr1/9q0aJF/xaG4dpx8HP8Ye9nSHFrg+5smDRtuPSViKBpCoSkQSij05E/NlML6npwenn5L7u7uw8fPXr0K0VRYmYlLBYwhBB49NFHy955550aXTf8Tqfm+eDTc1j3Xh3SPU4QCIm8vHcwJkkYpsTqpRX4eUE2DMPwM8Y85eXl3oaGhm+jR44JC8TqpNfr1U6dOnUpKyvLwTlXT339LV/51kG4NAVgwM3wrDDOGAwh4HKo+O1zc5Gd4TEZY/z48eOflpWV3SWEoFgAGdZMmhU7Vq1atdLr9aYCQH/A4L/bWQ8eDrQ3y4PbJBEcqoLeAR3rd9YDjKlCiNCdd95Z/vTTT8+RUsZk8cOwu6y8vDx3U1OTX1XVkKIojjf3HkfVJ58jI9WJqEXwN1Gqh6G7T8e///00zJ+WL4lItra2tk6ePDnf7/fL4Y4lw55rfuaZZx51OBySiOQ33/ZhX/05pLkdNyUMhIfYbqeKqkOfw6+bXEppjh8/Pvfhhx+eGovAPqxAPB4PX7Ro0a8BcEVRHP9b+yUGAsZ1pTwSRYgAp6agtasPh076wDlXiUguWbJkeUxi13CebMaMGfn5+fm5RGT6dYPXNrXC7VS/M0O+GaFoKsfB4y1gjKkAUFZW9kBeXl5aQgOZO3fuQ+HxvGxquYjOy35oioKb/QGskghOTcVXbd1ovdgPKaWZmpqqVlRUFCc0kPLy8lnh0RZv8nVBSImkWTTOGQaCIZz95lLkWFlZ2dyEBjJx4sTZ4fmIer6zFwpnSKbHExMBvo6eyB72SZMmFSU0kFGjRrms1939wcGCVJIQofA861JfMALE6/XmJTQQTXNENClkDrqrZLIQxgZrKBaQlJSUkoQGcisIGzJHGf7ciQ3k/5cq4jaQJBcbiA3EFhuIDcQWG4gNxBYbiA3EFhuIDcQWG4gtNhAbiC02EBuILTYQG4gtNhAbiC02EFtsIDYQW2wgNhBbbCA2EFtsIDYQW2wgtthAbCC22EBsILbYQJJX/g/HUuN6dLQVYwAAAABJRU5ErkJggg==";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v462";
+const APP_VERSION = "v465";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -680,6 +680,7 @@ function todayKey() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 function pct(m)  { return Math.min(100, Math.round((m/WAKE)*1000)/10); }
+function mtBoostWeight(it){ try{ if(!it||!it.boostTs) return 1; const age=Date.now()-it.boostTs; const W=7*86400000; if(age>=W) return 1; return 1 + 3*(1-age/W); }catch(e){ return 1; } }
 function openBibleRef(v){ try{ localStorage.setItem("jtReaderBibleRef", String(v).replace(/_/g," ")); window.dispatchEvent(new Event("jtGoReader")); }catch(e){} }
 function fmtM(m) {
   if (!m) return ":00";
@@ -5936,7 +5937,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       }
       setRev(null);
     } else {
-      setRev(r => r ? {...r, idx:r.idx+1, stage:0, got, back, gradedTags} : r);
+      setRev(r => r ? {...r, idx:r.idx+1, stage:0, round:0, got, back, gradedTags} : r);
     }
   };
   const finishReview = async (log) => {
@@ -5965,7 +5966,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const [memSsErr, setMemSsErr] = React.useState("");
   const memSsGo = d => { const n=cardsCount(); if(!n)return; setMemSsErr(""); setMemSs(s => s ? {idx:(s.idx + d + n) % n, show:false} : s); };
   // Move between cards during a review without grading (full-screen ‹ › arrows)
-  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
+  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:0, round:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
   function cardsCount(){ return ((box && box.cards) || []).length; }
   const memSsFetch = async (card) => {
     if (!card || memSsBusy) return;
@@ -6038,14 +6039,38 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   React.useEffect(() => { setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); setRevBars(false); verseStartRef.current = Date.now(); verseDoneRef.current = null; }, [rev && rev.idx, rev && rev.done]);
   React.useEffect(() => { if (revWordRef.current) { try { revWordRef.current.scrollIntoView({block:"nearest", behavior:"smooth"}); } catch(e){} } }, [revType.n]);
   const revLetters = w => (w||"").toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]/g,"");
+  const revAdvRef = React.useRef("");
+  const planFor = (cur, round) => {
+    if (!cur || !cur.text) return null;
+    const w = cur.text.split(/\s+/);
+    const chunks=[]; let st=0;
+    w.forEach((wd,i)=>{ if ((/[.,;:!?\u2014\u201d\u2019"]$/.test(wd) && i-st>=2) || i-st>=9) { chunks.push([st,i]); st=i+1; } });
+    if (st < w.length) chunks.push([st, w.length-1]);
+    const K = Math.max(1, chunks.length);
+    const total = K + 3;
+    const r = Math.min(round||0, total-1);
+    const showEnd = chunks[Math.min(K-1, r)][1];
+    const pct = r < K ? Math.min(40, 10 + r*10) : [55,70,85,100][Math.min(3, r-K)];
+    const idxs=[]; for(let i=0;i<=showEnd;i++) idxs.push(i);
+    let seed=0; const sid=String(cur.id||"x")+"|"+r;
+    for(let i=0;i<sid.length;i++) seed=(seed*31+sid.charCodeAt(i))>>>0;
+    const rnd=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; };
+    const pool=[...idxs]; for(let i=pool.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+    const nHide=Math.max(1, Math.round(idxs.length*pct/100));
+    const hidden=(pct>=100?idxs:pool.slice(0,nHide)).sort((a,b)=>a-b);
+    return { showEnd, hidden, hiddenSet:new Set(hidden), round:r, total, pct };
+  };
   const revOnType = (val) => {
     const cur = rev && rev.seq[rev.idx]; if (!cur || !cur.text) return;
     if (revType.missedAt != null) return;                     // locked on the missed screen until Retry
     const words = cur.text.split(/\s+/);
+    const plan = planFor(cur, (rev && rev.round)||0);
     setRevType(t => {
       let n = t.n, draft = val, lvl = t.revealLvl||0, miss = t.wordMiss||0, errors = t.errors||0, hints = t.hints||0, hinted = t.hinted;
       const grew = val.length > (t.draft||"").length;
+      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;   // given words are free
       while (n < words.length) {
+        if (plan && !plan.hiddenSet.has(n)) { n++; continue; }
         const target = revLetters(words[n]); const typed = revLetters(draft);
         if (!typed) break;
         if (!target.startsWith(typed)) break;                // wrong letters → hold (shown red)
@@ -6053,7 +6078,17 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         if (typed.length >= need) { n++; draft=""; lvl=0; miss=0; }
         else break;
       }
-      if (n >= words.length && verseDoneRef.current == null) verseDoneRef.current = Date.now();
+      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;   // trailing given words
+      const finalRound = !plan || plan.round >= plan.total-1;
+      if (n >= words.length && !finalRound) {
+        const key = String(cur.id||"x")+"|"+plan.round;
+        if (revAdvRef.current !== key) {
+          revAdvRef.current = key;
+          setTimeout(()=>{ setRev(r=>r?{...r, round:(r.round||0)+1}:r);
+            setRevType(t2=>({...t2, n:0, draft:"", revealLvl:0, wordMiss:0, missedAt:null})); }, 420);
+        }
+      }
+      if (n >= words.length && finalRound && verseDoneRef.current == null) verseDoneRef.current = Date.now();
       const tgt = n < words.length ? revLetters(words[n]) : "";
       const mm = !!draft && !!tgt && !tgt.startsWith(revLetters(draft));
       if (grew && mm) {                                       // wrong word → show verse with the missed word
@@ -6065,7 +6100,22 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const revFill = () => {                                    // clicking a hint word fills it
     const cur = rev && rev.seq[rev.idx]; if (!cur || !cur.text) return;
     const words = cur.text.split(/\s+/);
-    if (revType.n < words.length) setRevType(t => ({...t, n: t.n+1, draft:"", reveal:false, hinted:true, hints:(t.hints||0)+1, revealLvl:0, wordMiss:0}));
+    const plan = planFor(cur, (rev && rev.round)||0);
+    if (revType.n < words.length) setRevType(t => {
+      let n = t.n + 1;
+      while (n < words.length && plan && !plan.hiddenSet.has(n)) n++;
+      const finalRound = !plan || plan.round >= plan.total-1;
+      if (n >= words.length && !finalRound) {
+        const key = String(cur.id||"x")+"|"+plan.round;
+        if (revAdvRef.current !== key) {
+          revAdvRef.current = key;
+          setTimeout(()=>{ setRev(r=>r?{...r, round:(r.round||0)+1}:r);
+            setRevType(t2=>({...t2, n:0, draft:"", revealLvl:0, wordMiss:0, missedAt:null})); }, 420);
+        }
+      }
+      if (n >= words.length && finalRound && verseDoneRef.current == null) verseDoneRef.current = Date.now();
+      return {...t, n, draft:"", reveal:false, hinted:true, hints:(t.hints||0)+1, revealLvl:0, wordMiss:0};
+    });
   };
 
 
@@ -7000,14 +7050,18 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                 <div style={{flex:1,minHeight:0,overflowY:"auto"}}>
                   <div style={{fontSize:revFont,lineHeight:1.55,color:C.text,fontFamily:"Georgia, serif",whiteSpace:"pre-wrap"}}>{cur.text||"(no text yet — tap ESV above to load it)"}</div>
                 </div>
-                <button onClick={()=>{ verseStartRef.current=Date.now(); verseDoneRef.current=null; setRevType({n:0,draft:"",reveal:false,hinted:false,errors:0,hints:0,revealLvl:0,wordMiss:0}); setRev(r=>r?{...r,stage:1}:r); }}
+                <button onClick={()=>{ verseStartRef.current=Date.now(); verseDoneRef.current=null; setRevType({n:0,draft:"",reveal:false,hinted:false,errors:0,hints:0,revealLvl:0,wordMiss:0}); setRev(r=>r?{...r,stage:1,round:0}:r); }}
                   style={{marginTop:12,padding:"13px 4px",borderRadius:12,border:`1px solid ${PU}`,background:PU,color:"#fff",fontSize:16,fontWeight:800,cursor:"pointer",flexShrink:0}}>▶ Start</button>
               </div>
             ); })() : !rev.done ? (()=>{
             const cur = rev.seq[rev.idx];
             const words = cur.text ? cur.text.split(/\s+/) : [];
             const n = revType.n;
-            const complete = !!cur.text && n >= words.length;
+            const plan = cur.text ? planFor(cur, (rev.round||0)) : null;
+            const finalRound = !plan || plan.round >= plan.total-1;
+            const complete = !!cur.text && n >= words.length && finalRound;
+            const roundDone = !!cur.text && plan && n >= words.length && !finalRound;
+            const nextHid = (()=>{ if(!plan) return -1; for(const i of plan.hidden){ if(i>=n) return i; } return -1; })();
             const target = (cur.text && !complete) ? revLetters(words[n]) : "";
             const typedNow = revLetters(revType.draft);
             const mismatch = !!revType.draft && !!target && !target.startsWith(typedNow);
@@ -7069,12 +7123,40 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                         {refLabel && <span style={{color:C.gold,fontWeight:800,marginRight:8}}>{refLabel}</span>}{cur.text}
                       </div>
                     )}
-                    {(revType.n===0 && !revType.showAll)
-                      ? <div style={{flexGrow:1,flexShrink:1,minHeight:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,padding:"0 12px"}}>
-                          <div style={{fontSize:22,fontWeight:800,color:C.textMid,textAlign:"center",lineHeight:1.45}}>Just type the first letter of each word, in order</div>
-                          <div style={{fontSize:15,fontWeight:700,color:C.textFaint,textAlign:"center",lineHeight:1.5}}>Each correct first letter jumps to the next word. Miss a word and the next letter is revealed for you to type; keep missing and the whole word fills in.</div>
+                    <div style={{flexGrow:1,flexShrink:1,minHeight:0,overflowY:"auto",padding:"2px 2px 8px"}}>
+                      {plan && (
+                        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+                          <span style={{fontSize:11.5,fontWeight:800,color:C.textFaint,letterSpacing:"0.05em"}}>ROUND {plan.round+1}/{plan.total}</span>
+                          <div style={{flex:1,height:4,borderRadius:2,background:`rgba(${C.ink},0.14)`,overflow:"hidden"}}>
+                            <div style={{width:`${Math.round(((plan.round)+(roundDone?1:0))/plan.total*100)}%`,height:"100%",background:PU}}/>
+                          </div>
+                          <span style={{fontSize:11.5,fontWeight:800,color:PU}}>{plan.pct}% hidden</span>
                         </div>
-                      : <div style={{flexGrow:1,flexShrink:1,minHeight:0}}/>}
+                      )}
+                      {plan && (
+                        <div style={{fontSize:revFont,lineHeight:1.75,fontWeight:600,textAlign:"left"}}>
+                          {refLabel && <span style={{color:C.gold,fontWeight:800,marginRight:8}}>{refLabel}</span>}
+                          {words.slice(0, plan.showEnd+1).map((w,i)=>{
+                            const hid=plan.hiddenSet.has(i);
+                            if(!hid) return <span key={i} style={{color:C.text}}>{w}{" "}</span>;
+                            if(i<n)  return <span key={i} style={{color:PU}}>{w}{" "}</span>;
+                            const isNext = i===nextHid;
+                            const lvl = isNext ? (revType.revealLvl||0) : 0;
+                            return (
+                              <span key={i}
+                                onClick={e=>{ e.stopPropagation(); if(isNext) setRevType(t=>({...t, revealLvl:(t.revealLvl||0)+1, hints:(t.hints||0)+1, hinted:true})); }}
+                                style={{display:"inline-block",minWidth:Math.max(16, Math.round(w.length*revFont*0.4)),
+                                  borderBottom:`2px solid ${isNext?PU:"rgba(127,119,221,0.35)"}`,
+                                  color:C.textFaint,margin:"0 5px 2px 0",cursor:isNext?"pointer":"default",fontStyle:"italic"}}>
+                                {lvl>0 ? w.slice(0, Math.min(lvl, w.length)) : "\u00a0"}
+                              </span>
+                            );
+                          })}
+                          {plan.showEnd < words.length-1 && <span style={{color:C.textFaint}}>{"\u2026"}</span>}
+                        </div>
+                      )}
+                      {roundDone && <div style={{marginTop:10,fontSize:14,fontWeight:800,color:"#4ade80"}}>✓ Round complete — a little more from memory{"\u2026"}</div>}
+                    </div>
                     <div style={{flexShrink:0,display:"flex",flexDirection:"row-reverse",flexWrap:"wrap-reverse",justifyContent:"flex-start",alignContent:"flex-end",alignItems:"flex-end",gap:"2px 7px",width:"100%",fontSize:revFont,lineHeight:1.55,marginBottom:6}}>
                       {/* current word (blank) + small entry box: pinned bottom-right */}
                       {!complete && (<>
@@ -9320,7 +9402,7 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
   const [removed, setRemoved] = React.useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem("jtRemovedNames")||"[]")); } catch(e){ return new Set(); }
   });
-  const readPersonalCat = () => { try { const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return (Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():""})).filter(x=>x.n); } catch(e){ return []; } };
+  const readPersonalCat = () => { try { const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]"); return (Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():"", _pc:it.q, _b:it.boostTs||0, _w:mtBoostWeight(it)})).filter(x=>x.n).flatMap(x=>Array(Math.max(1,Math.round(x._w))).fill(x)); } catch(e){ return []; } };
   const [personal, setPersonal] = React.useState(readPersonalCat);
   const [srcH, setSrcH] = React.useState(() => { try { const v=localStorage.getItem("jtSrcH"); return v===null?true:v==="1"; } catch(e){ return true; } });
   const [srcP, setSrcP] = React.useState(() => { try { const v=localStorage.getItem("jtSrcP"); return v===null?true:v==="1"; } catch(e){ return true; } });
@@ -9703,6 +9785,14 @@ function NameOfJesusChip({count=0, initials="", onAddLook=()=>{}, onOpenReader=(
                 <button key={key} onClick={()=>{ const map={h:srcH,p:srcP,c:srcC}; const othersOn=Object.keys(map).filter(k=>k!==key).some(k=>map[k]); if(on&&!othersOn) return; const v=!on; setter(v); setNIdx(0); setCIdx(0); setPresentIdx(0); setForced(null); try{localStorage.setItem(lk,v?"1":"0");}catch(e){} wakeControls(); }}
                   style={{flexShrink:0,padding:"0 9px",height:38,borderRadius:10,fontSize:12,fontWeight:700,cursor:"pointer",lineHeight:1,whiteSpace:"nowrap",border:`1px solid ${on?C.gold:C.border}`,background:on?"rgba(212,160,23,0.15)":"transparent",color:on?C.gold:C.textMid}}>{on?"✓ ":""}{l}</button>
               ))}
+              {pItem && pItem._pc!=null && (()=>{ const active=(pItem._b||0) && (Date.now()-pItem._b < 7*86400000);
+                return <button onClick={()=>{ try{ const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]");
+                      const next=(Array.isArray(a)?a:[]).map(it=> (parseInt(it.q,10)===parseInt(pItem._pc,10)) ? {...it, boostTs: active?0:Date.now()} : it);
+                      localStorage.setItem("jtPersonalCatechism", JSON.stringify(next));
+                      localStorage.setItem("jtPersonalCatechismTs", String(Date.now()));
+                      window.dispatchEvent(new Event("jtPersonalCatechismChanged")); }catch(e){}
+                    wakeControls(); }}
+                  style={{...pCtrl, color:active?C.gold:pCtrl.color, borderColor:active?C.gold:undefined}}>{active?"⭐":"☆"}</button>; })()}
               <button onClick={()=>{setFont(pFont-2);wakeControls();}} style={pCtrl}>A−</button>
               <button onClick={()=>{setFont(pFont+2);wakeControls();}} style={pCtrl}>A+</button>
               <PColor C={C} value={slideColor} onChange={pickSlideColor} onWake={wakeControls} recents={recentColors}
@@ -10969,7 +11059,8 @@ function JesusNameBubble({ C }) {
   const srcH=localStorage.getItem("jtSrcH")!=="0", srcP=localStorage.getItem("jtSrcP")!=="0", srcC=localStorage.getItem("jtSrcC")!=="0";
   const personalNames=(()=>{try{
     const a=JSON.parse(localStorage.getItem("jtPersonalCatechism")||"[]");
-    return (Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():""})).filter(x=>x.n);
+    return (Array.isArray(a)?a:[]).map(it=>({n:String(it.answer||it.question||"").trim(), a:(it.question&&it.answer)?String(it.question).trim():"", _w:mtBoostWeight(it)})).filter(x=>x.n)
+      .flatMap(x=>Array(Math.max(1,Math.round(x._w))).fill(x));
   }catch(e){return [];}})();
   const slides=(()=>{ const g=[]; if(srcH&&typeof JESUS_NAMES!=="undefined")g.push(JESUS_NAMES); if(srcC&&typeof IN_CHRIST!=="undefined")g.push(IN_CHRIST); if(srcP&&personalNames.length)g.push(personalNames);
     if(!g.length) return (typeof JESUS_NAMES!=="undefined"?JESUS_NAMES:[{n:"",a:""}]);
@@ -11429,6 +11520,10 @@ function CatechismEditor({ C, onClose=()=>{} }) {
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
                   <span style={{fontSize:12,fontWeight:800,color:C.textFaint}}>Q{it.q}</span>
                   <span style={{flex:1}}/>
+                  {(()=>{ const active=(it.boostTs||0) && (Date.now()-it.boostTs < 7*86400000);
+                    return <button onClick={()=>{ const next=items.map((x,xi)=> xi===i ? {...x, boostTs: active?0:Date.now()} : x); commit(next); }}
+                      title={active?"Boosted — fades over 7d (tap to clear)":"Show more often for a week"}
+                      style={{background:active?"rgba(212,160,23,0.15)":"transparent",border:`1px solid ${active?C.gold:C.border}`,borderRadius:8,color:active?C.gold:C.textFaint,fontSize:13,fontWeight:800,cursor:"pointer",padding:"4px 9px",whiteSpace:"nowrap"}}>{active?"⭐":"☆"}</button>; })()}
                   <button onClick={()=>toggleReview(i)} style={{background:inReview?"rgba(127,119,221,0.12)":"transparent",border:`1px solid ${inReview?"#7F77DD":C.border}`,borderRadius:8,color:inReview?"#7F77DD":C.textFaint,fontSize:11,fontWeight:800,cursor:"pointer",padding:"5px 10px",whiteSpace:"nowrap"}}>{inReview?"✓ In review":"+ Add to review"}</button>
                   <button onClick={()=>del(i)} title="Delete" style={{background:"transparent",border:`1px solid ${C.border}`,borderRadius:8,color:"#e07a5f",fontSize:13,fontWeight:800,cursor:"pointer",padding:"5px 9px"}}>🗑</button>
                 </div>
@@ -13897,7 +13992,32 @@ export default function App() {
                                 if(!cnt) return null; return tot/cnt; })()}
                               onSlotTap={handleSlotTap}/>
 
-                            
+                            {(()=>{ // wavy 7-day trend ring (inner)
+                              const days=[]; for(let i=6;i>=0;i--){ const d=new Date(today+"T00:00:00"); d.setDate(d.getDate()-i);
+                                const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+                                days.push((entries[iso]||[]).reduce((t,e)=>t+(e.minutes||0),0)); }
+                              const mx=Math.max(1,...days);
+                              if (days.every(v=>v===0)) return null;
+                              const cx=arcSize/2, cy=arcSize/2, base=arcSize*0.27, amp=arcSize*0.11;
+                              const pts=days.map((v,i)=>{ const a=(-90 + i*(360/7))*Math.PI/180; const rr=base+amp*(v/mx);
+                                return [cx+rr*Math.cos(a), cy+rr*Math.sin(a)]; });
+                              const P=(k)=>pts[(k+pts.length)%pts.length];
+                              let d="M"+P(0)[0].toFixed(1)+" "+P(0)[1].toFixed(1);
+                              for(let i2=0;i2<pts.length;i2++){
+                                const p0=P(i2-1),p1=P(i2),p2=P(i2+1),p3=P(i2+2);
+                                const c1=[p1[0]+(p2[0]-p0[0])/6, p1[1]+(p2[1]-p0[1])/6];
+                                const c2=[p2[0]-(p3[0]-p1[0])/6, p2[1]-(p3[1]-p1[1])/6];
+                                d+=` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ${c2[1].toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+                              }
+                              const tp=pts[6];
+                              return (
+                                <svg width={arcSize} height={arcSize} viewBox={`0 0 ${arcSize} ${arcSize}`}
+                                  style={{position:"absolute",inset:0,pointerEvents:"none",zIndex:3}}>
+                                  <path d={d} fill="none" stroke="rgba(212,160,23,0.45)" strokeWidth="1.6"/>
+                                  <circle cx={tp[0]} cy={tp[1]} r="3" fill="#d4a017"/>
+                                </svg>
+                              ); })()}
+
                             {badgeData.map(({icon,mins,border,bg,color,angleDeg,slot})=>{
                               const rad = angleDeg * Math.PI / 180;
                               const DIAG = {morning:-135, midday:-45, evening:135};
