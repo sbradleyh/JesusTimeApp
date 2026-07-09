@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v491";
+const APP_VERSION = "v493";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5953,21 +5953,41 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     verseStartRef.current = Date.now(); verseDoneRef.current = null; } };
   const revElapsed = () => rev ? Date.now()-rev.start : 0;
   const fmtEl = ms => { const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
-  // Auto-count all time in Bible Memory (page + review) into one counter
+  // Auto-count all time in Bible Memory into ONE growing entry; a minute logs the moment it accrues
   const memPageSec = React.useRef(0);
   const flushMemPage = React.useRef(null);
   const [, setMemTimerTick] = React.useState(0);
+  const memBump = React.useRef(null);
   React.useEffect(()=>{
-    const tick = setInterval(()=>{
-      if (document.visibilityState==="visible") { memPageSec.current += 1; setMemTimerTick(x=>x+1); }
-    }, 1000);
-    const flush = () => {
-      let sec = memPageSec.current; memPageSec.current = 0;
-      try { sec += parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; } catch(e){}
-      const mins = Math.floor(sec/60);
-      try { localStorage.setItem("jtMemPageSec", String(sec - mins*60)); } catch(e){}
-      if (mins >= 1) addEntry(mins, {dur:`${mins}m`, notes:"#Bible_Memory", time:nowTimeStr()}, today);
+    // absorb any carried-over seconds from previous visits
+    try { memPageSec.current += parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; localStorage.setItem("jtMemPageSec","0"); } catch(e){}
+    const bump = () => {
+      let ref=null; try{ ref=JSON.parse(localStorage.getItem("jtMemAutoEntry")||"null"); }catch(e){}
+      setEntries(prev=>{
+        const list=[...((prev[today])||[])];
+        let updated=false;
+        if (ref && ref.day===today) {
+          for (let i=0;i<list.length;i++){ if(list[i].ts===ref.ts){ list[i]={...list[i], minutes:(list[i].minutes||0)+1}; updated=true; break; } }
+        }
+        if (!updated) {
+          const ts=Date.now();
+          list.push({ts, minutes:1, notes:"#Bible_Memory", time:nowTimeStr()});
+          try{ localStorage.setItem("jtMemAutoEntry", JSON.stringify({day:today, ts})); }catch(e){}
+        }
+        const next={...prev, [today]:list.sort((a,b)=>a.ts-b.ts)};
+        persist(next);
+        return next;
+      });
     };
+    memBump.current = bump;
+    const tick = setInterval(()=>{
+      if (document.visibilityState==="visible") {
+        memPageSec.current += 1;
+        if (memPageSec.current >= 60) { memPageSec.current -= 60; try{ memBump.current&&memBump.current(); }catch(e){} }
+        setMemTimerTick(x=>x+1);
+      }
+    }, 1000);
+    const flush = () => { try { localStorage.setItem("jtMemPageSec", String(memPageSec.current)); } catch(e){} memPageSec.current=0; };
     flushMemPage.current = flush;
     const onVis = () => { if (document.visibilityState==="hidden") flush(); };
     document.addEventListener("visibilitychange", onVis);
@@ -6138,9 +6158,9 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     setRevType(t => {
       let n = t.n, draft = val, lvl = t.revealLvl||0, miss = t.wordMiss||0, errors = t.errors||0, hints = t.hints||0, hinted = t.hinted;
       const grew = val.length > (t.draft||"").length;
-      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;   // given/letterless words are free
+      while (n < words.length && !revLetters(words[n])) n++;   // only letterless tokens are free
       while (n < words.length) {
-        if ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n])) { n++; continue; }
+        if (!revLetters(words[n])) { n++; continue; }
         const target = revLetters(words[n]); const typed = revLetters(draft);
         if (!typed) break;
         if (!target.startsWith(typed)) break;                // wrong letters → hold (shown red)
@@ -6148,7 +6168,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         if (typed.length >= need) { n++; draft=""; lvl=0; miss=0; }
         else break;
       }
-      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;   // trailing free words
+      while (n < words.length && !revLetters(words[n])) n++;   // trailing letterless tokens
       const finalRound = !plan || plan.round >= plan.total-1;
       if (n >= words.length && !finalRound) {
         const key = String(cur.id||"x")+"|"+plan.round;
@@ -6173,7 +6193,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     const plan = planFor(cur, (rev && rev.round)||0);
     if (revType.n < words.length) setRevType(t => {
       let n = t.n + 1;
-      while (n < words.length && ((plan && !plan.hiddenSet.has(n)) || !revLetters(words[n]))) n++;
+      while (n < words.length && !revLetters(words[n])) n++;
       const finalRound = !plan || plan.round >= plan.total-1;
       if (n >= words.length && !finalRound) {
         const key = String(cur.id||"x")+"|"+plan.round;
@@ -6833,9 +6853,8 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         )}
 
         {cards.length > 0 && (()=>{
-          let carry=0; try{ carry=parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; }catch(e){}
           const loggedM=(entries[today]||[]).reduce((t,e)=>t+((/#Bible_Memory/i.test(e.notes||""))?(e.minutes||0):0),0);
-          const secT=loggedM*60 + carry + memPageSec.current;
+          const secT=loggedM*60 + memPageSec.current;
           const timerStr=`${Math.floor(secT/60)}:${String(secT%60).padStart(2,"0")}`;
           const nNew  = cards.filter(c=>(c.level||0)===0).length;
           const nLrn  = cards.filter(c=>(c.level||0)>=1 && (c.level||0)<=2).length;
@@ -7155,7 +7174,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
             const finalRound = !plan || plan.round >= plan.total-1;
             const complete = !!cur.text && n >= words.length && finalRound;
             const roundDone = !!cur.text && plan && n >= words.length && !finalRound;
-            const nextHid = (()=>{ if(!plan) return -1; for(const i of plan.hidden){ if(i>=n) return i; } return -1; })();
+            const nextHid = n;
             const target = (cur.text && !complete) ? revLetters(words[n]) : "";
             const typedNow = revLetters(revType.draft);
             const mismatch = !!revType.draft && !!target && !target.startsWith(typedNow);
@@ -7220,6 +7239,11 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                       </div>
                     )}
                     <div style={{flexGrow:1,flexShrink:1,minHeight:0,overflowY:"auto",padding:"2px 2px 8px"}}>
+                      {plan && !complete && (
+                        <div style={{textAlign:"center",fontSize:12,fontWeight:700,color:C.textFaint,marginBottom:6}}>
+                          Type each blank\u2019s next letter \u00b7 tap the underlined blank for a hint
+                        </div>
+                      )}
                       {plan && (
                         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                           <span style={{fontSize:11.5,fontWeight:800,color:C.textFaint,letterSpacing:"0.05em"}}>ROUND {plan.round+1}/{plan.total}</span>
@@ -7230,10 +7254,12 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                         </div>
                       )}
                       {plan && (
-                        <div style={{fontSize:revFont,lineHeight:1.75,fontWeight:600,textAlign:"left"}}>
+                        <div onClick={()=>{ try{ const ta=document.querySelector("textarea[data-form-type=other]"); ta&&ta.focus(); }catch(e){} }} style={{fontSize:revFont,lineHeight:1.75,fontWeight:600,textAlign:"center"}}>
                           {words.slice(0, plan.showEnd+1).map((w,i)=>{
                             const hid=plan.hiddenSet.has(i);
-                            if(!hid || !revLetters(w)) return <span key={i} style={{color:i<refCnt?C.gold:C.text,fontWeight:i<refCnt?800:600}}>{w}{" "}</span>;
+                            const isCur = i===n && !complete;
+                            if(!hid || !revLetters(w)) return <span key={i} style={{color:i<refCnt?C.gold:C.text,fontWeight:i<refCnt?800:600,
+                              borderBottom:isCur?`2px solid ${mismatch?C.red:PU}`:"none"}}>{w}{" "}</span>;
                             if(i<n)  return <span key={i} style={{color:PU}}>{w}{" "}</span>;
                             const isNext = i===nextHid;
                             const lvl = isNext ? (revType.revealLvl||0) : 0;
@@ -7241,7 +7267,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                               <span key={i}
                                 onClick={e=>{ e.stopPropagation(); if(isNext) setRevType(t=>({...t, revealLvl:(t.revealLvl||0)+1, hints:(t.hints||0)+1, hinted:true})); }}
                                 style={{display:"inline-block",minWidth:Math.max(16, Math.round(w.length*revFont*0.4)),
-                                  borderBottom:`2px solid ${isNext?PU:"rgba(127,119,221,0.35)"}`,
+                                  borderBottom:`2px solid ${isNext?(mismatch?C.red:PU):"rgba(127,119,221,0.35)"}`,
                                   color:C.textFaint,margin:"0 5px 2px 0",cursor:isNext?"pointer":"default",fontStyle:"italic"}}>
                                 {lvl>0 ? w.slice(0, Math.min(lvl, w.length)) : "\u00a0"}
                               </span>
@@ -7253,8 +7279,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                       {roundDone && <div style={{marginTop:10,fontSize:14,fontWeight:800,color:"#4ade80"}}>✓ Round complete — a little more from memory{"\u2026"}</div>}
                     </div>
                     <div style={{flexShrink:0,display:"flex",flexDirection:"row-reverse",flexWrap:"wrap-reverse",justifyContent:"flex-start",alignContent:"flex-end",alignItems:"flex-end",gap:"2px 7px",width:"100%",fontSize:revFont,lineHeight:1.55,marginBottom:6}}>
-                      {/* current word (blank) + small entry box: pinned bottom-right */}
-                      {!complete && (<>
+                      {!complete && (
                         <textarea value={revType.draft} onChange={e=>revOnType(e.target.value)} autoFocus rows={1}
                           onClick={e=>e.stopPropagation()}
                           inputMode="text" enterKeyHint="done"
@@ -7262,29 +7287,9 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                           onFocus={()=>{ const ih=window.innerHeight; setTimeout(()=>{ const vv=window.visualViewport; if(!vv || (ih - vv.height) < 90) setKbOverlay(true); }, 650); }}
                           data-1p-ignore="true" data-lpignore="true" data-form-type="other"
                           onKeyDown={e=>{ if(e.key==="Enter") e.preventDefault(); }}
-                          placeholder="type…"
-                          style={{flex:"0 0 74px",minWidth:0,boxSizing:"border-box",resize:"none",overflow:"hidden",whiteSpace:"nowrap",
-                            height:34,lineHeight:"18px",fontFamily:"inherit",
-                            padding:"6px 8px",borderRadius:9,textAlign:"left",
-                            border:`2px solid ${mismatch?C.red:C.borderHi}`,background:mismatch?"rgba(220,80,80,0.10)":C.inputBg,
-                            color:C.text,fontSize:16,fontWeight:600,outline:"none"}}/>
-                        <span ref={revWordRef} onClick={e=>{e.stopPropagation();revFill();}} title="Tap to fill this word"
-                          style={{whiteSpace:"nowrap",cursor:"pointer",fontStyle:"italic",fontWeight:800,padding:"0 1px",alignSelf:"center",
-                            color:mismatch?C.red:PU,borderBottom:`2px solid ${mismatch?C.red:PU}`}}>
-                          {revType.draft
-                            ? revType.draft
-                            : (revType.reveal||revType.showAll)
-                              ? <span style={{color:C.textFaint,fontWeight:600}}>{words[n]}</span>
-                              : (revType.revealLvl>0)
-                                ? <span><span style={{color:C.textFaint,fontWeight:600}}>{words[n].slice(0,revType.revealLvl)}</span>{revType.revealLvl < words[n].length ? blank(words[n].slice(revType.revealLvl)) : null}</span>
-                                : blank(words[n])}</span>
-                      </>)}
-                      {/* completed words, most-recent first -> flow left; older rows wrap UP */}
-                      {Array.from({length:n},(_,k)=>{ const i=n-1-k; return (
-                        <span key={i} style={{color:C.text,fontWeight:600,whiteSpace:"nowrap"}}>{words[i]}</span>
-                      ); })}
-                      {/* reference -> rides at the very top */}
-                      {refLabel && <span style={{color:C.gold,fontWeight:800,whiteSpace:"nowrap"}}>{refLabel}</span>}
+                          style={{position:"absolute",width:2,height:2,opacity:0,padding:0,border:"none",outline:"none",
+                            background:"transparent",color:"transparent",caretColor:"transparent",resize:"none"}}/>
+                      )}
                     </div>
                   </>)) : (
                     <div style={{fontSize:13,color:C.textFaint,textAlign:"center",fontStyle:"italic"}}>
