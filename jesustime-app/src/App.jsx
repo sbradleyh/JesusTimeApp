@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v507";
+const APP_VERSION = "v509";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -699,6 +699,47 @@ function todayKey() {
 }
 function pct(m)  { return Math.min(100, Math.round((m/WAKE)*1000)/10); }
 function mtBoostWeight(it){ try{ if(!it||!it.boostTs) return 1; const age=Date.now()-it.boostTs; const W=7*86400000; if(age>=W) return 1; return 1 + 3*(1-age/W); }catch(e){ return 1; } }
+function usePageAutoTime({active=true, tag, autoKey, secKey, setEntries=null, persist=null, addEntry=null, today}){
+  const secRef = React.useRef(0);
+  const [, setTick] = React.useState(0);
+  const activeRef = React.useRef(!!active); activeRef.current = !!active;
+  const envRef = React.useRef({}); envRef.current = {setEntries, persist, addEntry, today, tag, autoKey};
+  React.useEffect(()=>{
+    try { secRef.current += parseInt(localStorage.getItem(secKey)||"0",10)||0; localStorage.setItem(secKey,"0"); } catch(e){}
+    const bump = () => {
+      const {setEntries, persist, addEntry, today, tag, autoKey} = envRef.current;
+      let ref=null; try{ ref=JSON.parse(localStorage.getItem(autoKey)||"null"); }catch(e){}
+      if (!setEntries) { addEntry && addEntry(1, {dur:"1m", notes:tag, time:nowTimeStr()}, today); return; }
+      setEntries(prev=>{
+        const list=[...((prev[today])||[])];
+        let upd=false;
+        if (ref && ref.day===today) {
+          for (let i=0;i<list.length;i++){ if(list[i].ts===ref.ts){ list[i]={...list[i], minutes:(list[i].minutes||0)+1}; upd=true; break; } }
+        }
+        if (!upd) {
+          const ts=Date.now();
+          list.push({ts, minutes:1, notes:tag, time:nowTimeStr()});
+          try{ localStorage.setItem(autoKey, JSON.stringify({day:today, ts})); }catch(e){}
+        }
+        const next={...prev, [today]:list.sort((a,b)=>a.ts-b.ts)};
+        persist && persist(next);
+        return next;
+      });
+    };
+    const t = setInterval(()=>{
+      if (document.visibilityState==="visible" && activeRef.current) {
+        secRef.current += 1;
+        if (secRef.current >= 60) { secRef.current -= 60; try{ bump(); }catch(e){} }
+        setTick(x=>x+1);
+      }
+    }, 1000);
+    const flush = () => { try{ localStorage.setItem(secKey, String(secRef.current)); }catch(e){} secRef.current=0; };
+    const onVis = () => { if (document.visibilityState==="hidden") flush(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", onVis); flush(); };
+  }, []); // eslint-disable-line
+  return secRef;
+}
 function openBibleRef(v){ try{ localStorage.setItem("jtReaderBibleRef", String(v).replace(/_/g," ")); window.dispatchEvent(new Event("jtGoReader")); }catch(e){} }
 function fmtM(m) {
   if (!m) return ":00";
@@ -912,7 +953,7 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
                   e.stopPropagation();
                   const tag=`#Prayed_${item.ts}`;
                   const notes=item.text?`${tag} ${item.text.slice(0,60)}`:tag;
-                  await addEntry(1,{dur:"1m",notes,time:nowTimeStr()},today);
+                  await addEntry(0,{dur:"0m",notes,time:nowTimeStr()},today);
                 }}
                   onTouchStart={e=>e.stopPropagation()} onTouchMove={e=>e.stopPropagation()} onTouchEnd={e=>e.stopPropagation()}
                   title="Mark prayed today"
@@ -975,7 +1016,7 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
                     if(mins>0){
                       const tag=`#Prayed_${item.ts}`;
                       const notes=editText.trim()?`${tag} ${editText.trim().slice(0,60)}`:tag;
-                      await addEntry(mins,{dur:`${mins}m`,notes,time:nowTimeStr()},today);
+                      await addEntry(0,{dur:"0m",notes,time:nowTimeStr()},today);
                       setEditMins("");
                     }
                   }
@@ -1007,6 +1048,7 @@ function PrayerCard({item, type, isOpen, expanded, setExpanded, markAnswered, de
 }
 
 function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persist}) {
+  const praySec = usePageAutoTime({active:true, tag:"#Prayed", autoKey:"jtPrayAutoEntry", secKey:"jtPraySec", setEntries, persist, addEntry, today});
   const [period, setPeriod] = React.useState("all");
   const [expanded, setExpanded] = React.useState({});
   const [showAdd, setShowAdd] = React.useState(false);
@@ -1162,12 +1204,13 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
       </div>
     <div style={{overflowX:"hidden",width:"100%"}}>
       {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Prayed/i.test(e.notes||""))?(e.minutes||0):0),0);
-        return m>0 ? (
+        const sec=m*60 + praySec.current;
+        return (
           <div style={{display:"flex",justifyContent:"flex-end",marginBottom:4}}>
             <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
-              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(m)} today</span>
+              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")} today</span>
           </div>
-        ) : null; })()}
+        ); })()}
       <div style={{display:"flex",gap:8,marginBottom:10}}>
         <button onClick={()=>{ setSessOpen(true); setSessStep(0); setSessStart(Date.now()); }}
           style={{flex:1,padding:"9px 4px",borderRadius:11,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>▶ Prayer Session</button>
@@ -1225,7 +1268,7 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
         ];
         const [t,body]=STEPS[sessStep];
         const finish=async()=>{ const mins=Math.max(1,Math.round((Date.now()-sessStart)/60000));
-          await addEntry(mins,{dur:`${mins}m`,notes:"#Prayed #Session",time:nowTimeStr()},today);
+          await addEntry(0,{dur:"0m",notes:"#Prayed #Session",time:nowTimeStr()},today);
           setSessOpen(false); };
         return (
           <div style={{position:"fixed",inset:0,zIndex:950,background:"rgba(0,0,0,0.75)",display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -4379,7 +4422,7 @@ function NamesCard({item, isOpen, setExpanded, deleteEntry, setEntries, persist,
     // Every 10 names reviewed = 1 min of time with Jesus
     const tk = todayKey();
     const prior = (entries[tk]||[]).filter(en=>/#Names_Review_\d+/i.test(en.notes||"")).length;
-    const mins = ((prior + 1) % 10 === 0) ? 1 : 0;
+    const mins = 0;
     await addEntry(mins, {dur:`${mins}m`, notes:`#Names_Review_${item.ts}`, time:nowTimeStr()}, tk);
   };
 
@@ -5206,6 +5249,7 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     const t = setInterval(()=>setRevTick(x=>x+1), 1000);
     return ()=>clearInterval(t);
   }, [rev]);
+  const startRoundFor = (c) => Math.max(0, Math.min(5, ((c && c.step)||0) - 1));
   const startReview = (all=false) => {
     const pool = all ? cards : dueCards;
     if (!pool.length) return;
@@ -5599,7 +5643,7 @@ const REF_ABBR = {"Matthew":"Matt","Mark":"Mark","Luke":"Luke","John":"John","Ac
 
 
 let _drillConsumed = 0;   // survives remounts: drill opens only on new requests
-function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bibleView="read", onSwitchView=()=>{}, drillSignal=0, computeStreak=()=>0, starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{}, esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvChapter=()=>{}, loadEsvPassage=()=>{}, onOpenReader=()=>{}}) {
+function BibleModule({entries, addEntry, setEntries=null, persist=async()=>{}, today, workerUrl="", appToken="", bibleView="read", onSwitchView=()=>{}, drillSignal=0, computeStreak=()=>0, starredTags=[], onToggleStar=()=>{}, sharedTags=[], toggleSharedTag=()=>{}, esvChapCache={}, esvChapBusy="", esvChapErr="", loadEsvChapter=()=>{}, loadEsvPassage=()=>{}, onOpenReader=()=>{}}) {
   const BL = '#378ADD', PU = '#7F77DD';
 
   // ── Deep links (Bible.com USFM codes + Accordance) ──
@@ -5956,55 +6000,16 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
       byOldest(withText).forEach(c=>{ if(order.length<3 && !seen.has(c.id)){ order.push(c); seen.add(c.id); } });
       if (!order.length) return;
     }
-    setRev({seq:order, idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:0});
+    setRev({seq:order, idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:startRoundFor(order[0])});
     setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
     verseStartRef.current = Date.now(); verseDoneRef.current = null;
   };
-  const reviewCard = (c) => { if (c) { setRev({seq:[c], idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:0});
+  const reviewCard = (c) => { if (c) { setRev({seq:[c], idx:0, got:0, back:0, gradedTags:[], start:Date.now(), done:false, stage:1, round:startRoundFor(c)});
     setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
     verseStartRef.current = Date.now(); verseDoneRef.current = null; } };
   const revElapsed = () => rev ? Date.now()-rev.start : 0;
   const fmtEl = ms => { const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
-  // Auto-count all time in Bible Memory into ONE growing entry; a minute logs the moment it accrues
-  const memPageSec = React.useRef(0);
-  const flushMemPage = React.useRef(null);
-  const [, setMemTimerTick] = React.useState(0);
-  const memBump = React.useRef(null);
-  React.useEffect(()=>{
-    // absorb any carried-over seconds from previous visits
-    try { memPageSec.current += parseInt(localStorage.getItem("jtMemPageSec")||"0",10)||0; localStorage.setItem("jtMemPageSec","0"); } catch(e){}
-    const bump = () => {
-      let ref=null; try{ ref=JSON.parse(localStorage.getItem("jtMemAutoEntry")||"null"); }catch(e){}
-      setEntries(prev=>{
-        const list=[...((prev[today])||[])];
-        let updated=false;
-        if (ref && ref.day===today) {
-          for (let i=0;i<list.length;i++){ if(list[i].ts===ref.ts){ list[i]={...list[i], minutes:(list[i].minutes||0)+1}; updated=true; break; } }
-        }
-        if (!updated) {
-          const ts=Date.now();
-          list.push({ts, minutes:1, notes:"#Bible_Memory", time:nowTimeStr()});
-          try{ localStorage.setItem("jtMemAutoEntry", JSON.stringify({day:today, ts})); }catch(e){}
-        }
-        const next={...prev, [today]:list.sort((a,b)=>a.ts-b.ts)};
-        persist(next);
-        return next;
-      });
-    };
-    memBump.current = bump;
-    const tick = setInterval(()=>{
-      if (document.visibilityState==="visible") {
-        memPageSec.current += 1;
-        if (memPageSec.current >= 60) { memPageSec.current -= 60; try{ memBump.current&&memBump.current(); }catch(e){} }
-        setMemTimerTick(x=>x+1);
-      }
-    }, 1000);
-    const flush = () => { try { localStorage.setItem("jtMemPageSec", String(memPageSec.current)); } catch(e){} memPageSec.current=0; };
-    flushMemPage.current = flush;
-    const onVis = () => { if (document.visibilityState==="hidden") flush(); };
-    document.addEventListener("visibilitychange", onVis);
-    return () => { clearInterval(tick); document.removeEventListener("visibilitychange", onVis); flush(); };
-  }, []); // eslint-disable-line
+
   const [memStats, setMemStats] = React.useState(() => { try { return JSON.parse(localStorage.getItem("jtMemoryStats")||"null") || {reviews:0,perfect:0,errors:0,hints:0,memorized:0}; } catch(e){ return {reviews:0,perfect:0,errors:0,hints:0,memorized:0}; } });
   const bumpStats = p => setMemStats(s => { const n = {reviews:(s.reviews||0)+(p.reviews||0), perfect:(s.perfect||0)+(p.perfect||0), errors:(s.errors||0)+(p.errors||0), hints:(s.hints||0)+(p.hints||0), memorized:(s.memorized||0)+(p.memorized||0)}; try { localStorage.setItem("jtMemoryStats", JSON.stringify(n)); } catch(e){} return n; });
   const revGrade = ok => {
@@ -6016,6 +6021,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     let _sd = null;
     if (_completed) { const _miss=revType.errors||0, _hints=revType.hints||0, _t=verseTimeMs(); _sd={score:verseScore(_t,_miss,_hints), timeMs:_t, miss:_miss, hints:_hints}; }
     gradeCard(cur.id, ok, _sd);
+    try{ const _pl=planFor(cur, rev.round||0); saveStep(cur.id, _pl ? _pl.total-1 : 5); }catch(e){}
     const tag = (cur.bk && cur.ch && cur.v1)
       ? `#Bible_Memory_${tagBook(cur.bk)}-${cur.ch}:${cur.v1}${cur.v2>cur.v1?`-${cur.v2}`:""}` : null;
     const gradedTags = tag ? [...rev.gradedTags, tag] : rev.gradedTags;
@@ -6024,7 +6030,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
     if (isLast) {
       setRev(null);
     } else {
-      setRev(r => r ? {...r, idx:r.idx+1, stage:1, round:0, got, back, gradedTags} : r);
+      setRev(r => r ? {...r, idx:r.idx+1, stage:1, round:startRoundFor(r.seq[r.idx+1]), got, back, gradedTags} : r);
       setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0});
       verseStartRef.current = Date.now(); verseDoneRef.current = null;
     }
@@ -6072,7 +6078,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   const [memSsErr, setMemSsErr] = React.useState("");
   const memSsGo = d => { const n=cardsCount(); if(!n)return; setMemSsErr(""); setMemSs(s => s ? {idx:(s.idx + d + n) % n, show:false} : s); };
   // Move between cards during a review without grading (full-screen ‹ › arrows)
-  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:1, round:0}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
+  const revSkip = (d) => { setRev(r => { if(!r||r.done) return r; const ni=Math.max(0,Math.min(r.seq.length-1, r.idx+d)); return ni===r.idx?r:{...r, idx:ni, stage:1, round:startRoundFor(r.seq[ni])}; }); setRevType({n:0, draft:"", reveal:false, hinted:false, errors:0, hints:0, revealLvl:0, wordMiss:0}); };
   function cardsCount(){ return ((box && box.cards) || []).length; }
   const memSsFetch = async (card) => {
     if (!card || memSsBusy) return;
@@ -6146,26 +6152,29 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   React.useEffect(() => { if (revWordRef.current) { try { revWordRef.current.scrollIntoView({block:"nearest", behavior:"smooth"}); } catch(e){} } }, [revType.n]);
   const revLetters = w => (w||"").toLowerCase().replace(/[^a-z0-9\u00C0-\u024F]/g,"");
   const revAdvRef = React.useRef("");
+  const saveStep = (id, st) => { try {
+    saveBox({...box, cards: box.cards.map(c => c.id===id ? {...c, step: Math.max(0, Math.min(5, st))} : c)});
+  } catch(e){} };
   const revWords = (cur) => { const rw=String((cur&&cur.label)||"").trim(); const a=rw?rw.split(/\s+/):[]; return a.concat(String((cur&&cur.text)||"").split(/\s+/)); };
   const refTokCount = (cur) => { const rw=String((cur&&cur.label)||"").trim(); return rw? rw.split(/\s+/).length : 0; };
   const planFor = (cur, round) => {
     if (!cur || !cur.text) return null;
     const w = revWords(cur);
-    const chunks=[]; let st=0;
-    w.forEach((wd,i)=>{ if ((/[.,;:!?\u2014\u201d\u2019"]$/.test(wd) && i-st>=2) || i-st>=9) { chunks.push([st,i]); st=i+1; } });
-    if (st < w.length) chunks.push([st, w.length-1]);
-    const K = Math.max(1, chunks.length);
-    const total = K + 3;
+    const SEGS = 5;                                   // five 20% passes marching through the verse
+    const total = SEGS + 1;                           // + final 100% step
     const r = Math.min(round||0, total-1);
-    const showEnd = chunks[Math.min(K-1, r)][1];
-    const pct = r < K ? Math.min(40, 10 + r*10) : [55,70,85,100][Math.min(3, r-K)];
-    const idxs=[]; for(let i=0;i<=showEnd;i++) idxs.push(i);
-    let seed=0; const sid=String(cur.id||"x")+"|"+r;
-    for(let i=0;i<sid.length;i++) seed=(seed*31+sid.charCodeAt(i))>>>0;
-    const rnd=()=>{ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; };
-    const pool=[...idxs]; for(let i=pool.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
-    const nHide=Math.max(1, Math.round(idxs.length*pct/100));
-    const hidden=(pct>=100?idxs:pool.slice(0,nHide)).sort((a,b)=>a-b);
+    const showEnd = w.length - 1;                     // full verse always visible
+    const letterIdx = []; w.forEach((wd,i)=>{ if(/[a-zA-Z]/.test(wd)) letterIdx.push(i); });
+    let hidden;
+    if (r < SEGS) {
+      const n = letterIdx.length;
+      let a = Math.floor(r*n/SEGS), b = Math.floor((r+1)*n/SEGS);
+      if (b <= a) b = Math.min(n, a+1);
+      hidden = letterIdx.slice(a, b);
+    } else {
+      hidden = letterIdx.slice();
+    }
+    const pct = r < SEGS ? 20 : 100;
     return { showEnd, hidden, hiddenSet:new Set(hidden), round:r, total, pct };
   };
   const revOnType = (val) => {
@@ -6191,6 +6200,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         const key = String(cur.id||"x")+"|"+plan.round;
         if (revAdvRef.current !== key) {
           revAdvRef.current = key;
+          try{ saveStep(cur.id, plan.round + 1); }catch(e){}
           setTimeout(()=>{ setRev(r=>r?{...r, round:(r.round||0)+1}:r);
             setRevType(t2=>({...t2, n:0, draft:"", revealLvl:0, wordMiss:0, missedAt:null})); }, 420);
         }
@@ -6218,6 +6228,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
         const key = String(cur.id||"x")+"|"+plan.round;
         if (revAdvRef.current !== key) {
           revAdvRef.current = key;
+          try{ saveStep(cur.id, plan.round + 1); }catch(e){}
           setTimeout(()=>{ setRev(r=>r?{...r, round:(r.round||0)+1}:r);
             setRevType(t2=>({...t2, n:0, draft:"", revealLvl:0, wordMiss:0, missedAt:null})); }, 420);
         }
@@ -6397,6 +6408,14 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
 
   // Books-of-the-Bible drill: type the first 2 letters of each book in order
   const [drill, setDrill] = React.useState(null); // null | {list,label,idx,miss,input,wrong,hint,start,done}
+  const memPageSec = usePageAutoTime({
+    active: bibleView==="mem" && !(drill && drill.list),
+    tag:"#Bible_Memory", autoKey:"jtMemAutoEntry", secKey:"jtMemPageSec",
+    setEntries, persist, addEntry, today});
+  const bookSec = usePageAutoTime({
+    active: !!(drill && drill.list && !drill.done),
+    tag:"#Bible_Books", autoKey:"jtBooksAutoEntry", secKey:"jtBooksSec",
+    setEntries, persist, addEntry, today});
   const [, setDrillTick] = React.useState(0);
   React.useEffect(() => {
     if (!drill || drill.done || !drill.list) return;
@@ -6483,8 +6502,8 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
   });
   const finishDrill = async (log) => {
     if (log && drill && drill.idx > 0) {
-      const mins = Math.max(1, Math.round(drillElapsed()/60000));
-      await addEntry(mins, {dur:`${mins}m`,
+      const mins = 0;
+      await addEntry(0, {dur:"0m",
         notes:`#Bible_Books ${drill.label} drill · ${drill.idx}/${drill.list.length} books · ${drill.miss} miss${drill.miss===1?"":"es"} · ${drill.hints||0} hint${(drill.hints||0)===1?"":"s"}`,
         time:nowTimeStr()}, today);
       // Record bests only on full completion
@@ -6966,7 +6985,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
           {!drill.list && (()=>{ const dDone=(entries[today]||[]).some(e=>/#Bible_Books\b/.test(e.notes||"")); const dStreak=computeStreak("Bible_Books",entries,today);
             const dMins=(entries[today]||[]).reduce((t,e)=>t+((/#Bible_Books\b/.test(e.notes||""))?(e.minutes||0):0),0); return (
             <div style={{display:"flex",justifyContent:"center",flexShrink:0,padding:"0 16px 6px"}}>
-              {dMins>0 && <span style={{alignSelf:"center",marginRight:8,fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(dMins)} today</span>}
+              {(()=>{ const sec=dMins*60 + bookSec.current; return <span style={{alignSelf:"center",marginRight:8,fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")} today</span>; })()}
               <div style={{display:"inline-flex",alignItems:"center",gap:8,padding:"8px 16px",borderRadius:16,border:`1px solid ${dDone?C.chipHi:`rgba(${C.ink},0.15)`}`,background:C.chipShell}}>
                 <span style={{fontSize:22}}>📚</span>
                 <span style={{fontSize:13,fontWeight:700,color:dDone?C.chipHi:`rgba(${C.ink},0.4)`,letterSpacing:"0.05em"}}>Books Drill</span>
@@ -7292,7 +7311,7 @@ function BibleModule({entries, addEntry, today, workerUrl="", appToken="", bible
                             return (
                               <span key={i}
                                 onClick={e=>{ e.stopPropagation(); if(isNext) setRevType(t=>({...t, revealLvl:(t.revealLvl||0)+1, hints:(t.hints||0)+1, hinted:true})); }}
-                                style={{display:"inline-block",minWidth:Math.max(16, Math.round(w.length*revFont*0.4)),
+                                style={{display:"inline-block",minWidth:"3ch",textAlign:"center",
                                   borderBottom:`2px solid ${isNext?(mismatch?C.red:PU):"rgba(127,119,221,0.35)"}`,
                                   color:C.textFaint,margin:"0 5px 2px 0",cursor:isNext?"pointer":"default",fontStyle:"italic"}}>
                                 {lvl>0 ? w.slice(0, Math.min(lvl, w.length)) : "\u00a0"}
@@ -10184,6 +10203,7 @@ function Look4JesusTracker({entries, setEntries=()=>{}, persist=()=>{}, addEntry
 }
 
 function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persist}) {
+  const namesSec = usePageAutoTime({active:true, tag:"#Names_Review", autoKey:"jtNamesAutoEntry", secKey:"jtNamesSec", setEntries, persist, addEntry, today});
   const [expanded, setExpanded] = React.useState({});
   const [search, setSearch] = React.useState("");
   const [showSearch, setShowSearch] = React.useState(false);
@@ -10370,12 +10390,13 @@ function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persis
   return (
     <div style={{paddingTop:16}}>
       {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Names_Review/i.test(e.notes||""))?(e.minutes||0):0),0);
-        return m>0 ? (
+        const sec=m*60 + namesSec.current;
+        return (
           <div style={{display:"flex",justifyContent:"flex-end",padding:"0 52px 4px 12px"}}>
             <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
-              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {fmtM(m)} today</span>
+              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")} today</span>
           </div>
-        ) : null; })()}
+        ); })()}
       <div style={{position:"absolute",top:9,right:12,zIndex:11}}>
         <button onClick={()=>setShowSearch(s=>!s)} title="Search & add names"
           style={{height:32,padding:"0 10px",borderRadius:9,border:`1.5px solid ${showSearch?C.gold:C.borderHi}`,
@@ -14494,7 +14515,7 @@ export default function App() {
                       )}
                       {activeMainTab === "bible" && bibleChosen && (
                         <div style={{overflowX:"hidden",width:"100%",padding:"0 4px"}}>
-                          <BibleModule entries={entries} addEntry={addEntry} today={today} workerUrl={workerUrl||""} appToken={appToken||""}
+                          <BibleModule entries={entries} addEntry={addEntry} setEntries={setEntries} persist={persist} today={today} workerUrl={workerUrl||""} appToken={appToken||""}
                             esvChapCache={esvChapCache} esvChapBusy={esvChapBusy} esvChapErr={esvChapErr} loadEsvChapter={loadEsvChapter} loadEsvPassage={loadEsvPassage}
                             bibleView={bibleView} onSwitchView={saveBibleView} drillSignal={drillSignal}
                             computeStreak={computeStreak} starredTags={starredTags}
