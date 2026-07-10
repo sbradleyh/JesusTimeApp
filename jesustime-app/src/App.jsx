@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v509";
+const APP_VERSION = "v512";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -1203,17 +1203,13 @@ function PrayerTracker({entries, addEntry, deleteEntry, today, setEntries, persi
         </button>
       </div>
     <div style={{overflowX:"hidden",width:"100%"}}>
-      {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Prayed/i.test(e.notes||""))?(e.minutes||0):0),0);
-        const sec=m*60 + praySec.current;
-        return (
-          <div style={{display:"flex",justifyContent:"flex-end",marginBottom:4}}>
-            <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
-              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")} today</span>
-          </div>
-        ); })()}
       <div style={{display:"flex",gap:8,marginBottom:10}}>
         <button onClick={()=>{ setSessOpen(true); setSessStep(0); setSessStart(Date.now()); }}
           style={{flex:1,padding:"9px 4px",borderRadius:11,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.10)",color:C.gold,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>▶ Prayer Session</button>
+        {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Prayed/i.test(e.notes||""))?(e.minutes||0):0),0);
+          const sec=m*60 + praySec.current;
+          return <span style={{alignSelf:"center",fontSize:12,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
+            borderRadius:9,padding:"3px 8px",background:"rgba(212,160,23,0.08)",flexShrink:0}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")}</span>; })()}
         <button onClick={()=>setStatsOpen(o=>!o)}
           style={{flexShrink:0,padding:"9px 14px",borderRadius:11,border:`1px solid ${statsOpen?C.gold:C.border}`,background:statsOpen?C.buttonActive:"transparent",color:statsOpen?C.gold:C.textFaint,fontSize:13.5,fontWeight:800,cursor:"pointer"}}>📊</button>
       </div>
@@ -5249,7 +5245,6 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
     const t = setInterval(()=>setRevTick(x=>x+1), 1000);
     return ()=>clearInterval(t);
   }, [rev]);
-  const startRoundFor = (c) => Math.max(0, Math.min(5, ((c && c.step)||0) - 1));
   const startReview = (all=false) => {
     const pool = all ? cards : dueCards;
     if (!pool.length) return;
@@ -5982,6 +5977,7 @@ function BibleModule({entries, addEntry, setEntries=null, persist=async()=>{}, t
     const t = setInterval(()=>setRevTick(x=>x+1), 1000);
     return ()=>clearInterval(t);
   }, [rev]);
+  const startRoundFor = (c) => Math.max(0, Math.min(5, ((c && c.step)||0) - 1));
   const startReview = (all=false) => {
     let order;
     if (all) {
@@ -10389,14 +10385,6 @@ function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persis
 
   return (
     <div style={{paddingTop:16}}>
-      {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Names_Review/i.test(e.notes||""))?(e.minutes||0):0),0);
-        const sec=m*60 + namesSec.current;
-        return (
-          <div style={{display:"flex",justifyContent:"flex-end",padding:"0 52px 4px 12px"}}>
-            <span style={{fontSize:12.5,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
-              borderRadius:10,padding:"3px 10px",background:"rgba(212,160,23,0.08)"}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")} today</span>
-          </div>
-        ); })()}
       <div style={{position:"absolute",top:9,right:12,zIndex:11}}>
         <button onClick={()=>setShowSearch(s=>!s)} title="Search & add names"
           style={{height:32,padding:"0 10px",borderRadius:9,border:`1.5px solid ${showSearch?C.gold:C.borderHi}`,
@@ -10409,6 +10397,10 @@ function NamesTracker({entries, addEntry, deleteEntry, today, setEntries, persis
         <div style={{fontSize:14,color:C.textMid}}>
           <strong style={{color:C.gold}}>{totalNames}</strong> names · <strong style={{color:"#60a060"}}>{reviewedTodayCount}</strong> reviewed today
           {todayTotal > 0 && <span style={{color:C.textFaint}}> ({todayTotal}×)</span>}
+          {(()=>{ const m=(entries[today]||[]).reduce((t,e)=>t+((/#Names_Review/i.test(e.notes||""))?(e.minutes||0):0),0);
+          const sec=m*60 + namesSec.current;
+          return <span style={{fontSize:12,fontWeight:800,color:C.gold,border:`1px solid rgba(212,160,23,0.4)`,
+            borderRadius:9,padding:"2px 8px",background:"rgba(212,160,23,0.08)",marginLeft:8,flexShrink:0}}>⏱ {Math.floor(sec/60)}:{String(sec%60).padStart(2,"0")}</span>; })()}
         </div>
       </div>
 
@@ -12888,6 +12880,21 @@ export default function App() {
       setSelectedFilterTags([TAB_DEFAULT_TAGS[t]]);
     }
   };
+  // After being away a while, reopening the app lands on the home page
+  React.useEffect(()=>{
+    let hiddenAt = null;
+    const onVis = () => {
+      if (document.visibilityState === "hidden") { hiddenAt = Date.now(); return; }
+      if (hiddenAt && Date.now() - hiddenAt > 5*60*1000) {
+        setActiveMainTab("today");
+        try { localStorage.setItem("jtMainTab","today"); } catch(e){}
+        try { window.scrollTo(0,0); } catch(e){}
+      }
+      hiddenAt = null;
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []); // eslint-disable-line
   React.useEffect(()=>{
     if (activeMainTab === "reader") {
       const has = (entries[today]||[]).some(e=>/#Reader\b/i.test(e.notes||""));
