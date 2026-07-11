@@ -5,7 +5,7 @@ const JESUS_ICON = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAA
 const RUNNER_ICON = "data:image/png;base64,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";
 
 // Bump this on every build so you can confirm the deployed version on-device.
-const APP_VERSION = "v516";
+const APP_VERSION = "v518";
 
 // ── Easy revert: set to false to restore original large circle + embedded stats ──
 const COMPACT_CIRCLE = false;
@@ -5228,7 +5228,8 @@ function CatechismModule({entries, addEntry, today, workerUrl="", appToken="", c
   const gradeCard = (cardId, ok) => {
     saveBox({...box, cards: box.cards.map(c => {
       if (c.id !== cardId) return c;
-      const level = Math.max(0, Math.min(3, c.level + (ok ? 1 : -1)));
+      let level = Math.max(0, Math.min(3, c.level + (ok ? 1 : -1)));
+      if (!ok && (c.level||0)===0 && sd && sd.timeMs > 60000) level = 1;   // a real minute of work moves New → Recent even on a rough pass
       return {...c, level, slot:slotFor(level, c.id), n:c.n+1, last:today};
     })});
   };
@@ -6458,6 +6459,49 @@ function BibleModule({entries, addEntry, setEntries=null, persist=async()=>{}, t
     const raw = ratio*1000 - (d.miss||0)*12 - (d.hints||0)*30 - timeSec/3;
     return Math.max(0, Math.round(raw));
   };
+  // ⏭ Next-Book game: shown a random book, type the letters of the one that follows
+  const [nbGame, setNbGame] = React.useState(null);
+  const [, setNbTick] = React.useState(0);
+  React.useEffect(()=>{
+    if (!nbGame || nbGame.done) return;
+    const t = setInterval(()=>setNbTick(x=>x+1), 500);
+    return ()=>clearInterval(t);
+  }, [nbGame && !nbGame.done]); // eslint-disable-line
+  const nbLetters = w => String(w||"").toLowerCase().replace(/[^a-z]/g,"");
+  const nbNewQ = (used) => { const max=ALL_BOOKS.length-1; let i;
+    do { i=Math.floor(Math.random()*max); } while (used && used.has(i) && used.size<max);
+    return i; };
+  const startNbGame = () => {
+    const used=new Set(); const first=nbNewQ(used); used.add(first);
+    setNbGame({qIdx:0,total:10,curIdx:first,used,typed:0,lvl:0,missRun:0,errors:0,hints:0,score:0,start:Date.now(),done:false,flashTs:0});
+  };
+  const nbOnType = (val) => {
+    setNbGame(g => {
+      if (!g || g.done) return g;
+      const ch = val.slice(-1).toLowerCase();
+      if (!/[a-z]/.test(ch)) return g;
+      const target = nbLetters(ALL_BOOKS[g.curIdx+1]);
+      const need = target[g.typed];
+      if (ch === need) {
+        const typed = g.typed+1;
+        const fullNeeded = Math.min(3, target.length);
+        if (typed < fullNeeded) return {...g, typed, missRun:0};
+        // question answered
+        if (g.qIdx+1 >= g.total) return {...g, typed, done:true, score:g.score+1, endMs:Date.now()-g.start};
+        const used=new Set(g.used); const nx=nbNewQ(used); used.add(nx);
+        return {...g, qIdx:g.qIdx+1, curIdx:nx, used, typed:0, lvl:0, missRun:0, score:g.score+1};
+      }
+      const missRun=(g.missRun||0)+1; let lvl=g.lvl, hints=g.hints, typed=g.typed;
+      if (missRun>=2) { lvl=lvl+1; hints=hints+1; typed=Math.min(nbLetters(ALL_BOOKS[g.curIdx+1]).length, g.typed+1); }
+      return {...g, errors:(g.errors||0)+1, missRun: missRun>=2?0:missRun, lvl, hints, typed, flashTs:Date.now()};
+    });
+  };
+  const finishNbGame = async (g) => {
+    const secs=Math.round((g.endMs||((Date.now())-g.start))/1000);
+    const mm=Math.floor(secs/60), ss=secs%60;
+    await addEntry(0,{dur:"0m",notes:`#Bible_Books next-book game · ${g.score}/${g.total} · ${mm}:${String(ss).padStart(2,"0")} · ${g.errors||0} miss${(g.errors||0)===1?"":"es"}${g.hints?` · ${g.hints} hint${g.hints===1?"":"s"}`:""}`,time:nowTimeStr()},today);
+    setNbGame(null);
+  };
   const startDrill = (label, list) => {
     // Open the keyboard inside the tap via the persistent hidden input (it stays mounted across
     // the picker -> drill transition, so the keyboard never drops). Focus then moves to the visible box.
@@ -6953,6 +6997,53 @@ function BibleModule({entries, addEntry, setEntries=null, persist=async()=>{}, t
       {bibleView==="read" && <BibleBooksPage entries={entries} addEntry={addEntry} today={today} hideSummary={true}/>}
 
       {/* ── Books drill overlay ── */}
+      {nbGame && (()=>{
+        const g=nbGame;
+        const promptBook=ALL_BOOKS[g.curIdx];
+        const answer=ALL_BOOKS[g.curIdx+1];
+        const tletters=nbLetters(answer);
+        const needN=Math.min(3, tletters.length);
+        const secs=Math.round(((g.done?(g.endMs||0):(Date.now()-g.start)))/1000);
+        const mm=Math.floor(secs/60), ss=secs%60;
+        const flash=g.flashTs && (Date.now()-g.flashTs<600);
+        return (
+          <div style={{position:"fixed",inset:0,zIndex:100000,background:C.bg,display:"flex",flexDirection:"column",
+              paddingTop:"env(safe-area-inset-top)"}}
+            onClick={()=>{ try{ const ta=document.getElementById("nbGameInput"); ta&&ta.focus(); }catch(e){} }}>
+            <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px"}}>
+              <span style={{fontSize:13,fontWeight:800,color:C.textFaint}}>Q {Math.min(g.qIdx+1,g.total)}/{g.total}</span>
+              <span style={{fontSize:13,fontWeight:800,color:"#4ade80"}}>✓ {g.score}</span>
+              <span style={{marginLeft:"auto",fontSize:14,fontWeight:800,color:PU}}>⏱ {mm}:{String(ss).padStart(2,"0")}</span>
+              <button onClick={e=>{ e.stopPropagation(); setNbGame(null); }}
+                style={{width:34,height:34,borderRadius:9,border:`1px solid ${C.border}`,background:"transparent",color:C.textFaint,fontSize:15,cursor:"pointer"}}>✕</button>
+            </div>
+            {!g.done ? (
+              <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:18,padding:"0 20px 12vh"}}>
+                <div style={{fontSize:13.5,fontWeight:700,color:C.textFaint,textAlign:"center"}}>Which book comes after…</div>
+                <div style={{fontSize:34,fontWeight:900,color:C.gold,textAlign:"center",lineHeight:1.2}}>{promptBook}</div>
+                <div style={{fontSize:26,fontWeight:800,letterSpacing:"0.12em",color:PU,
+                    borderBottom:`3px solid ${flash?C.red:PU}`,padding:"2px 14px",minWidth:120,textAlign:"center",fontStyle:"italic"}}>
+                  {tletters.slice(0,g.typed) || "\u00a0"}
+                </div>
+                <div style={{fontSize:12,fontWeight:700,color:C.textFaint,textAlign:"center"}}>type the first {needN} letters · miss twice and one fills in</div>
+                <textarea id="nbGameInput" autoFocus rows={1} value="" onChange={e=>nbOnType(e.target.value)}
+                  autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+                  data-1p-ignore="true" data-lpignore="true" data-form-type="other"
+                  onKeyDown={e=>{ if(e.key==="Enter") e.preventDefault(); }}
+                  style={{position:"absolute",width:2,height:2,opacity:0,border:"none",outline:"none",background:"transparent",color:"transparent",caretColor:"transparent",resize:"none"}}/>
+              </div>
+            ) : (
+              <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"0 20px 10vh"}}>
+                <div style={{fontSize:40}}>🎉</div>
+                <div style={{fontSize:24,fontWeight:900,color:C.gold}}>{g.score}/{g.total}</div>
+                <div style={{fontSize:15,fontWeight:700,color:C.textMid}}>⏱ {mm}:{String(ss).padStart(2,"0")} · {g.errors||0} miss{(g.errors||0)===1?"":"es"}{g.hints?` · ${g.hints} hint${g.hints===1?"":"s"}`:""}</div>
+                <button onClick={e=>{ e.stopPropagation(); finishNbGame(g); }}
+                  style={{marginTop:8,padding:"12px 34px",borderRadius:12,border:`1px solid ${C.gold}`,background:"rgba(212,160,23,0.14)",color:C.gold,fontSize:16,fontWeight:800,cursor:"pointer"}}>Save & close</button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
       {drill && (
         <div style={{position:"fixed",top:(isTesla||drillKbOverlay)?0:(vvTop||0),left:0,right:0,
           height:(isTesla||drillKbOverlay)?"45vh":(vvH?`${vvH}px`:"var(--jt-vh,100dvh)"),maxHeight:(isTesla||drillKbOverlay)?"45vh":(vvH?`${vvH}px`:"var(--jt-vh,100dvh)"),
@@ -7024,6 +7115,15 @@ function BibleModule({entries, addEntry, setEntries=null, persist=async()=>{}, t
                 </div>
                 );
               })}
+              <div style={{width:"100%",maxWidth:340}}>
+                <button onClick={()=>{ setDrill(null); startNbGame(); }}
+                  style={{width:"100%",padding:"14px 16px",borderRadius:14,marginTop:2,
+                    border:`1px solid ${PU}`,background:"rgba(127,119,221,0.10)",
+                    color:PU,fontSize:19,fontWeight:800,cursor:"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+                  ⏭ Next-Book Game <span style={{fontSize:14,fontWeight:700,opacity:0.75}}>(10 Qs)</span>
+                </button>
+              </div>
             </div>
             <div style={{flexShrink:0,display:"flex",justifyContent:"center",padding:"10px 16px calc(10px + env(safe-area-inset-bottom))"}}>
               <button onClick={()=>setDrill(null)} title="Close"
